@@ -1,6 +1,5 @@
 ### IntelliJ IDEA
 .idea/
-!.idea/runConfigurations/
 .idea_modules/
 data/
 out/
