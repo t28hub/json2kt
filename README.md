@@ -1,5 +1,6 @@
 Json2Kotlin
 =====
+[![Build Project](https://github.com/t28hub/json2kotlin/actions/workflows/build.yml/badge.svg)](https://github.com/t28hub/json2kotlin/actions/workflows/build.yml)
 
 ## License
 
