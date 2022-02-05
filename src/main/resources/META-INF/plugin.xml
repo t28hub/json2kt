@@ -1,0 +1,20 @@
+<idea-plugin>
+    <id>io.t28.json2kotlin</id>
+    <name>Json2Kotlin</name>
+    <vendor email="t28oogle@gmail.com" url="https://github.com/t28hub">Tatsuya Maki</vendor>
+    <resource-bundle>messages.Json2KotlinBundle</resource-bundle>
+
+    <description>
+        <![CDATA[
+        JSON to Kotlin data classes conversion plugin for IntelliJ IDEA.
+        ]]>
+    </description>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+    </extensions>
+
+    <actions>
+    </actions>
+</idea-plugin>
