@@ -16,6 +16,7 @@
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     alias(deps.plugins.intellij)
+    alias(deps.plugins.kotlin.jvm)
 }
 
 group = "io.t28.json2kotlin"
@@ -29,9 +30,42 @@ repositories {
 intellij {
     pluginName.set("Json2Kotlin")
     version.set("2021.3.2")
+    plugins.addAll(
+        "com.intellij.java",
+        "org.jetbrains.kotlin"
+    )
 }
 
 tasks {
+    val javaVersion = "${JavaVersion.VERSION_11}"
+    compileKotlin {
+        sourceCompatibility = javaVersion
+        targetCompatibility = javaVersion
+        kotlinOptions {
+            jvmTarget = javaVersion
+            freeCompilerArgs = listOf("-Xopt-in=kotlin.RequiresOptIn")
+        }
+    }
+
+    compileTestKotlin {
+        sourceCompatibility = javaVersion
+        targetCompatibility = javaVersion
+        kotlinOptions {
+            jvmTarget = javaVersion
+            freeCompilerArgs = listOf("-Xopt-in=kotlin.RequiresOptIn")
+        }
+    }
+
+    compileJava {
+        sourceCompatibility = javaVersion
+        targetCompatibility = javaVersion
+    }
+
+    compileTestJava {
+        sourceCompatibility = javaVersion
+        targetCompatibility = javaVersion
+    }
+
     runIde {
         autoReloadPlugins.set(true)
     }
