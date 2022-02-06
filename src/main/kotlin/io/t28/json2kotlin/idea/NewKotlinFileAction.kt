@@ -17,13 +17,14 @@ package io.t28.json2kotlin.idea
 
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import io.t28.json2kotlin.idea.ui.NewKotlinFileDialog
 import io.t28.json2kotlin.idea.util.getProjectRootManager
 import io.t28.json2kotlin.idea.util.ideView
 import io.t28.json2kotlin.idea.util.isAvailable
 import org.jetbrains.kotlin.idea.KotlinIcons
 
 /**
- * Action class for creating a Kotlin file from JSON or JSON Schenma
+ * Action class for creating a Kotlin file from JSON or JSON Schema.
  */
 class NewKotlinFileAction : AnAction(KotlinIcons.FILE) {
     override fun actionPerformed(e: AnActionEvent) {
@@ -32,9 +33,15 @@ class NewKotlinFileAction : AnAction(KotlinIcons.FILE) {
             return
         }
 
+        val dialog = NewKotlinFileDialog(project)
+        if (!dialog.showAndGet()) {
+            return
+        }
+        val state = dialog.getInputState()
+
         Notifications.info(
-            title = Json2KotlinBundle.message("plugin.name"),
-            content = "Json to Kotlin classes conversion plugin for IntelliJ IDEA",
+            title = message("plugin.name"),
+            content = "Input state:$state",
         ).notify(project)
     }
 
