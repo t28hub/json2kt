@@ -15,8 +15,7 @@
   -->
 
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Run IDE with plugin" type="GradleRunConfiguration" factoryName="Gradle">
-    <log_file alias="idea.log" path="$PROJECT_DIR$/build/idea-sandbox/system/log/idea.log" />
+  <configuration default="false" name="Bundle the plugin as a distribution" type="GradleRunConfiguration" factoryName="Gradle">
     <ExternalSystemSettings>
       <option name="executionName" />
       <option name="externalProjectPath" value="$PROJECT_DIR$" />
@@ -27,7 +26,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value="runIde" />
+          <option value="buildPlugin" />
         </list>
       </option>
       <option name="vmOptions" />

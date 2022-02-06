@@ -24,9 +24,16 @@ private const val BUNDLE = "messages.Json2KotlinBundle"
 /**
  * Resource bundle for Json2Kotlin plugin.
  */
-object Json2KotlinBundle : AbstractBundle(BUNDLE) {
-    @Nls
-    fun message(@PropertyKey(resourceBundle = BUNDLE) key: String, vararg args: Any): String {
-        return getMessage(key, *args)
-    }
+object Json2KotlinBundle : AbstractBundle(BUNDLE)
+
+/**
+ * Retrieve a message from resource bundle.
+ *
+ * @param key Property key defined in [BUNDLE] file.
+ * @param args Arguments referenced by the format.
+ */
+@Nls
+fun message(@PropertyKey(resourceBundle = BUNDLE) key: String, vararg args: Any): String {
+    "".format()
+    return Json2KotlinBundle.getMessage(key, *args)
 }

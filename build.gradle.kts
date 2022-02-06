@@ -26,6 +26,11 @@ repositories {
     mavenCentral()
 }
 
+dependencies {
+    implementation(deps.kotlin.stdlib)
+    implementation(deps.kotlin.reflect)
+}
+
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
     pluginName.set("Json2Kotlin")
