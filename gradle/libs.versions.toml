@@ -1,11 +1,19 @@
 [versions]
 intellij = "1.3.1"
+junit = "5.8.2"
 kotlin = "1.6.10"
+kotlinx-serialization = "1.3.2"
+truth = "1.1.3"
 
 [plugins]
 intellij = { id = "org.jetbrains.intellij", version.ref = "intellij" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 
 [libraries]
+junit = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+truth = { module = "com.google.truth:truth", version.ref = "truth" }

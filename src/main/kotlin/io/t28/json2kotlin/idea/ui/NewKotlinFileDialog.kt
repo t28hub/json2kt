@@ -21,9 +21,14 @@ import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.DialogWrapper
+import com.intellij.openapi.ui.InputValidatorEx
+import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.openapi.util.text.Strings
+import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.COLUMNS_SHORT
+import com.intellij.ui.dsl.builder.Cell
 import com.intellij.ui.dsl.builder.LabelPosition
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.RowLayout
@@ -33,9 +38,9 @@ import com.intellij.ui.dsl.builder.columns
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import com.intellij.ui.dsl.gridLayout.VerticalAlign
+import com.intellij.ui.layout.ValidationInfoBuilder
 import com.intellij.ui.layout.toBinding
 import io.t28.json2kotlin.idea.message
-import org.jetbrains.annotations.Nls
 import org.jetbrains.kotlin.idea.util.application.runReadAction
 import org.jetbrains.kotlin.idea.util.application.runWriteAction
 import javax.swing.JComponent
@@ -43,23 +48,26 @@ import javax.swing.JComponent
 @Suppress("UnstableApiUsage")
 class NewKotlinFileDialog(
     private val project: Project,
-    state: InputState = InputState.empty()
+    private val nameValidator: InputValidatorEx = ClassNameValidator(project),
+    initialState: InputState = InputState.empty()
 ) : DialogWrapper(project, true) {
     private val state: InputState
 
-    private lateinit var jsonEditor: Editor
+    private lateinit var textEditor: Editor
 
     init {
+        state = initialState.copy()
         title = message("action.new.file.dialog.title")
         isResizable = true
         setOKButtonText(message("action.new.file.dialog.button.ok"))
         setCancelButtonText(message("action.new.file.dialog.button.cancel"))
-        this.state = state.copy()
+
         init()
+        initValidation()
     }
 
     override fun createCenterPanel(): JComponent {
-        jsonEditor = EditorFactory.getInstance().let { factory ->
+        textEditor = EditorFactory.getInstance().let { factory ->
             val document = factory.createDocument(Strings.EMPTY_CHAR_SEQUENCE)
             val editor = factory.createEditor(document, project, JsonFileType.INSTANCE, false)
             editor.initialize()
@@ -67,7 +75,7 @@ class NewKotlinFileDialog(
 
         return panel {
             nameInputRow()
-            typeInputRow()
+            formatInputRow()
             textInputRow()
         }.apply {
             withMinimumWidth(MIN_DIALOG_WIDTH)
@@ -75,45 +83,98 @@ class NewKotlinFileDialog(
         }
     }
 
+    override fun doOKAction() {
+        val errors = doValidateAll()
+        if (errors.isNotEmpty()) {
+            return
+        }
+        super.doOKAction()
+    }
+
+    override fun dispose() {
+        if (!textEditor.isDisposed) {
+            EditorFactory.getInstance().releaseEditor(textEditor)
+        }
+        super.dispose()
+    }
+
+    fun getCurrentState(): InputState {
+        return state.copy()
+    }
+
     private fun Panel.nameInputRow() = row(message("action.new.file.dialog.name.title")) {
         textField().apply {
-            // Set Validation Input
             columns(COLUMNS_SHORT)
             bindText(state::name)
+
+            validationOnInput(::validateClassName)
+
             focused()
         }
     }.layout(RowLayout.PARENT_GRID)
 
-    fun getInputState(): InputState {
-        return state.copy()
-    }
+    private lateinit var formatComboBox: Cell<ComboBox<String>>
 
-    private fun Panel.typeInputRow() = row(message("action.new.file.dialog.type.title")) {
-        val items = InputType.values().map { type ->
+    private fun Panel.formatInputRow() = row(message("action.new.file.dialog.format.title")) {
+        val items = Format.values().map { type ->
             type.displayName()
         }.toTypedArray()
-        comboBox(items).apply {
-            bindItem(state::type)
+
+        formatComboBox = comboBox(items).apply {
+            bindItem(
+                getter = {
+                    state.format.displayName()
+                },
+                setter = { name ->
+                    state.format = name?.let {
+                        Format.findByDisplayName(it)
+                    } ?: Format.JSON
+                }
+            )
         }
     }.layout(RowLayout.PARENT_GRID)
 
     private fun Panel.textInputRow() = row {
-        cell(jsonEditor.component).apply {
+        cell(textEditor.component).apply {
             label(message("action.new.file.dialog.text.title"), LabelPosition.TOP)
+
             horizontalAlign(HorizontalAlign.FILL)
             verticalAlign(VerticalAlign.FILL)
             resizableColumn()
+
+            validationOnApply(::validateInputText)
+            validationOnInput(::validateInputText)
+
             bind(
                 componentGet = {
-                    runReadAction { jsonEditor.document.text }
+                    runReadAction { textEditor.document.text }
                 },
                 componentSet = { _, value ->
-                    runWriteAction { jsonEditor.document.setText(value) }
+                    runWriteAction { textEditor.document.setText(value) }
                 },
-                state::text.toBinding()
+                binding = state::content.toBinding()
             )
         }
     }.resizableRow()
+
+    private fun validateClassName(builder: ValidationInfoBuilder, textField: JBTextField): ValidationInfo? {
+        val className = textField.text.trim()
+        return nameValidator.getErrorText(className)?.let { message ->
+            builder.error(message)
+        }
+    }
+
+    @Suppress("UNUSED_PARAMETER")
+    private fun validateInputText(builder: ValidationInfoBuilder, component: JComponent): ValidationInfo? {
+        val inputText = runReadAction {
+            textEditor.document.text
+        }
+        val currentFormat = Format.findByDisplayName(formatComboBox.component.item)
+        val validator = currentFormat.inputValidator()
+        return validator.getErrorText(inputText)?.let { message ->
+            builder.error(message)
+        }
+    }
 
     companion object {
         private const val MIN_DIALOG_WIDTH = 600
@@ -145,29 +206,14 @@ class NewKotlinFileDialog(
 
     data class InputState(
         var name: String,
-        var type: String,
-        var text: String
+        var format: Format,
+        var content: String
     ) {
         companion object {
             fun empty(): InputState {
-                return InputState(name = "", type = "JSON", text = "")
+                return InputState(name = "", format = Format.JSON, content = "")
             }
         }
     }
 
-    enum class InputType {
-        JSON {
-            override fun displayName(): String {
-                return message("action.new.file.dialog.type.json")
-            }
-        },
-        JSON_SCHEMA {
-            override fun displayName(): String {
-                return message("action.new.file.dialog.type.jsonschema")
-            }
-        };
-
-        @Nls
-        abstract fun displayName(): String
-    }
 }

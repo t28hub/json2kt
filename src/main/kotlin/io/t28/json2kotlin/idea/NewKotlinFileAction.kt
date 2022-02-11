@@ -37,7 +37,7 @@ class NewKotlinFileAction : AnAction(KotlinIcons.FILE) {
         if (!dialog.showAndGet()) {
             return
         }
-        val state = dialog.getInputState()
+        val state = dialog.getCurrentState()
 
         Notifications.info(
             title = message("plugin.name"),

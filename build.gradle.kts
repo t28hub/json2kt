@@ -17,6 +17,7 @@
 plugins {
     alias(deps.plugins.intellij)
     alias(deps.plugins.kotlin.jvm)
+    alias(deps.plugins.kotlinx.serialization)
 }
 
 group = "io.t28.json2kotlin"
@@ -29,6 +30,11 @@ repositories {
 dependencies {
     implementation(deps.kotlin.stdlib)
     implementation(deps.kotlin.reflect)
+    implementation(deps.kotlinx.serialization.json)
+
+    testImplementation(deps.junit)
+    testImplementation(deps.kotlin.test)
+    testImplementation(deps.truth)
 }
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
@@ -69,6 +75,18 @@ tasks {
     compileTestJava {
         sourceCompatibility = javaVersion
         targetCompatibility = javaVersion
+    }
+
+    test {
+        useJUnitPlatform()
+
+        jvmArgs(
+            "--add-opens=java.base/java.io=ALL-UNNAMED",
+            "--add-opens=java.desktop/java.awt=ALL-UNNAMED",
+            "--add-opens=java.desktop/java.awt.event=ALL-UNNAMED",
+            "--add-opens=java.desktop/javax.swing=ALL-UNNAMED",
+            "--add-opens=java.desktop/sun.awt=ALL-UNNAMED",
+        )
     }
 
     runIde {
