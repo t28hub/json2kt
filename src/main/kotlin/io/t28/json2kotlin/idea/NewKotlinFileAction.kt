@@ -38,10 +38,12 @@ class NewKotlinFileAction : AnAction(KotlinIcons.FILE) {
             return
         }
         val state = dialog.getCurrentState()
+        val kotlin = Kotlinify.fromJson(state.content)
+            .toKotlin("", className = state.name)
 
         Notifications.info(
             title = message("plugin.name"),
-            content = "Input state:$state",
+            content = "'$state' to '$kotlin'",
         ).notify(project)
     }
 

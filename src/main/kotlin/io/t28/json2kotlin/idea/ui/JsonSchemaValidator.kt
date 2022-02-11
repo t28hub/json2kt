@@ -20,7 +20,6 @@ import io.t28.json2kotlin.idea.message
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.jsonObject
 
 /**
  * Implementation of [InputValidatorEx] for checking whether input string is valid JSON Schema.
