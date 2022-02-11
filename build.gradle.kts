@@ -31,6 +31,7 @@ dependencies {
     implementation(deps.kotlin.stdlib)
     implementation(deps.kotlin.reflect)
     implementation(deps.kotlinx.serialization.json)
+    implementation(deps.kotlinpoet)
 
     testImplementation(deps.junit)
     testImplementation(deps.kotlin.test)
