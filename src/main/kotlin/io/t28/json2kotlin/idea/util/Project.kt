@@ -17,7 +17,9 @@ package io.t28.json2kotlin.idea.util
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectRootManager
+import com.intellij.psi.PsiFileFactory
 import com.intellij.psi.PsiNameHelper
+import com.intellij.psi.codeStyle.CodeStyleManager
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
@@ -30,6 +32,20 @@ fun Project?.isAvailable(): Boolean {
         returns(true) implies (this@isAvailable != null)
     }
     return this != null && isInitialized && !isDisposed
+}
+
+/**
+ * Retrieve [CodeStyleManager] from current project.
+ */
+fun Project.getCodeStyleManager(): CodeStyleManager {
+    return CodeStyleManager.getInstance(this)
+}
+
+/**
+ * Retrieve [PsiFileFactory] from current project.
+ */
+fun Project.getPsiFileFactory(): PsiFileFactory {
+    return PsiFileFactory.getInstance(this)
 }
 
 /**

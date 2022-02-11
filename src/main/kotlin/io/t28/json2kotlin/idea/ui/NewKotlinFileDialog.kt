@@ -16,10 +16,15 @@
 package io.t28.json2kotlin.idea.ui
 
 import com.intellij.json.JsonFileType
+import com.intellij.json.JsonLanguage
+import com.intellij.openapi.actionSystem.AnAction
+import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.ex.EditorEx
+import com.intellij.openapi.keymap.KeymapUtil
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.DialogWrapper
@@ -40,9 +45,12 @@ import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import com.intellij.ui.dsl.gridLayout.VerticalAlign
 import com.intellij.ui.layout.ValidationInfoBuilder
 import com.intellij.ui.layout.toBinding
+import io.t28.json2kotlin.idea.command.ReformatCommand
 import io.t28.json2kotlin.idea.message
-import org.jetbrains.kotlin.idea.util.application.runReadAction
-import org.jetbrains.kotlin.idea.util.application.runWriteAction
+import io.t28.json2kotlin.idea.util.runReadAction
+import io.t28.json2kotlin.idea.util.runWriteAction
+import java.awt.event.ActionEvent
+import javax.swing.Action
 import javax.swing.JComponent
 
 @Suppress("UnstableApiUsage")
@@ -52,6 +60,16 @@ class NewKotlinFileDialog(
     initialState: InputState = InputState.empty()
 ) : DialogWrapper(project, true) {
     private val state: InputState
+
+    private var inputText: String
+        get() = runReadAction {
+            textEditor.document.text
+        }
+        set(value) = runWriteAction(project) {
+            with(textEditor.document) {
+                replaceString(0, textLength, value)
+            }
+        }
 
     private lateinit var textEditor: Editor
 
@@ -67,11 +85,7 @@ class NewKotlinFileDialog(
     }
 
     override fun createCenterPanel(): JComponent {
-        textEditor = EditorFactory.getInstance().let { factory ->
-            val document = factory.createDocument(Strings.EMPTY_CHAR_SEQUENCE)
-            val editor = factory.createEditor(document, project, JsonFileType.INSTANCE, false)
-            editor.initialize()
-        }
+        textEditor = createTextEditor()
 
         return panel {
             nameInputRow()
@@ -81,6 +95,16 @@ class NewKotlinFileDialog(
             withMinimumWidth(MIN_DIALOG_WIDTH)
             withMinimumHeight(MIN_DIALOG_HEIGHT)
         }
+    }
+
+    override fun createLeftSideActions(): Array<Action> {
+        return arrayOf(
+            object : DialogWrapperAction(message("action.new.file.dialog.button.format")) {
+                override fun doAction(e: ActionEvent) {
+                    performReformatAction()
+                }
+            }
+        )
     }
 
     override fun doOKAction() {
@@ -122,9 +146,7 @@ class NewKotlinFileDialog(
 
         formatComboBox = comboBox(items).apply {
             bindItem(
-                getter = {
-                    state.format.displayName()
-                },
+                getter = { state.format.displayName() },
                 setter = { name ->
                     state.format = name?.let {
                         Format.findByDisplayName(it)
@@ -146,16 +168,27 @@ class NewKotlinFileDialog(
             validationOnInput(::validateInputText)
 
             bind(
-                componentGet = {
-                    runReadAction { textEditor.document.text }
-                },
-                componentSet = { _, value ->
-                    runWriteAction { textEditor.document.setText(value) }
-                },
+                componentGet = { inputText },
+                componentSet = { _, value -> inputText = value },
                 binding = state::content.toBinding()
             )
         }
     }.resizableRow()
+
+    private fun createTextEditor(): Editor {
+        val factory = EditorFactory.getInstance()
+        val document = factory.createDocument(Strings.EMPTY_CHAR_SEQUENCE)
+        return factory.createEditor(document, project, JsonFileType.INSTANCE, false).apply {
+            // Register a shortcut for 'Reformat Code'
+            val shortcutSet = KeymapUtil.getActiveKeymapShortcuts(IdeActions.ACTION_EDITOR_REFORMAT)
+            val action = object : AnAction() {
+                override fun actionPerformed(e: AnActionEvent) {
+                    performReformatAction()
+                }
+            }
+            action.registerCustomShortcutSet(shortcutSet, component)
+        }.initialize()
+    }
 
     private fun validateClassName(builder: ValidationInfoBuilder, textField: JBTextField): ValidationInfo? {
         val className = textField.text.trim()
@@ -166,13 +199,20 @@ class NewKotlinFileDialog(
 
     @Suppress("UNUSED_PARAMETER")
     private fun validateInputText(builder: ValidationInfoBuilder, component: JComponent): ValidationInfo? {
-        val inputText = runReadAction {
-            textEditor.document.text
-        }
         val currentFormat = Format.findByDisplayName(formatComboBox.component.item)
         val validator = currentFormat.inputValidator()
         return validator.getErrorText(inputText)?.let { message ->
             builder.error(message)
+        }
+    }
+
+    private fun performReformatAction() {
+        try {
+            val reformatted = ReformatCommand(project, inputText, JsonLanguage.INSTANCE).execute()
+            inputText = reformatted
+        } catch (e: Throwable) {
+            // TODO: Report an error
+            e.printStackTrace()
         }
     }
 
@@ -215,5 +255,4 @@ class NewKotlinFileDialog(
             }
         }
     }
-
 }
