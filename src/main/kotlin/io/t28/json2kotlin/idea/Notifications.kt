@@ -53,7 +53,7 @@ class Notifications internal constructor(
     /**
      * Notify a notification.
      *
-     * @param project Current project
+     * @param project Current project.
      */
     fun notify(project: Project?) {
         val notificationGroup = NotificationGroupManager.getInstance().getNotificationGroup(GROUP_ID)
