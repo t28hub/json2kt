@@ -17,6 +17,7 @@ package io.t28.json2kotlin.idea.util
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectRootManager
+import com.intellij.psi.PsiNameHelper
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
@@ -32,7 +33,14 @@ fun Project?.isAvailable(): Boolean {
 }
 
 /**
- * Get [ProjectRootManager] from current project.
+ * Retrieve [PsiNameHelper] from current project.
+ */
+fun Project.getPsiNameHelper(): PsiNameHelper {
+    return PsiNameHelper.getInstance(this)
+}
+
+/**
+ * Retrieve [ProjectRootManager] from current project.
  */
 fun Project.getProjectRootManager(): ProjectRootManager {
     return ProjectRootManager.getInstance(this)
