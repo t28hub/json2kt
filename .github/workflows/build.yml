@@ -13,7 +13,7 @@ on:
       - '*.txt'
 
 jobs:
-  test:
+  check:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -29,6 +29,10 @@ jobs:
           distribution: 'adopt'
           cache: gradle
 
+      # Run static code analysis in project
+      - name: Run static code analysis
+        run: ./gradlew detekt --parallel
+
       # Run all tests in project
       - name: Run all tests
         run: ./gradlew test --parallel
@@ -43,9 +47,9 @@ jobs:
             ${{ github.workspace }}/kotlinify-idea-plugin/build/reports/tests
         if: ${{ always() }}
 
-      # Collect test reports from all modules
-      - name: Collect test reports
-        run: ./gradlew koverCollectReports
+      # Collect detekt and kover reports from all modules
+      - name: Collect reports
+        run: ./gradlew detektMergeReports koverCollectReports --parallel
 
       # Upload coverage reports
       - name: Upload coverage reports
@@ -56,9 +60,9 @@ jobs:
         if: ${{ always() }}
 
   build-core:
-    needs: [ test ]
+    needs: [ check ]
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       # Check out current repository
       - name: Checkout repository
@@ -73,7 +77,7 @@ jobs:
         run: ./gradlew :kotlinify-core:build
 
   build-idea-plugin:
-    needs: [ test ]
+    needs: [ check ]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:

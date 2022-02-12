@@ -30,6 +30,9 @@ internal class KotlinifyTest {
 
         // Assert
         assertThat(actual).isEqualTo("""
+            // {
+            //   "name": "Alice"
+            // }
             package io.t28.kotlinify.samples
 
             public class User

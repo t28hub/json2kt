@@ -30,6 +30,7 @@ sealed class Kotlinify {
     class KotlinBuilder internal constructor(private val content: String) {
         fun toKotlin(packageName: String, className: String): String {
             val fileSpec = FileSpec.builder(packageName = packageName, fileName = FILE_NAME).apply {
+                addComment(content)
                 indent("  ")
                 addType(TypeSpec.classBuilder(className).build())
             }.build()

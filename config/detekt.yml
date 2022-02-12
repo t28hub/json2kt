@@ -1,0 +1,50 @@
+build:
+  maxIssues: 0
+  excludeCorrectable: false
+
+config:
+  validation: true
+  excludes: ''
+
+processors:
+  active: true
+  exclude:
+    - 'DetektProgressListener'
+
+console-reports:
+  active: true
+  exclude:
+    - 'ProjectStatisticsReport'
+    - 'ComplexityReport'
+    - 'NotificationReport'
+    - 'FileBasedFindingsReport'
+
+output-reports:
+  active: true
+  exclude:
+    - 'TxtOutputReport'
+
+formatting:
+  active: false
+  autoCorrect: false
+
+style:
+  active: true
+  ForbiddenComment:
+    active: false
+  MaxLineLength:
+    active: false
+  ReturnCount:
+    active: true
+    max: 3
+    excludedFunctions: 'equals'
+    excludeLabeled: false
+    excludeReturnFromLambda: true
+    excludeGuardClauses: true
+  ThrowsCount:
+    active: true
+    max: 3
+    excludeGuardClauses: true
+  UnusedPrivateMember:
+    active: true
+    allowedNames: '(_|ignored|expected|serialVersionUID)'

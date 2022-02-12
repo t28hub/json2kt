@@ -33,7 +33,7 @@ object JsonValidator : InputValidatorEx {
 
         val json = try {
             Json.parseToJsonElement(input)
-        } catch (e: SerializationException) {
+        } catch (_: SerializationException) {
             return message("action.new.file.dialog.error.text.unparseable")
         }
 
