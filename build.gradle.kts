@@ -13,95 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import groovy.lang.MissingPropertyException
+import kotlin.jvm.Throws
+
+/**
+ * Retrieve a property by key as a String
+ *
+ * @param key Property key.
+ * @return Property value as a String.
+ * @throws MissingPropertyException Property key does not exist in properties.
+ */
+@Throws(MissingPropertyException::class)
+fun properties(key: String): String {
+    val property = project.findProperty(key)
+    return property?.toString() ?: throw MissingPropertyException("Property '$key' does not exist")
+}
+
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    alias(deps.plugins.intellij)
     alias(deps.plugins.kotlin.jvm)
-    alias(deps.plugins.kotlinx.serialization)
 }
 
-group = "io.t28.json2kotlin"
-version = "1.0-SNAPSHOT"
+allprojects {
+    group = properties("plugin.group")
+    version = properties("plugin.version")
 
-repositories {
-    mavenCentral()
+    repositories {
+        mavenCentral()
+    }
 }
 
-dependencies {
-    implementation(deps.kotlin.stdlib)
-    implementation(deps.kotlin.reflect)
-    implementation(deps.kotlinx.serialization.json)
-    implementation(deps.kotlinpoet)
-
-    testImplementation(deps.junit)
-    testImplementation(deps.kotlin.test)
-    testImplementation(deps.truth)
-}
-
-// See https://github.com/JetBrains/gradle-intellij-plugin/
-intellij {
-    pluginName.set("Json2Kotlin")
-    version.set("2021.3.2")
-    plugins.addAll(
-        "com.intellij.java",
-        "org.jetbrains.kotlin"
-    )
+subprojects {
+    apply(plugin = "org.jetbrains.kotlin.jvm")
 }
 
 tasks {
-    val javaVersion = "${JavaVersion.VERSION_11}"
-    compileKotlin {
-        sourceCompatibility = javaVersion
-        targetCompatibility = javaVersion
-        kotlinOptions {
-            jvmTarget = javaVersion
-            freeCompilerArgs = listOf("-Xopt-in=kotlin.RequiresOptIn")
-        }
-    }
-
-    compileTestKotlin {
-        sourceCompatibility = javaVersion
-        targetCompatibility = javaVersion
-        kotlinOptions {
-            jvmTarget = javaVersion
-            freeCompilerArgs = listOf("-Xopt-in=kotlin.RequiresOptIn")
-        }
-    }
-
-    compileJava {
-        sourceCompatibility = javaVersion
-        targetCompatibility = javaVersion
-    }
-
-    compileTestJava {
-        sourceCompatibility = javaVersion
-        targetCompatibility = javaVersion
-    }
-
-    test {
-        useJUnitPlatform()
-
-        jvmArgs(
-            "--add-opens=java.base/java.io=ALL-UNNAMED",
-            "--add-opens=java.desktop/java.awt=ALL-UNNAMED",
-            "--add-opens=java.desktop/java.awt.event=ALL-UNNAMED",
-            "--add-opens=java.desktop/javax.swing=ALL-UNNAMED",
-            "--add-opens=java.desktop/javax.swing.plaf.basic=ALL-UNNAMED",
-            "--add-opens=java.desktop/sun.awt=ALL-UNNAMED",
-            "--add-opens=java.desktop/sun.font=ALL-UNNAMED",
-        )
-    }
-
-    runIde {
-        autoReloadPlugins.set(true)
-    }
-
-    patchPluginXml {
-        changeNotes.set(
-            """
-            Add change notes here.<br>
-            <em>most HTML tags may be used</em>
-        """.trimIndent()
-        )
-    }
 }

@@ -13,12 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-rootProject.name = "kotlinify"
+package io.t28.kotlinify.idea
 
-include("kotlinify-core", "kotlinify-idea-plugin")
+import com.intellij.AbstractBundle
+import org.jetbrains.annotations.Nls
+import org.jetbrains.annotations.PropertyKey
 
-// https://docs.gradle.org/current/userguide/platforms.html
-enableFeaturePreview("VERSION_CATALOGS")
-dependencyResolutionManagement {
-    defaultLibrariesExtensionName.set("deps")
+private const val BUNDLE = "messages.KotlinifyBundle"
+
+/**
+ * Resource bundle for Kotlinify plugin.
+ */
+object KotlinifyBundle : AbstractBundle(BUNDLE)
+
+/**
+ * Retrieve a message from resource bundle.
+ *
+ * @param key Property key defined in [BUNDLE] file.
+ * @param args Arguments referenced by the format.
+ */
+@Nls
+fun message(@PropertyKey(resourceBundle = BUNDLE) key: String, vararg args: Any): String {
+    return KotlinifyBundle.getMessage(key, *args)
 }
