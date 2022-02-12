@@ -53,7 +53,7 @@ import java.awt.event.ActionEvent
 import javax.swing.Action
 import javax.swing.JComponent
 
-@Suppress("UnstableApiUsage")
+@Suppress("UnstableApiUsage", "TooManyFunctions")
 class NewKotlinFileDialog(
     private val project: Project,
     private val nameValidator: InputValidatorEx = ClassNameValidator(project),
@@ -210,9 +210,8 @@ class NewKotlinFileDialog(
         try {
             val reformatted = ReformatCommand(project, inputText, JsonLanguage.INSTANCE).execute()
             inputText = reformatted
-        } catch (e: Throwable) {
+        } catch (_: Throwable) {
             // TODO: Report an error
-            e.printStackTrace()
         }
     }
 

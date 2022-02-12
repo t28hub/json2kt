@@ -27,6 +27,7 @@ import kotlinx.serialization.json.JsonObject
 object JsonSchemaValidator : InputValidatorEx {
     private const val JSON_SCHEMA_KEYWORD = "\$schema"
 
+    @Suppress("ReturnCount")
     override fun getErrorText(input: String): String? {
         if (input.isEmpty()) {
             return message("action.new.file.dialog.error.text.empty")
@@ -34,7 +35,7 @@ object JsonSchemaValidator : InputValidatorEx {
 
         val json = try {
             Json.parseToJsonElement(input)
-        } catch (e: SerializationException) {
+        } catch (_: SerializationException) {
             return message("action.new.file.dialog.error.text.unparseable")
         }
 

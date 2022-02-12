@@ -14,8 +14,23 @@
  * limitations under the License.
  */
 import groovy.lang.MissingPropertyException
+import io.gitlab.arturbosch.detekt.Detekt
+import io.gitlab.arturbosch.detekt.extensions.DetektExtension
+import io.gitlab.arturbosch.detekt.report.ReportMergeTask
 import kotlin.jvm.Throws
 import kotlinx.kover.api.CoverageEngine
+
+@Suppress("DSL_SCOPE_VIOLATION")
+plugins {
+    alias(deps.plugins.detekt)
+    alias(deps.plugins.kotlin.jvm)
+    alias(deps.plugins.kotlinx.kover)
+}
+
+kover {
+    isDisabled = false
+    coverageEngine.set(CoverageEngine.JACOCO)
+}
 
 /**
  * Retrieve a property by key as a String
@@ -30,17 +45,6 @@ fun properties(key: String): String {
     return property?.toString() ?: throw MissingPropertyException("Property '$key' does not exist")
 }
 
-@Suppress("DSL_SCOPE_VIOLATION")
-plugins {
-    alias(deps.plugins.kotlin.jvm)
-    alias(deps.plugins.kotlinx.kover)
-}
-
-kover {
-    isDisabled = false
-    coverageEngine.set(CoverageEngine.JACOCO)
-}
-
 allprojects {
     group = properties("plugin.group")
     version = properties("plugin.version")
@@ -52,6 +56,7 @@ allprojects {
 
 subprojects {
     apply(plugin = "org.jetbrains.kotlin.jvm")
+    apply(plugin = "io.gitlab.arturbosch.detekt")
 
     tasks {
         val javaVersion = properties("java.version")
@@ -82,10 +87,48 @@ subprojects {
             sourceCompatibility = javaVersion
             targetCompatibility = javaVersion
         }
+
+        withType<Detekt>() {
+            reports {
+                xml.required.set(true)
+                html.required.set(false)
+                txt.required.set(false)
+                sarif.required.set(true)
+            }
+        }
+    }
+
+    configure<DetektExtension> {
+        buildUponDefaultConfig = true
+        config = files("$rootDir/config/detekt.yml")
+        source = files("src/main/kotlin", "src/test/kotlin")
     }
 }
 
 tasks {
+    register<ReportMergeTask>("detektMergeXmlReports") {
+        group = "verification"
+        description = "Merges XML reports from all subprojects in one directory."
+
+        input.from(subprojects.map { "${it.buildDir}/reports/detekt/detekt.xml" })
+        output.set(file("$buildDir/reports/detekt/detekt.xml"))
+    }
+
+    register<ReportMergeTask>("detektMergeSarifReports") {
+        group = "verification"
+        description = "Merges Sarif reports from all subprojects in one directory."
+
+        input.from(subprojects.map { "${it.buildDir}/reports/detekt/detekt.sarif" })
+        output.set(file("$buildDir/reports/detekt/detekt.sarif"))
+    }
+
+    register("detektMergeReports") {
+        group = "verification"
+        description = "Merges reports from all subprojects in one directory."
+
+        dependsOn("detektMergeXmlReports", "detektMergeSarifReports")
+    }
+
     koverCollectReports {
         outputDir.set(layout.buildDirectory.dir("reports/kover"))
     }
