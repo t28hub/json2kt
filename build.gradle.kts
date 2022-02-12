@@ -15,6 +15,7 @@
  */
 import groovy.lang.MissingPropertyException
 import kotlin.jvm.Throws
+import kotlinx.kover.api.CoverageEngine
 
 /**
  * Retrieve a property by key as a String
@@ -32,6 +33,12 @@ fun properties(key: String): String {
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     alias(deps.plugins.kotlin.jvm)
+    alias(deps.plugins.kotlinx.kover)
+}
+
+kover {
+    isDisabled = false
+    coverageEngine.set(CoverageEngine.JACOCO)
 }
 
 allprojects {
@@ -45,7 +52,41 @@ allprojects {
 
 subprojects {
     apply(plugin = "org.jetbrains.kotlin.jvm")
+
+    tasks {
+        val javaVersion = properties("java.version")
+        compileKotlin {
+            sourceCompatibility = javaVersion
+            targetCompatibility = javaVersion
+            kotlinOptions {
+                jvmTarget = javaVersion
+                freeCompilerArgs = listOf("-Xopt-in=kotlin.RequiresOptIn")
+            }
+        }
+
+        compileTestKotlin {
+            sourceCompatibility = javaVersion
+            targetCompatibility = javaVersion
+            kotlinOptions {
+                jvmTarget = javaVersion
+                freeCompilerArgs = listOf("-Xopt-in=kotlin.RequiresOptIn")
+            }
+        }
+
+        compileJava {
+            sourceCompatibility = javaVersion
+            targetCompatibility = javaVersion
+        }
+
+        compileTestJava {
+            sourceCompatibility = javaVersion
+            targetCompatibility = javaVersion
+        }
+    }
 }
 
 tasks {
+    koverCollectReports {
+        outputDir.set(layout.buildDirectory.dir("reports/kover"))
+    }
 }
