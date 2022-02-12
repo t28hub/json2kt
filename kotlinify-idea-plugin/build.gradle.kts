@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import kotlinx.kover.api.KoverTaskExtension
+
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     alias(deps.plugins.intellij)
@@ -41,35 +43,6 @@ intellij {
 }
 
 tasks {
-    val javaVersion = "${JavaVersion.VERSION_11}"
-    compileKotlin {
-        sourceCompatibility = javaVersion
-        targetCompatibility = javaVersion
-        kotlinOptions {
-            jvmTarget = javaVersion
-            freeCompilerArgs = listOf("-Xopt-in=kotlin.RequiresOptIn")
-        }
-    }
-
-    compileTestKotlin {
-        sourceCompatibility = javaVersion
-        targetCompatibility = javaVersion
-        kotlinOptions {
-            jvmTarget = javaVersion
-            freeCompilerArgs = listOf("-Xopt-in=kotlin.RequiresOptIn")
-        }
-    }
-
-    compileJava {
-        sourceCompatibility = javaVersion
-        targetCompatibility = javaVersion
-    }
-
-    compileTestJava {
-        sourceCompatibility = javaVersion
-        targetCompatibility = javaVersion
-    }
-
     test {
         useJUnitPlatform()
 
@@ -82,10 +55,25 @@ tasks {
             "--add-opens=java.desktop/sun.awt=ALL-UNNAMED",
             "--add-opens=java.desktop/sun.font=ALL-UNNAMED",
         )
+
+        configure<KoverTaskExtension> {
+            isEnabled = true
+            includes = listOf("io.t28.kotlinify.idea.*")
+            excludes = listOf(
+                "io.t28.kotlinify.idea.ui.*"
+            )
+        }
+        finalizedBy(koverReport)
     }
 
-    withType<Wrapper> {
-        gradleVersion = "7.3"
+    koverHtmlReport {
+        isEnabled = true
+        htmlReportDir.set(layout.buildDirectory.dir("reports/kover"))
+    }
+
+    koverXmlReport {
+        isEnabled = true
+        xmlReportFile.set(layout.buildDirectory.file("reports/kover/reports.xml"))
     }
 
     runIde {

@@ -2,6 +2,7 @@
 intellij = "1.3.1"
 junit = "5.8.2"
 kotlin = "1.6.10"
+kotlinx-kover = "0.5.0"
 kotlinx-serialization = "1.3.2"
 kotlinpoet = "1.10.2"
 truth = "1.1.3"
@@ -9,6 +10,7 @@ truth = "1.1.3"
 [plugins]
 intellij = { id = "org.jetbrains.intellij", version.ref = "intellij" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlinx-kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kotlinx-kover" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 
 [libraries]
