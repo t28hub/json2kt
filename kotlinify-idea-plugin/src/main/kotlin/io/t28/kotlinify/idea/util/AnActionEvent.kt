@@ -13,12 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-rootProject.name = "kotlinify"
+package io.t28.kotlinify.idea.util
 
-include("kotlinify-core", "kotlinify-idea-plugin")
+import com.intellij.ide.IdeView
+import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.LangDataKeys
 
-// https://docs.gradle.org/current/userguide/platforms.html
-enableFeaturePreview("VERSION_CATALOGS")
-dependencyResolutionManagement {
-    defaultLibrariesExtensionName.set("deps")
-}
+/**
+ * Retrieve [IdeView] if exists
+ */
+val AnActionEvent.ideView: IdeView?
+    get() {
+        return getData(LangDataKeys.IDE_VIEW)
+    }
