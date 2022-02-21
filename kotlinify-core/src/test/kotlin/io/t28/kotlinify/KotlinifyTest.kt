@@ -22,22 +22,46 @@ internal class KotlinifyTest {
     @Test
     fun `toKotlin should generate kotlin class`() {
         // Act
-        val actual = Kotlinify.fromJson("""
+        val actual = Kotlinify.fromJson(
+            """
             {
-              "name": "Alice"
+              "id": 1,
+              "login": "octocat",
+              "site_admin": false,
+              "plan": {
+                "name": "Medium",
+                "space": 400,
+                "private_repos": 20,
+                "collaborators": 0
+              }
             }
-        """.trimIndent()).toKotlin(packageName = "io.t28.kotlinify.samples", "User")
+        """.trimIndent()
+        ).toKotlin(packageName = "io.t28.kotlinify.samples", "User")
 
         // Assert
-        assertThat(actual).isEqualTo("""
+        assertThat(actual).isEqualTo(
+            """
             package io.t28.kotlinify.samples
 
+            import kotlin.Boolean
+            import kotlin.Int
             import kotlin.String
 
             public data class User(
-              public val name: String
+              public val id: Int,
+              public val login: String,
+              public val site_admin: Boolean,
+              public val plan: Plan
             )
 
-        """.trimIndent())
+            public data class Plan(
+              public val name: String,
+              public val space: Int,
+              public val private_repos: Int,
+              public val collaborators: Int
+            )
+
+        """.trimIndent()
+        )
     }
 }

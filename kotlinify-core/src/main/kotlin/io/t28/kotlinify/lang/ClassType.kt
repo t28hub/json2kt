@@ -13,13 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.t28.kotlinify.parser
 
-import io.t28.kotlinify.Element
-import kotlin.jvm.Throws
+package io.t28.kotlinify.lang
 
-interface Parser {
-    @Throws(ParseException::class)
-    fun parse(string: String): Element
-}
-
+class ClassType(
+    packageName: String,
+    vararg simpleNames: String,
+    isNullable: Boolean = false
+) : KType(packageName = packageName, simpleNames = simpleNames.toList(), isNullable)

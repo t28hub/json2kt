@@ -18,37 +18,47 @@ package io.t28.kotlinify
 import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.BOOLEAN
 import com.squareup.kotlinpoet.ClassName
-import com.squareup.kotlinpoet.DOUBLE
+import com.squareup.kotlinpoet.FLOAT
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
+import com.squareup.kotlinpoet.INT
 import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.LONG
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.STRING
+import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asTypeName
-import io.t28.kotlinify.parser.JsonParser
-import io.t28.kotlinify.parser.Parser
+import io.t28.kotlinify.parser.AnyType
+import io.t28.kotlinify.parser.ArrayType
+import io.t28.kotlinify.parser.BooleanType
+import io.t28.kotlinify.parser.ElementType
+import io.t28.kotlinify.parser.FloatType
+import io.t28.kotlinify.parser.IntType
+import io.t28.kotlinify.parser.JsonElementParser
+import io.t28.kotlinify.parser.NullType
+import io.t28.kotlinify.parser.ObjectElement
+import io.t28.kotlinify.parser.ObjectType
+import io.t28.kotlinify.parser.ScalarType
+import io.t28.kotlinify.parser.StringType
 
 object Kotlinify {
     fun fromJson(json: String): KotlinBuilder {
-        return KotlinBuilder(JsonParser(), json)
+        return KotlinBuilder(JsonElementParser(), json)
     }
 
     class KotlinBuilder internal constructor(
-        private val parser: Parser,
+        private val parser: JsonElementParser,
         private val content: String
     ) {
-        fun toKotlin(packageName: String, className: String): String {
-            val typeSpec = when (val element = parser.parse(content)) {
-                is ObjectElement -> write(packageName, className, element)
-                else -> throw IllegalArgumentException("Root content is invalid element '${element::class}'")
+        fun toKotlin(packageName: String, fileName: String): String {
+            val typeSpecs = parser.parse(content).map { element ->
+                write(packageName, element.name ?: fileName, element)
             }
 
-            val fileSpec = FileSpec.builder(packageName, className).apply {
-                addType(typeSpec)
+            val fileSpec = FileSpec.builder(packageName, fileName).apply {
+                typeSpecs.forEach(this::addType)
             }.build()
             return fileSpec.toString()
         }
@@ -59,23 +69,12 @@ object Kotlinify {
                     modifiers += KModifier.DATA
                 }
 
-                propertySpecs += element.properties.map { (name, property) ->
-                    val type = when (property) {
-                        is ArrayElement -> List::class.asTypeName().parameterizedBy(ANY)
-                        is ObjectElement -> ClassName(packageName = packageName, simpleNames = listOf(name))
-                        is PrimitiveElement -> when (property) {
-                            is BooleanElement -> BOOLEAN
-                            is LongElement -> LONG
-                            is NumberElement -> DOUBLE
-                            is StringElement -> STRING
-                            else -> ANY.copy(nullable = true)
-                        }
-                    }
-
-                    PropertySpec.builder(name, type).apply {
+                propertySpecs += element.properties.map { property ->
+                    val type = property.type.asTypeName(packageName)
+                    PropertySpec.builder(property.name, type).apply {
                         modifiers += KModifier.PUBLIC
                         mutable(false)
-                        initializer(name)
+                        initializer(property.name)
                     }.build()
                 }
 
@@ -86,5 +85,27 @@ object Kotlinify {
                 }.build())
             }.build()
         }
+    }
+
+    private fun ElementType.asTypeName(packageName: String): TypeName {
+        val type = when (this) {
+            is NullType -> ANY.copy(nullable = true)
+            is ArrayType -> List::class.asTypeName().parameterizedBy(type.asTypeName(packageName))
+            is ObjectType -> ClassName(packageName, names)
+            is ScalarType -> asTypeName()
+            else -> ANY
+        }
+        return type.copy(nullable = isNullable)
+    }
+
+    private fun ScalarType.asTypeName(): TypeName {
+        val type = when (this) {
+            is AnyType -> ANY
+            is BooleanType -> BOOLEAN
+            is IntType -> INT
+            is FloatType -> FLOAT
+            is StringType -> STRING
+        }
+        return type.copy(nullable = isNullable)
     }
 }
