@@ -30,26 +30,26 @@ import com.squareup.kotlinpoet.STRING
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asTypeName
-import io.t28.kotlinify.parser.AnyType
-import io.t28.kotlinify.parser.ArrayType
-import io.t28.kotlinify.parser.BooleanType
-import io.t28.kotlinify.parser.ElementType
-import io.t28.kotlinify.parser.FloatType
-import io.t28.kotlinify.parser.IntType
-import io.t28.kotlinify.parser.JsonElementParser
-import io.t28.kotlinify.parser.NullType
-import io.t28.kotlinify.parser.ObjectElement
-import io.t28.kotlinify.parser.ObjectType
-import io.t28.kotlinify.parser.ScalarType
-import io.t28.kotlinify.parser.StringType
+import io.t28.kotlinify.element.AnyType
+import io.t28.kotlinify.element.ArrayType
+import io.t28.kotlinify.element.BooleanType
+import io.t28.kotlinify.element.ElementType
+import io.t28.kotlinify.element.FloatType
+import io.t28.kotlinify.element.IntType
+import io.t28.kotlinify.parser.JsonParser
+import io.t28.kotlinify.element.NullType
+import io.t28.kotlinify.element.TypeElement
+import io.t28.kotlinify.element.ObjectType
+import io.t28.kotlinify.element.PrimitiveType
+import io.t28.kotlinify.element.StringType
 
 object Kotlinify {
     fun fromJson(json: String): KotlinBuilder {
-        return KotlinBuilder(JsonElementParser(), json)
+        return KotlinBuilder(JsonParser(), json)
     }
 
     class KotlinBuilder internal constructor(
-        private val parser: JsonElementParser,
+        private val parser: JsonParser,
         private val content: String
     ) {
         fun toKotlin(packageName: String, fileName: String): String {
@@ -63,14 +63,14 @@ object Kotlinify {
             return fileSpec.toString()
         }
 
-        private fun write(packageName: String, className: String, element: ObjectElement): TypeSpec {
+        private fun write(packageName: String, className: String, element: TypeElement): TypeSpec {
             return TypeSpec.classBuilder(className).apply {
                 if (element.properties.isNotEmpty()) {
                     modifiers += KModifier.DATA
                 }
 
                 propertySpecs += element.properties.map { property ->
-                    val type = property.type.asTypeName(packageName)
+                    val type = property.asType().asTypeName(packageName)
                     PropertySpec.builder(property.name, type).apply {
                         modifiers += KModifier.PUBLIC
                         mutable(false)
@@ -90,15 +90,15 @@ object Kotlinify {
     private fun ElementType.asTypeName(packageName: String): TypeName {
         val type = when (this) {
             is NullType -> ANY.copy(nullable = true)
-            is ArrayType -> List::class.asTypeName().parameterizedBy(type.asTypeName(packageName))
+            is ArrayType -> List::class.asTypeName().parameterizedBy(componentType.asTypeName(packageName))
             is ObjectType -> ClassName(packageName, names)
-            is ScalarType -> asTypeName()
+            is PrimitiveType -> asTypeName()
             else -> ANY
         }
         return type.copy(nullable = isNullable)
     }
 
-    private fun ScalarType.asTypeName(): TypeName {
+    private fun PrimitiveType.asTypeName(): TypeName {
         val type = when (this) {
             is AnyType -> ANY
             is BooleanType -> BOOLEAN

@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package io.t28.kotlinify.element
 
-package io.t28.kotlinify.lang
-
-sealed class KType(
-    val packageName: String,
-    val simpleNames: List<String>,
-    val isNullable: Boolean = false
-)
+/**
+ * Represents a null type.
+ */
+object NullType : ElementType {
+    override val isNullable: Boolean = true
+}

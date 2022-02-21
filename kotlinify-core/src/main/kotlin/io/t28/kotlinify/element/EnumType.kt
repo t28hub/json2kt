@@ -13,13 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.t28.kotlinify.lang
+package io.t28.kotlinify.element
 
-import kotlin.reflect.KVisibility
-
-data class KPropertyElement(
-    val visibility: KVisibility = KVisibility.PUBLIC,
-    val type: KType,
-    val name: String,
-    val mutable: Boolean = false
-)
+/**
+ * Represents an enum type.
+ *
+ *  @param names The names of enum.
+ *  @param values The values of enum.
+ */
+data class EnumType(
+    val names: List<String>,
+    val values: List<String>,
+    override val isNullable: Boolean = false
+) : ElementType

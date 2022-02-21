@@ -13,11 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package io.t28.kotlinify.element
 
-package io.t28.kotlinify.lang
-
-class ClassType(
-    packageName: String,
-    vararg simpleNames: String,
-    isNullable: Boolean = false
-) : KType(packageName = packageName, simpleNames = simpleNames.toList(), isNullable)
+/**
+ * Represents a primitive type.
+ */
+sealed interface PrimitiveType : ElementType

@@ -13,18 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.t28.kotlinify.lang
+package io.t28.kotlinify.element
 
-import kotlin.reflect.KVisibility
-
-data class KTypeElement(
-    val kind: Kind,
-    val name: String,
-    val visibility: KVisibility = KVisibility.PUBLIC,
-    val properties: List<KPropertyElement> = emptyList()
-) {
-    enum class Kind {
-        CLASS,
-        INTERFACE
-    }
-}
+/**
+ * Represents a float type.
+ */
+data class FloatType(
+    override val isNullable: Boolean = false
+) : PrimitiveType

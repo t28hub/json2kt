@@ -33,7 +33,15 @@ internal class KotlinifyTest {
                 "space": 400,
                 "private_repos": 20,
                 "collaborators": 0
-              }
+              },
+              "emails": [
+                {
+                  "email": "octocat@github.com",
+                  "verified": true,
+                  "primary": true,
+                  "visibility": "public"
+                }
+              ]
             }
         """.trimIndent()
         ).toKotlin(packageName = "io.t28.kotlinify.samples", "User")
@@ -46,12 +54,14 @@ internal class KotlinifyTest {
             import kotlin.Boolean
             import kotlin.Int
             import kotlin.String
+            import kotlin.collections.List
 
             public data class User(
               public val id: Int,
               public val login: String,
               public val site_admin: Boolean,
-              public val plan: Plan
+              public val plan: Plan,
+              public val emails: List<EmailsItem>
             )
 
             public data class Plan(
@@ -59,6 +69,13 @@ internal class KotlinifyTest {
               public val space: Int,
               public val private_repos: Int,
               public val collaborators: Int
+            )
+
+            public data class EmailsItem(
+              public val email: String,
+              public val verified: Boolean,
+              public val primary: Boolean,
+              public val visibility: String
             )
 
         """.trimIndent()
