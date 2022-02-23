@@ -16,14 +16,134 @@
 package io.t28.kotlinify
 
 import com.google.common.truth.Truth.assertThat
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 internal class KotlinifyTest {
-    @Test
-    fun `toKotlin should generate kotlin class`() {
-        // Act
-        val actual = Kotlinify.fromJson(
-            """
+    @Nested
+    inner class JsonTest {
+        @Test
+        fun `should generate a kotlin class from an empty array`() {
+            // Act
+            val actual = Kotlinify.fromJson("[]")
+                .toKotlin(packageName = "io.t28.kotlinify.samples", fileName = "EmptyArray")
+
+            // Assert
+            assertThat(actual).isEqualTo(
+                """
+            package io.t28.kotlinify.samples
+
+            import java.util.ArrayList
+            import kotlin.Any
+
+            public class EmptyArray : ArrayList<Any?>()
+
+            """.trimIndent()
+            )
+        }
+
+        @Test
+        fun `should generate a kotlin class from a primitive array`() {
+            // Act
+            val actual = Kotlinify.fromJson("[1, 2, 3]")
+                .toKotlin(packageName = "io.t28.kotlinify.samples", fileName = "PrimitiveArray")
+
+            // Assert
+            assertThat(actual).isEqualTo(
+                """
+            package io.t28.kotlinify.samples
+
+            import java.util.ArrayList
+            import kotlin.Int
+
+            public class PrimitiveArray : ArrayList<Int>()
+
+            """.trimIndent()
+            )
+        }
+
+        @Test
+        fun `should generate a kotlin class from an object array`() {
+            // Act
+            val actual = Kotlinify.fromJson(
+                // language=json
+                """
+                    [
+                      {
+                        "email": "octocat@octocat.org",
+                        "primary": false,
+                        "verified": false,
+                        "visibility": "public"
+                      }
+                    ]
+                """.trimIndent())
+                .toKotlin(packageName = "io.t28.kotlinify.samples", fileName = "Emails")
+
+            // Assert
+            assertThat(actual).isEqualTo(
+                """
+            package io.t28.kotlinify.samples
+
+            import java.util.ArrayList
+            import kotlin.Boolean
+            import kotlin.String
+
+            public class Emails : ArrayList<Emails_Item>()
+
+            public data class Emails_Item(
+              public val email: String,
+              public val primary: Boolean,
+              public val verified: Boolean,
+              public val visibility: String
+            )
+
+            """.trimIndent()
+            )
+        }
+
+        @Test
+        fun `should generate a kotlin class from a nested array`() {
+            // Act
+            val actual = Kotlinify.fromJson("[[[]]]")
+                .toKotlin(packageName = "io.t28.kotlinify.samples", fileName = "NestedArray")
+
+            // Assert
+            assertThat(actual).isEqualTo(
+                """
+            package io.t28.kotlinify.samples
+
+            import java.util.ArrayList
+            import kotlin.Any
+            import kotlin.collections.List
+
+            public class NestedArray : ArrayList<List<List<Any?>>>()
+
+            """.trimIndent()
+            )
+        }
+
+        @Test
+        fun `should generate a kotlin class from an empty object`() {
+            // Act
+            val actual = Kotlinify.fromJson("{}")
+                .toKotlin(packageName = "io.t28.kotlinify.samples", fileName = "EmptyObject")
+
+            // Assert
+            assertThat(actual).isEqualTo(
+                """
+            package io.t28.kotlinify.samples
+
+            public class EmptyObject()
+
+            """.trimIndent()
+            )
+        }
+
+        @Test
+        fun `should generate a kotlin class from a complex object`() {
+            // Act
+            val actual = Kotlinify.fromJson(
+                """
             {
               "id": 1,
               "login": "octocat",
@@ -44,11 +164,11 @@ internal class KotlinifyTest {
               ]
             }
         """.trimIndent()
-        ).toKotlin(packageName = "io.t28.kotlinify.samples", "User")
+            ).toKotlin(packageName = "io.t28.kotlinify.samples", "User")
 
-        // Assert
-        assertThat(actual).isEqualTo(
-            """
+            // Assert
+            assertThat(actual).isEqualTo(
+                """
             package io.t28.kotlinify.samples
 
             import kotlin.Boolean
@@ -61,7 +181,7 @@ internal class KotlinifyTest {
               public val login: String,
               public val site_admin: Boolean,
               public val plan: Plan,
-              public val emails: List<EmailsItem>
+              public val emails: List<Emails>
             )
 
             public data class Plan(
@@ -71,7 +191,7 @@ internal class KotlinifyTest {
               public val collaborators: Int
             )
 
-            public data class EmailsItem(
+            public data class Emails(
               public val email: String,
               public val verified: Boolean,
               public val primary: Boolean,
@@ -79,6 +199,7 @@ internal class KotlinifyTest {
             )
 
         """.trimIndent()
-        )
+            )
+        }
     }
 }

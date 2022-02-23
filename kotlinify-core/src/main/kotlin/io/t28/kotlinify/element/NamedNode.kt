@@ -16,13 +16,32 @@
 package io.t28.kotlinify.element
 
 /**
- * Represents an enum type.
+ * Represents a named node.
  *
- *  @param names The names of enum.
- *  @param values The values of enum.
+ * @param name The name of this [Node].
+ * @param node The real [Node].
  */
-data class EnumType(
-    val names: List<String>,
-    val values: List<String>,
-    override val isNullable: Boolean = false
-) : ElementType
+data class NamedNode<T : Node>(
+    val node: T,
+    val name: String,
+    val simpleName: String,
+) : Node {
+    init {
+        require(name.isNotEmpty()) { "Name is empty string" }
+    }
+
+    override val isNullable: Boolean
+        get() = node.isNullable
+
+    override fun toString(): String = buildString {
+        append(NamedNode::class.simpleName)
+        append("{")
+        append("name=$name,")
+        append("node=$node")
+        append("}")
+    }
+
+    override fun children(): Collection<Node> {
+        return node.children()
+    }
+}

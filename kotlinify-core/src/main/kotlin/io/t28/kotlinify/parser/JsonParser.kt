@@ -15,26 +15,26 @@
  */
 package io.t28.kotlinify.parser
 
-import io.t28.kotlinify.element.AnyType
-import io.t28.kotlinify.element.ArrayType
-import io.t28.kotlinify.element.BooleanType
-import io.t28.kotlinify.element.ElementType
-import io.t28.kotlinify.element.FloatType
-import io.t28.kotlinify.element.IntType
-import io.t28.kotlinify.element.NullType
-import io.t28.kotlinify.element.ObjectType
-import io.t28.kotlinify.element.PropertyElement
-import io.t28.kotlinify.element.StringType
-import io.t28.kotlinify.element.TypeElement
-import io.t28.kotlinify.serialization.firstOrElse
+import io.t28.kotlinify.element.ArrayNode
+import io.t28.kotlinify.element.BooleanValue
+import io.t28.kotlinify.element.FloatValue
+import io.t28.kotlinify.element.IntValue
+import io.t28.kotlinify.element.NamedNode
+import io.t28.kotlinify.element.Node
+import io.t28.kotlinify.element.NullValue
+import io.t28.kotlinify.element.ObjectNode
+import io.t28.kotlinify.element.StringValue
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.boolean
 import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.float
 import kotlinx.serialization.json.floatOrNull
+import kotlinx.serialization.json.int
 import kotlinx.serialization.json.intOrNull
 
 /**
@@ -43,90 +43,57 @@ import kotlinx.serialization.json.intOrNull
  * @param json The instance of Json for deserialization.
  */
 class JsonParser(private val json: Json = Json) : Parser {
-    override fun parse(string: String): Collection<TypeElement> {
+    override fun parse(string: String): Collection<Node> {
         val element = try {
             json.parseToJsonElement(string)
         } catch (e: SerializationException) {
             throw ParseException("Invalid JSON string", e)
         }
 
-        return when (element) {
-            is JsonArray -> element.asTypeElement()
-            is JsonObject -> element.asTypeElement()
-            is JsonPrimitive -> throw ParseException("Invalid root JSON type 'primitive'")
+        val rootNode = when (element) {
+            is JsonArray -> element.asNode()
+            is JsonObject -> element.asNode()
+            is JsonPrimitive -> element.asNode()
+        }
+        return listOf(rootNode)
+    }
+
+    private fun JsonElement.asNode(): Node {
+        return when (this) {
+            is JsonArray -> this.asNode()
+            is JsonObject -> this.asNode()
+            is JsonPrimitive -> this.asNode()
         }
     }
 
-    private fun JsonArray.asTypeElement(name: String? = null): List<TypeElement> {
-        val created = mutableListOf<TypeElement>()
-        when (val firstElement = firstOrElse(JsonNull)) {
-            is JsonArray -> {
-                val typeName = name.toTypeName(suffix = "List")
-                created += firstElement.asTypeElement(typeName)
-                ArrayType(componentType = ObjectType(typeName))
+    private fun JsonArray.asNode(): Node {
+        val items = map { childElement -> childElement.asNode() }
+        return ArrayNode(items = items)
+    }
+
+    private fun JsonObject.asNode(): Node {
+        val children = entries.map { (key, element) ->
+            val node = when (element) {
+                is JsonArray -> element.asNode()
+                is JsonObject -> element.asNode()
+                is JsonPrimitive -> element.asNode()
             }
-            is JsonObject -> {
-                val typeName = name.toTypeName(suffix = "Item")
-                created += firstElement.asTypeElement(typeName)
-                ObjectType(typeName)
-            }
-            is JsonPrimitive -> {
-                firstElement.asElementType()
-            }
+            NamedNode(
+                node = node,
+                name = key,
+                simpleName = key.replaceFirstChar { it.uppercaseChar() }
+            )
         }
-        return created.toList()
+        return ObjectNode(children = children)
     }
 
-    private fun JsonObject.asTypeElement(name: String? = null): List<TypeElement> {
-        val created = mutableListOf<TypeElement>()
-        val properties = entries.map { (key, child) ->
-            val type = when (child) {
-                is JsonArray -> {
-                    created += child.asTypeElement(key.toTypeName())
-                    child.asElementType(created)
-                }
-                is JsonObject -> {
-                    created += child.asTypeElement(key.toTypeName())
-                    val simpleName = created.firstOrNull()?.name ?: throw IllegalArgumentException("First element is missing")
-                    ObjectType(simpleName)
-                }
-                is JsonPrimitive -> {
-                    child.asElementType()
-                }
-            }
-            PropertyElement(type = type, name = key)
-        }
-        created.add(0, TypeElement(name = name, properties = properties))
-        return created.toList()
-    }
-
-    private fun JsonArray.asElementType(types: List<TypeElement>): ElementType {
-        val elementType = when (val firstElement = firstOrElse(JsonNull)) {
-            is JsonArray -> firstElement.asElementType(types)
-            is JsonObject -> firstElement.asElementType(types)
-            is JsonPrimitive -> firstElement.asElementType()
-        }
-        return ArrayType(componentType = elementType)
-    }
-
-    @Suppress("unused")
-    private fun JsonObject.asElementType(types: List<TypeElement>): ElementType {
-        val simpleName = types.lastOrNull() ?: throw IllegalArgumentException("Last element is missing")
-        return simpleName.asType()
-    }
-
-    private fun JsonPrimitive.asElementType(): ElementType {
+    private fun JsonPrimitive.asNode(): Node {
         return when {
-            this is JsonNull -> NullType
-            this.isString -> StringType()
-            this.intOrNull != null -> IntType()
-            this.floatOrNull != null -> FloatType()
-            this.booleanOrNull != null -> BooleanType()
-            else -> AnyType(isNullable = true)
+            this.isString -> StringValue(content)
+            this.intOrNull != null -> IntValue(int)
+            this.floatOrNull != null -> FloatValue(float)
+            this.booleanOrNull != null -> BooleanValue(boolean)
+            else -> NullValue
         }
-    }
-
-    private fun String?.toTypeName(prefix: String = "", suffix: String = ""): String {
-        return "$prefix${this?.replaceFirstChar { it.uppercaseChar() }}$suffix"
     }
 }
