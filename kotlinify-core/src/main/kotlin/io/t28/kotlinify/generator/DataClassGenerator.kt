@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.t28.kotlinify.element
+package io.t28.kotlinify.generator
 
-/**
- * Represents a float type.
- */
-data class FloatType(
-    override val isNullable: Boolean = false
-) : PrimitiveType
+import com.squareup.kotlinpoet.TypeSpec
+import io.t28.kotlinify.element.ObjectNode
+
+class DataClassGenerator(packageName: String) : ClassGenerator<ObjectNode>(packageName) {
+    override fun generate(className: String, node: ObjectNode): Collection<TypeSpec> {
+        return node.asTypeSpecs(className = className)
+    }
+}

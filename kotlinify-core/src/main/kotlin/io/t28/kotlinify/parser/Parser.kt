@@ -15,7 +15,7 @@
  */
 package io.t28.kotlinify.parser
 
-import io.t28.kotlinify.element.TypeElement
+import io.t28.kotlinify.element.Node
 import kotlin.jvm.Throws
 
 /**
@@ -23,10 +23,10 @@ import kotlin.jvm.Throws
  */
 interface Parser {
     /**
-     * Parse string to collection of [TypeElement].
+     * Parse string to collection of [Node].
      *
      * @param string The string to be parsed.
      */
     @Throws(ParseException::class)
-    fun parse(string: String): Collection<TypeElement>
+    fun parse(string: String): Collection<Node>
 }

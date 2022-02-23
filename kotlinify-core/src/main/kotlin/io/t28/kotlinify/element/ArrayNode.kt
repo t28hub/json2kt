@@ -16,8 +16,28 @@
 package io.t28.kotlinify.element
 
 /**
- * Represents a null type.
+ * Represents an array node.
+ *
+ * @param isNullable Whether this node is nullable.
+ * @param items The items of this node.
  */
-object NullType : ElementType {
-    override val isNullable: Boolean = true
+data class ArrayNode(
+    override val isNullable: Boolean = false,
+    private val items: List<Node> = emptyList()
+) : Node {
+    override fun toString(): String = buildString {
+        append(ArrayNode::class.simpleName)
+        append("{")
+        append("isNullable=$isNullable,")
+        append("items=$items")
+        append("}")
+    }
+
+    override fun children(): Collection<Node> {
+        return items
+    }
+
+    fun componentNode(): Node {
+        return items.firstOrNull() ?: NullValue
+    }
 }

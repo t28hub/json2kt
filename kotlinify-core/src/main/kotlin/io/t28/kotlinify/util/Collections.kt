@@ -13,14 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.t28.kotlinify.element
+package io.t28.kotlinify.util
+
+private const val FIRST_INDEX = 0
 
 /**
- * Represents an element.
+ * Insert an element at first index.
+ *
+ * @param element The element to be inserted.
  */
-sealed interface Element {
-    /**
-     * Return as a type of this [Element].
-     */
-    fun asType(): ElementType
+fun <E> MutableList<E>.addFirst(element: E) {
+    add(FIRST_INDEX, element)
 }

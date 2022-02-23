@@ -15,33 +15,12 @@
  */
 package io.t28.kotlinify
 
-import com.squareup.kotlinpoet.ANY
-import com.squareup.kotlinpoet.BOOLEAN
-import com.squareup.kotlinpoet.ClassName
-import com.squareup.kotlinpoet.FLOAT
 import com.squareup.kotlinpoet.FileSpec
-import com.squareup.kotlinpoet.FunSpec
-import com.squareup.kotlinpoet.INT
-import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.ParameterSpec
-import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
-import com.squareup.kotlinpoet.PropertySpec
-import com.squareup.kotlinpoet.STRING
-import com.squareup.kotlinpoet.TypeName
-import com.squareup.kotlinpoet.TypeSpec
-import com.squareup.kotlinpoet.asTypeName
-import io.t28.kotlinify.element.AnyType
-import io.t28.kotlinify.element.ArrayType
-import io.t28.kotlinify.element.BooleanType
-import io.t28.kotlinify.element.ElementType
-import io.t28.kotlinify.element.FloatType
-import io.t28.kotlinify.element.IntType
+import io.t28.kotlinify.element.ArrayNode
 import io.t28.kotlinify.parser.JsonParser
-import io.t28.kotlinify.element.NullType
-import io.t28.kotlinify.element.TypeElement
-import io.t28.kotlinify.element.ObjectType
-import io.t28.kotlinify.element.PrimitiveType
-import io.t28.kotlinify.element.StringType
+import io.t28.kotlinify.element.ObjectNode
+import io.t28.kotlinify.generator.DataClassGenerator
+import io.t28.kotlinify.generator.ListClassGenerator
 
 object Kotlinify {
     fun fromJson(json: String): KotlinBuilder {
@@ -53,8 +32,13 @@ object Kotlinify {
         private val content: String
     ) {
         fun toKotlin(packageName: String, fileName: String): String {
-            val typeSpecs = parser.parse(content).map { element ->
-                write(packageName, element.name ?: fileName, element)
+            val nodes = parser.parse(content)
+            val typeSpecs = nodes.flatMap { node ->
+                when (node) {
+                    is ArrayNode -> ListClassGenerator(packageName).generate(fileName, node)
+                    is ObjectNode -> DataClassGenerator(packageName).generate(fileName, node)
+                    else -> emptyList()
+                }
             }
 
             val fileSpec = FileSpec.builder(packageName, fileName).apply {
@@ -63,49 +47,5 @@ object Kotlinify {
             return fileSpec.toString()
         }
 
-        private fun write(packageName: String, className: String, element: TypeElement): TypeSpec {
-            return TypeSpec.classBuilder(className).apply {
-                if (element.properties.isNotEmpty()) {
-                    modifiers += KModifier.DATA
-                }
-
-                propertySpecs += element.properties.map { property ->
-                    val type = property.asType().asTypeName(packageName)
-                    PropertySpec.builder(property.name, type).apply {
-                        modifiers += KModifier.PUBLIC
-                        mutable(false)
-                        initializer(property.name)
-                    }.build()
-                }
-
-                primaryConstructor(FunSpec.constructorBuilder().apply {
-                    parameters += propertySpecs.map { propertySpec ->
-                        ParameterSpec.builder(propertySpec.name, propertySpec.type).build()
-                    }
-                }.build())
-            }.build()
-        }
-    }
-
-    private fun ElementType.asTypeName(packageName: String): TypeName {
-        val type = when (this) {
-            is NullType -> ANY.copy(nullable = true)
-            is ArrayType -> List::class.asTypeName().parameterizedBy(componentType.asTypeName(packageName))
-            is ObjectType -> ClassName(packageName, names)
-            is PrimitiveType -> asTypeName()
-            else -> ANY
-        }
-        return type.copy(nullable = isNullable)
-    }
-
-    private fun PrimitiveType.asTypeName(): TypeName {
-        val type = when (this) {
-            is AnyType -> ANY
-            is BooleanType -> BOOLEAN
-            is IntType -> INT
-            is FloatType -> FLOAT
-            is StringType -> STRING
-        }
-        return type.copy(nullable = isNullable)
     }
 }

@@ -16,6 +16,24 @@
 package io.t28.kotlinify.element
 
 /**
- * Represents a primitive type.
+ * Represents an object node.
+ *
+ * @param isNullable Whether this node is nullable.
+ * @param children The children of this node.
  */
-sealed interface PrimitiveType : ElementType
+data class ObjectNode(
+    override val isNullable: Boolean = false,
+    private val children: List<NamedNode<out Node>> = emptyList()
+) : Node {
+    override fun toString(): String = buildString {
+        append(ObjectNode::class.simpleName)
+        append("{")
+        append("isNullable=$isNullable,")
+        append("children=$children")
+        append("}")
+    }
+
+    override fun children(): Collection<NamedNode<out Node>> {
+        return children
+    }
+}
