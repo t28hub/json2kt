@@ -24,6 +24,7 @@ import io.t28.kotlinify.element.Node
 import io.t28.kotlinify.element.NullValue
 import io.t28.kotlinify.element.ObjectNode
 import io.t28.kotlinify.element.StringValue
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
@@ -55,7 +56,7 @@ class JsonParser(private val json: Json = Json) : Parser {
             is JsonObject -> element.asNode()
             is JsonPrimitive -> element.asNode()
         }
-        return listOf(rootNode)
+        return persistentListOf(rootNode)
     }
 
     private fun JsonElement.asNode(): Node {

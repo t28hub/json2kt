@@ -20,11 +20,12 @@ import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asTypeName
 import io.t28.kotlinify.element.ArrayNode
 import io.t28.kotlinify.util.addFirst
+import kotlinx.collections.immutable.toImmutableList
 
 class ListClassGenerator(packageName: String) : ClassGenerator<ArrayNode>(packageName) {
     override fun generate(className: String, node: ArrayNode): Collection<TypeSpec> {
         val itemClassName = "$className$ITEM_CLASS_SUFFIX"
-        val generated = node.asTypeSpecs(itemClassName)
+        val generated = node.asTypeSpecs(itemClassName).toMutableList()
 
         val rootTypeSpec = TypeSpec.classBuilder(className).apply {
             val componentNode = node.componentNode().named(itemClassName, itemClassName)
@@ -32,9 +33,8 @@ class ListClassGenerator(packageName: String) : ClassGenerator<ArrayNode>(packag
             superclass(superclass)
         }.build()
 
-        return generated.toMutableList().apply {
-            addFirst(rootTypeSpec)
-        }.toList()
+        generated.addFirst(rootTypeSpec)
+        return generated.toImmutableList()
     }
 
     companion object {

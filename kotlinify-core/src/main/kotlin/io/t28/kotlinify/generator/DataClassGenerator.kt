@@ -17,9 +17,10 @@ package io.t28.kotlinify.generator
 
 import com.squareup.kotlinpoet.TypeSpec
 import io.t28.kotlinify.element.ObjectNode
+import kotlinx.collections.immutable.toImmutableList
 
 class DataClassGenerator(packageName: String) : ClassGenerator<ObjectNode>(packageName) {
     override fun generate(className: String, node: ObjectNode): Collection<TypeSpec> {
-        return node.asTypeSpecs(className = className)
+        return node.asTypeSpecs(className = className).toImmutableList()
     }
 }

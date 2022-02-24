@@ -15,6 +15,9 @@
  */
 package io.t28.kotlinify.element
 
+import io.t28.kotlinify.util.firstOrElse
+import kotlinx.collections.immutable.toImmutableList
+
 /**
  * Represents an array node.
  *
@@ -34,10 +37,10 @@ data class ArrayNode(
     }
 
     override fun children(): Collection<Node> {
-        return items
+        return items.toImmutableList()
     }
 
     fun componentNode(): Node {
-        return items.firstOrNull() ?: NullValue
+        return items.firstOrElse(NullValue)
     }
 }

@@ -23,6 +23,7 @@ plugins {
 dependencies {
     implementation(deps.kotlin.stdlib)
     implementation(deps.kotlin.reflect)
+    implementation(deps.kotlinx.collections.immutable)
     implementation(deps.kotlinx.serialization.json)
     implementation(deps.kotlinpoet)
 
