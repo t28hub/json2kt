@@ -18,6 +18,13 @@ package io.t28.kotlinify.util
 private const val FIRST_INDEX = 0
 
 /**
+ * Return the first element, or [defaultValue] if the list is empty.
+ */
+fun <T> List<T>.firstOrElse(defaultValue: T): T {
+    return if (isEmpty()) defaultValue else this[0]
+}
+
+/**
  * Insert an element at first index.
  *
  * @param element The element to be inserted.

@@ -15,6 +15,8 @@
  */
 package io.t28.kotlinify.element
 
+import kotlinx.collections.immutable.toImmutableList
+
 /**
  * Represents a named node.
  *
@@ -28,6 +30,7 @@ data class NamedNode<T : Node>(
 ) : Node {
     init {
         require(name.isNotEmpty()) { "Name is empty string" }
+        require(simpleName.isNotEmpty()) { "Simple name is empty string" }
     }
 
     override val isNullable: Boolean
@@ -36,12 +39,13 @@ data class NamedNode<T : Node>(
     override fun toString(): String = buildString {
         append(NamedNode::class.simpleName)
         append("{")
+        append("node=$node,")
         append("name=$name,")
-        append("node=$node")
+        append("simpleName=$simpleName")
         append("}")
     }
 
     override fun children(): Collection<Node> {
-        return node.children()
+        return node.children().toImmutableList()
     }
 }

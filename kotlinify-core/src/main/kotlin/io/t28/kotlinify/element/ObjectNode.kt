@@ -15,6 +15,8 @@
  */
 package io.t28.kotlinify.element
 
+import kotlinx.collections.immutable.toImmutableList
+
 /**
  * Represents an object node.
  *
@@ -34,6 +36,6 @@ data class ObjectNode(
     }
 
     override fun children(): Collection<NamedNode<out Node>> {
-        return children
+        return children.toImmutableList()
     }
 }
