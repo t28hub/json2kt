@@ -16,190 +16,102 @@
 package io.t28.kotlinify
 
 import com.google.common.truth.Truth.assertThat
+import io.t28.kotlinify.Resources.readResourceAsString
+import io.t28.kotlinify.util.getFilename
 import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
+import org.junit.jupiter.api.extension.ExtensionContext
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.Arguments.arguments
+import org.junit.jupiter.params.provider.ArgumentsProvider
+import org.junit.jupiter.params.provider.ArgumentsSource
+import java.io.IOException
+import java.io.InputStream
+import java.nio.charset.Charset
+import java.util.stream.Stream
+import kotlin.jvm.Throws
+
+object Resources {
+    @Throws(IOException::class)
+    fun Any.readResourceAsStream(path: String): InputStream {
+        val stream = this::class.java.getResourceAsStream(path)
+        requireNotNull(stream) { "Path '$path' does not exists" }
+        return stream
+    }
+
+    @Throws(IOException::class)
+    fun Any.readResourceAsString(path: String, charset: Charset = Charsets.UTF_8): String {
+        return readResourceAsStream(path).use { input ->
+            input.readBytes().toString(charset)
+        }
+    }
+}
 
 internal class KotlinifyTest {
     @Nested
+    @TestInstance(PER_CLASS)
     inner class JsonTest {
-        @Test
-        fun `should generate a kotlin class from an empty array`() {
+        @ParameterizedTest(name = "should generate kotlin classes from {0}")
+        @ArgumentsSource(ClassFixtures::class)
+        fun `should generate kotlin classes from JSON`(jsonFilepath: String, kotlinFilepath: String) {
+            // Arrange
+            val input = readResourceAsString(jsonFilepath)
+            val output = readResourceAsString(kotlinFilepath)
+
             // Act
-            val actual = Kotlinify.fromJson("[]")
-                .toKotlin(packageName = "io.t28.kotlinify.samples", fileName = "EmptyArray")
+            val actual = Kotlinify.fromJson(input)
+                .toKotlin(packageName = PACKAGE_NAME, fileName = kotlinFilepath.getFilename())
+
+            // Assert
+            assertThat(actual).isEqualTo(output)
+        }
+
+        @ParameterizedTest(name = "should not generate a kotlin class from {0}")
+        @ArgumentsSource(EmptyClassFixtures::class)
+        fun `should not generate a kotlin class`(json: String) {
+            // Act
+            val actual = Kotlinify.fromJson(json)
+                .toKotlin(packageName = PACKAGE_NAME, fileName = "EmptyClass.kt")
 
             // Assert
             assertThat(actual).isEqualTo(
                 """
-            package io.t28.kotlinify.samples
+                package io.t28.kotlinify
 
-            import java.util.ArrayList
-            import kotlin.Any
 
-            public class EmptyArray : ArrayList<Any?>()
-
-            """.trimIndent()
+                """.trimIndent()
             )
         }
+    }
 
-        @Test
-        fun `should generate a kotlin class from a primitive array`() {
-            // Act
-            val actual = Kotlinify.fromJson("[1, 2, 3]")
-                .toKotlin(packageName = "io.t28.kotlinify.samples", fileName = "PrimitiveArray")
+    companion object {
+        private const val PACKAGE_NAME = "io.t28.kotlinify"
 
-            // Assert
-            assertThat(actual).isEqualTo(
-                """
-            package io.t28.kotlinify.samples
-
-            import java.util.ArrayList
-            import kotlin.Int
-
-            public class PrimitiveArray : ArrayList<Int>()
-
-            """.trimIndent()
-            )
-        }
-
-        @Test
-        fun `should generate a kotlin class from an object array`() {
-            // Act
-            val actual = Kotlinify.fromJson(
-                // language=json
-                """
-                    [
-                      {
-                        "email": "octocat@octocat.org",
-                        "primary": false,
-                        "verified": false,
-                        "visibility": "public"
-                      }
-                    ]
-                """.trimIndent())
-                .toKotlin(packageName = "io.t28.kotlinify.samples", fileName = "Emails")
-
-            // Assert
-            assertThat(actual).isEqualTo(
-                """
-            package io.t28.kotlinify.samples
-
-            import java.util.ArrayList
-            import kotlin.Boolean
-            import kotlin.String
-
-            public class Emails : ArrayList<Emails_Item>()
-
-            public data class Emails_Item(
-              public val email: String,
-              public val primary: Boolean,
-              public val verified: Boolean,
-              public val visibility: String
-            )
-
-            """.trimIndent()
-            )
-        }
-
-        @Test
-        fun `should generate a kotlin class from a nested array`() {
-            // Act
-            val actual = Kotlinify.fromJson("[[[]]]")
-                .toKotlin(packageName = "io.t28.kotlinify.samples", fileName = "NestedArray")
-
-            // Assert
-            assertThat(actual).isEqualTo(
-                """
-            package io.t28.kotlinify.samples
-
-            import java.util.ArrayList
-            import kotlin.Any
-            import kotlin.collections.List
-
-            public class NestedArray : ArrayList<List<List<Any?>>>()
-
-            """.trimIndent()
-            )
-        }
-
-        @Test
-        fun `should generate a kotlin class from an empty object`() {
-            // Act
-            val actual = Kotlinify.fromJson("{}")
-                .toKotlin(packageName = "io.t28.kotlinify.samples", fileName = "EmptyObject")
-
-            // Assert
-            assertThat(actual).isEqualTo(
-                """
-            package io.t28.kotlinify.samples
-
-            public class EmptyObject()
-
-            """.trimIndent()
-            )
-        }
-
-        @Test
-        fun `should generate a kotlin class from a complex object`() {
-            // Act
-            val actual = Kotlinify.fromJson(
-                """
-            {
-              "id": 1,
-              "login": "octocat",
-              "site_admin": false,
-              "plan": {
-                "name": "Medium",
-                "space": 400,
-                "private_repos": 20,
-                "collaborators": 0
-              },
-              "emails": [
-                {
-                  "email": "octocat@github.com",
-                  "verified": true,
-                  "primary": true,
-                  "visibility": "public"
-                }
-              ]
+        class ClassFixtures : ArgumentsProvider {
+            override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> {
+                return Stream.of(
+                    arguments("empty_object.json", "EmptyObject.kt"),
+                    arguments("github_user.json", "GitHubUser.kt"),
+                    arguments("github_user_emails.json", "GitHubUserEmails.kt")
+                )
             }
-        """.trimIndent()
-            ).toKotlin(packageName = "io.t28.kotlinify.samples", "User")
+        }
 
-            // Assert
-            assertThat(actual).isEqualTo(
-                """
-            package io.t28.kotlinify.samples
-
-            import kotlin.Boolean
-            import kotlin.Int
-            import kotlin.String
-            import kotlin.collections.List
-
-            public data class User(
-              public val id: Int,
-              public val login: String,
-              public val site_admin: Boolean,
-              public val plan: Plan,
-              public val emails: List<Emails>
-            )
-
-            public data class Plan(
-              public val name: String,
-              public val space: Int,
-              public val private_repos: Int,
-              public val collaborators: Int
-            )
-
-            public data class Emails(
-              public val email: String,
-              public val verified: Boolean,
-              public val primary: Boolean,
-              public val visibility: String
-            )
-
-        """.trimIndent()
-            )
+        class EmptyClassFixtures : ArgumentsProvider {
+            override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> {
+                return Stream.of(
+                    arguments("null"),
+                    arguments("true"),
+                    arguments("23"),
+                    arguments("\"Alice\""),
+                    arguments("[]"),
+                    arguments("[[[]]]"),
+                    arguments("[1, 2, 3]"),
+                    arguments("[[[1, 2, 3]]]"),
+                )
+            }
         }
     }
 }

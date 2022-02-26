@@ -13,34 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.t28.kotlinify.element
+package io.t28.kotlinify.lang
 
-import io.t28.kotlinify.util.firstOrElse
-import kotlinx.collections.immutable.toImmutableList
+import kotlin.reflect.KType
 
 /**
- * Represents an array node.
- *
- * @param isNullable Whether this node is nullable.
- * @param items The items of this node.
+ * Represents a primitive value.
  */
-data class ArrayNode(
-    override val isNullable: Boolean = false,
-    private val items: List<Node> = emptyList()
-) : Node {
+sealed class PrimitiveValue : ValueNode() {
+    /**
+     * The type of this value.
+     */
+    abstract val type: KType
+
+    /**
+     * Whether this value is nullable.
+     */
+    abstract override val isNullable: Boolean
+
     override fun toString(): String = buildString {
-        append(ArrayNode::class.simpleName)
+        append(this@PrimitiveValue::class.simpleName)
         append("{")
-        append("isNullable=$isNullable,")
-        append("items=$items")
+        append("type=$type")
+        append("isNullable=$isNullable")
         append("}")
     }
 
     override fun children(): Collection<Node> {
-        return items.toImmutableList()
-    }
-
-    fun componentNode(): Node {
-        return items.firstOrElse(NullValue)
+        return emptyList()
     }
 }

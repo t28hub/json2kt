@@ -13,21 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.t28.kotlinify.parser
-
-import io.t28.kotlinify.lang.Node
-import kotlin.jvm.Throws
+package io.t28.kotlinify.lang
 
 /**
- * Parser to deserialize from string.
+ * Represents a value element.
  */
-interface Parser {
+sealed class ValueNode : Node {
     /**
-     * Parse string to collection of [Node].
-     *
-     * @param rootName The name of root type.
-     * @param content The string content to be parsed.
+     * Whether this value is nullable.
      */
-    @Throws(ParseException::class)
-    fun parse(rootName: String, content: String): Collection<Node>
+    abstract val isNullable: Boolean
+
+    override fun toString(): String = buildString {
+        append(this@ValueNode::class.simpleName)
+        append("{")
+        append("isNullable=$isNullable")
+        append("}")
+    }
+
+    override fun children(): Collection<Node> {
+        return emptyList()
+    }
 }

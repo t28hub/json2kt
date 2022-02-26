@@ -13,17 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.t28.kotlinify.element
+package io.t28.kotlinify.lang
 
 /**
  * Represents a node.
  */
 sealed interface Node {
-    /**
-     * Whether this [Node] is nullable.
-     */
-    val isNullable: Boolean
-
     /**
      * Whether this [Node] has children.
      */
@@ -36,14 +31,4 @@ sealed interface Node {
      * @return The collection of the children nodes.
      */
     fun children(): Collection<Node>
-
-    /**
-     * Wrap this [Node] as a [NamedNode] with name and simple name.
-     *
-     * @param name The name of this node.
-     * @param simpleName The simple name of this node.
-     */
-    fun named(name: String, simpleName: String): NamedNode<out Node> {
-        return NamedNode(this, name = name, simpleName = simpleName)
-    }
 }

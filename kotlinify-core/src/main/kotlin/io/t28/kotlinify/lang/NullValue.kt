@@ -13,21 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.t28.kotlinify.parser
+package io.t28.kotlinify.lang
 
-import io.t28.kotlinify.lang.Node
-import kotlin.jvm.Throws
+import kotlin.reflect.KType
+import kotlin.reflect.full.createType
 
 /**
- * Parser to deserialize from string.
+ * Represents a null value.
  */
-interface Parser {
-    /**
-     * Parse string to collection of [Node].
-     *
-     * @param rootName The name of root type.
-     * @param content The string content to be parsed.
-     */
-    @Throws(ParseException::class)
-    fun parse(rootName: String, content: String): Collection<Node>
+object NullValue : PrimitiveValue() {
+    override val type: KType
+        get() = Any::class.createType(nullable = true)
+
+    override val isNullable: Boolean = true
 }

@@ -13,39 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.t28.kotlinify.element
-
-import kotlinx.collections.immutable.toImmutableList
+package io.t28.kotlinify.lang
 
 /**
- * Represents a named node.
+ * Represents a property element.
  *
- * @param name The name of this [Node].
- * @param node The real [Node].
+ * @param value The value of this property.
+ * @param name The name of this property.
+ * @param originalName The original name of this property.
  */
-data class NamedNode<T : Node>(
-    val node: T,
+data class PropertyNode(
+    val value: ValueNode,
     val name: String,
-    val simpleName: String,
+    val originalName: String,
 ) : Node {
     init {
         require(name.isNotEmpty()) { "Name is empty string" }
-        require(simpleName.isNotEmpty()) { "Simple name is empty string" }
+        require(originalName.isNotEmpty()) { "Original name is empty string" }
     }
 
-    override val isNullable: Boolean
-        get() = node.isNullable
-
     override fun toString(): String = buildString {
-        append(NamedNode::class.simpleName)
+        append(PropertyNode::class.simpleName)
         append("{")
-        append("node=$node,")
+        append("value=$value,")
         append("name=$name,")
-        append("simpleName=$simpleName")
+        append("originalName=$originalName")
         append("}")
     }
 
     override fun children(): Collection<Node> {
-        return node.children().toImmutableList()
+        return emptyList()
     }
 }
