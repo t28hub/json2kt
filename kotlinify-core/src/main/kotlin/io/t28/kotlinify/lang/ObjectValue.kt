@@ -13,14 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.t28.kotlinify.generator
+package io.t28.kotlinify.lang
 
-import com.squareup.kotlinpoet.TypeSpec
-import io.t28.kotlinify.element.ObjectNode
-import kotlinx.collections.immutable.toImmutableList
-
-class DataClassGenerator(packageName: String) : ClassGenerator<ObjectNode>(packageName) {
-    override fun generate(className: String, node: ObjectNode): Collection<TypeSpec> {
-        return node.asTypeSpecs(className = className).toImmutableList()
+/**
+ * Represents an object value.
+ *
+ * @param reference The reference element of this value.
+ * @param isNullable Whether this value is nullable.
+ */
+class ObjectValue(
+    val reference: TypeNode,
+    override val isNullable: Boolean = false
+) : ValueNode() {
+    override fun toString(): String = buildString {
+        append(ObjectValue::class.simpleName)
+        append("{")
+        append("reference=$reference,")
+        append("isNullable=$isNullable")
+        append("}")
     }
 }

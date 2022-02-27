@@ -16,11 +16,10 @@
 package io.t28.kotlinify
 
 import com.squareup.kotlinpoet.FileSpec
-import io.t28.kotlinify.element.ArrayNode
 import io.t28.kotlinify.parser.JsonParser
-import io.t28.kotlinify.element.ObjectNode
-import io.t28.kotlinify.generator.DataClassGenerator
-import io.t28.kotlinify.generator.ListClassGenerator
+import io.t28.kotlinify.generator.ClassGenerator
+import io.t28.kotlinify.util.getFilename
+import io.t28.kotlinify.util.removeFileExtension
 
 object Kotlinify {
     fun fromJson(json: String): KotlinBuilder {
@@ -32,16 +31,13 @@ object Kotlinify {
         private val content: String
     ) {
         fun toKotlin(packageName: String, fileName: String): String {
-            val nodes = parser.parse(content)
-            val typeSpecs = nodes.flatMap { node ->
-                when (node) {
-                    is ArrayNode -> ListClassGenerator(packageName).generate(fileName, node)
-                    is ObjectNode -> DataClassGenerator(packageName).generate(fileName, node)
-                    else -> emptyList()
-                }
+            val classGenerator = ClassGenerator(packageName)
+            val typeName = fileName.getFilename().removeFileExtension()
+            val typeSpecs = parser.parse(typeName, content).map { node ->
+                classGenerator.generate(node)
             }
-
             val fileSpec = FileSpec.builder(packageName, fileName).apply {
+                indent("    ")
                 typeSpecs.forEach(this::addType)
             }.build()
             return fileSpec.toString()

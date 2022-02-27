@@ -13,29 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.t28.kotlinify.element
+package io.t28.kotlinify.lang
 
 import kotlinx.collections.immutable.toImmutableList
 
 /**
- * Represents an object node.
+ * Represents a type element.
  *
- * @param isNullable Whether this node is nullable.
- * @param children The children of this node.
+ * @param name The name of this type.
+ * @param properties The children of this type.
  */
-data class ObjectNode(
-    override val isNullable: Boolean = false,
-    private val children: List<NamedNode<out Node>> = emptyList()
+data class TypeNode(
+    val name: String,
+    private val properties: Collection<PropertyNode> = emptyList(),
 ) : Node {
     override fun toString(): String = buildString {
-        append(ObjectNode::class.simpleName)
+        append(TypeNode::class.simpleName)
         append("{")
-        append("isNullable=$isNullable,")
-        append("children=$children")
+        append("name=$name")
+        append("properties=$properties")
         append("}")
     }
 
-    override fun children(): Collection<NamedNode<out Node>> {
-        return children.toImmutableList()
+    override fun children(): Collection<PropertyNode> {
+        return properties.toImmutableList()
     }
 }

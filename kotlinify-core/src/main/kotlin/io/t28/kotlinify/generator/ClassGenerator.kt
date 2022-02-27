@@ -15,61 +15,35 @@
  */
 package io.t28.kotlinify.generator
 
-import com.squareup.kotlinpoet.ANY
-import com.squareup.kotlinpoet.BOOLEAN
 import com.squareup.kotlinpoet.ClassName
-import com.squareup.kotlinpoet.FLOAT
 import com.squareup.kotlinpoet.FunSpec
-import com.squareup.kotlinpoet.INT
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
-import com.squareup.kotlinpoet.STRING
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asTypeName
-import io.t28.kotlinify.element.ArrayNode
-import io.t28.kotlinify.element.BooleanValue
-import io.t28.kotlinify.element.FloatValue
-import io.t28.kotlinify.element.IntValue
-import io.t28.kotlinify.element.NamedNode
-import io.t28.kotlinify.element.Node
-import io.t28.kotlinify.element.NullValue
-import io.t28.kotlinify.element.ObjectNode
-import io.t28.kotlinify.element.StringValue
-import io.t28.kotlinify.element.ValueNode
-import io.t28.kotlinify.util.addFirst
+import io.t28.kotlinify.lang.ArrayValue
+import io.t28.kotlinify.lang.ObjectValue
+import io.t28.kotlinify.lang.PrimitiveValue
+import io.t28.kotlinify.lang.TypeNode
+import io.t28.kotlinify.lang.ValueNode
 
-sealed class ClassGenerator<T : Node>(protected val packageName: String) {
-    abstract fun generate(className: String, node: T): Collection<TypeSpec>
-
-    protected fun ArrayNode.asTypeSpecs(className: String): Collection<TypeSpec> {
-        return when (val componentNode = componentNode()) {
-            is ArrayNode -> componentNode.asTypeSpecs(className)
-            is ObjectNode -> componentNode.asTypeSpecs(className)
-            else -> emptyList()
-        }
+class ClassGenerator(protected val packageName: String) {
+    fun generate(node: TypeNode): TypeSpec {
+        return node.asTypeSpec()
     }
 
-    protected fun ObjectNode.asTypeSpecs(className: String): Collection<TypeSpec> {
-        val generated = mutableListOf<TypeSpec>()
-        val rootTypeSpec = TypeSpec.classBuilder(className).apply {
+    private fun TypeNode.asTypeSpec(): TypeSpec {
+        return TypeSpec.classBuilder(name).apply {
             if (hasChildren) {
                 modifiers += KModifier.DATA
             }
 
-            generated += children().flatMap { childNode ->
-                when (childNode.node) {
-                    is ArrayNode -> childNode.node.asTypeSpecs(childNode.simpleName)
-                    is ObjectNode -> childNode.node.asTypeSpecs(childNode.simpleName)
-                    else -> emptyList()
-                }
-            }
-
-            propertySpecs += children().map { childNode ->
-                val propertyName = childNode.name
-                val propertyType = childNode.asTypeName(packageName)
+            propertySpecs += children().map { property ->
+                val propertyName = property.name
+                val propertyType = property.value.asTypeName(packageName)
                 PropertySpec.builder(propertyName, propertyType).apply {
                     modifiers += KModifier.PUBLIC
                     mutable(false)
@@ -83,32 +57,16 @@ sealed class ClassGenerator<T : Node>(protected val packageName: String) {
                 }
             }.build())
         }.build()
-
-        generated.addFirst(rootTypeSpec)
-        return generated.toList()
     }
 
-    protected fun NamedNode<*>.asTypeName(packageName: String): TypeName {
-        val (node, name, simpleName) = this
-        val typeName = when (node) {
-            is ArrayNode -> {
-                val componentNode = node.componentNode().named(name, simpleName)
-                List::class.asTypeName().parameterizedBy(componentNode.asTypeName(packageName))
-            }
-            is ObjectNode -> ClassName(packageName, simpleName)
-            is ValueNode<*> -> node.asTypeName()
-            else -> ANY
-        }
-        return typeName.copy(nullable = isNullable)
-    }
-
-    protected fun ValueNode<*>.asTypeName(): TypeName {
+    private fun ValueNode.asTypeName(packageName: String): TypeName {
         val typeName = when (this) {
-            is NullValue -> ANY
-            is BooleanValue -> BOOLEAN
-            is IntValue -> INT
-            is FloatValue -> FLOAT
-            is StringValue -> STRING
+            is ArrayValue -> {
+                val typeArgument = componentType().asTypeName(packageName)
+                List::class.asTypeName().parameterizedBy(typeArgument)
+            }
+            is ObjectValue -> ClassName(packageName, reference.name)
+            is PrimitiveValue -> type.asTypeName()
         }
         return typeName.copy(nullable = isNullable)
     }
