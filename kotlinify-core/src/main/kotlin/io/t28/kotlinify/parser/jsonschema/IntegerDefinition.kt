@@ -13,19 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.t28.kotlinify.lang
 
-import kotlin.reflect.KType
-import kotlin.reflect.full.createType
+package io.t28.kotlinify.parser.jsonschema
 
-/**
- * Represents an int value.
- *
- * @param isNullable Whether this element is nullable.
- */
-data class IntValue(
-    override val isNullable: Boolean = false
-) : PrimitiveValue() {
-    override val type: KType
-        get() = Int::class.createType(nullable = isNullable)
+import kotlinx.serialization.EncodeDefault
+import kotlinx.serialization.EncodeDefault.Mode.ALWAYS
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.Serializable
+
+@OptIn(ExperimentalSerializationApi::class)
+@Serializable
+data class IntegerDefinition(
+    override val title: String? = null,
+    override val description: String? = null
+) : PrimitiveDefinition() {
+    @EncodeDefault(ALWAYS)
+    override val type: DataType = DataType.INTEGER
 }

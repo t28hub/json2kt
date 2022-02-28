@@ -15,7 +15,7 @@
  */
 package io.t28.kotlinify.parser
 
-import io.t28.kotlinify.lang.Node
+import io.t28.kotlinify.lang.TypeNode
 import kotlin.jvm.Throws
 
 /**
@@ -23,11 +23,11 @@ import kotlin.jvm.Throws
  */
 interface Parser {
     /**
-     * Parse string to collection of [Node].
+     * Parse string to collection of [TypeNode].
      *
      * @param rootName The name of root type.
      * @param content The string content to be parsed.
      */
     @Throws(ParseException::class)
-    fun parse(rootName: String, content: String): Collection<Node>
+    fun parse(rootName: String, content: String): Collection<TypeNode>
 }

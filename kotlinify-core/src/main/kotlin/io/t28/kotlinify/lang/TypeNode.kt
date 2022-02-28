@@ -23,14 +23,14 @@ import kotlinx.collections.immutable.toImmutableList
  * @param name The name of this type.
  * @param properties The children of this type.
  */
-data class TypeNode(
+class TypeNode(
     val name: String,
-    private val properties: Collection<PropertyNode> = emptyList(),
+    internal val properties: Collection<PropertyNode> = emptyList(),
 ) : Node {
     override fun toString(): String = buildString {
         append(TypeNode::class.simpleName)
         append("{")
-        append("name=$name")
+        append("name=$name,")
         append("properties=$properties")
         append("}")
     }

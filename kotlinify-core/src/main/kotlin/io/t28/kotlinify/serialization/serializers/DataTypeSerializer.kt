@@ -15,7 +15,7 @@
  */
 package io.t28.kotlinify.serialization.serializers
 
-import io.t28.kotlinify.parser.DataType
+import io.t28.kotlinify.parser.jsonschema.DataType
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException

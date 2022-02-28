@@ -15,20 +15,19 @@
  */
 package io.t28.kotlinify.serialization.serializers
 
-import io.t28.kotlinify.parser.ArrayDefinition
-import io.t28.kotlinify.parser.DataType
-import io.t28.kotlinify.parser.Definition
-import io.t28.kotlinify.parser.EnumDefinition
-import io.t28.kotlinify.parser.NullDefinition
-import io.t28.kotlinify.parser.ObjectDefinition
-import io.t28.kotlinify.parser.PrimitiveDefinition
-import io.t28.kotlinify.parser.RefDefinition
+import io.t28.kotlinify.parser.jsonschema.ArrayDefinition
+import io.t28.kotlinify.parser.jsonschema.DataType
+import io.t28.kotlinify.parser.jsonschema.Definition
+import io.t28.kotlinify.parser.jsonschema.EnumDefinition
+import io.t28.kotlinify.parser.jsonschema.NullDefinition
+import io.t28.kotlinify.parser.jsonschema.ObjectDefinition
+import io.t28.kotlinify.parser.jsonschema.PrimitiveDefinition
+import io.t28.kotlinify.parser.jsonschema.RefDefinition
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.Serializer
-import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.descriptors.PolymorphicKind
 import kotlinx.serialization.descriptors.buildSerialDescriptor
 import kotlinx.serialization.encoding.Decoder

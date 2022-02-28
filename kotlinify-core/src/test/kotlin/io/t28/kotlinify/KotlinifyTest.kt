@@ -18,6 +18,7 @@ package io.t28.kotlinify
 import com.google.common.truth.Truth.assertThat
 import io.t28.kotlinify.util.getFilename
 import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
 import org.junit.jupiter.api.extension.ExtensionContext
@@ -33,7 +34,7 @@ internal class KotlinifyTest {
     @TestInstance(PER_CLASS)
     inner class JsonTest {
         @ParameterizedTest(name = "should generate kotlin classes from {0}")
-        @ArgumentsSource(ClassFixtures::class)
+        @ArgumentsSource(JsonClassFixtures::class)
         fun `should generate kotlin classes from JSON`(jsonFilepath: String, kotlinFilepath: String) {
             // Arrange
             val input = readResourceAsString(jsonFilepath)
@@ -48,7 +49,7 @@ internal class KotlinifyTest {
         }
 
         @ParameterizedTest(name = "should not generate a kotlin class from {0}")
-        @ArgumentsSource(EmptyClassFixtures::class)
+        @ArgumentsSource(JsonEmptyClassFixtures::class)
         fun `should not generate a kotlin class`(json: String) {
             // Act
             val actual = Kotlinify.fromJson(json)
@@ -65,10 +66,45 @@ internal class KotlinifyTest {
         }
     }
 
+    @Nested
+    @TestInstance(PER_CLASS)
+    inner class JsonSchemaTest {
+        @Test
+        fun `should generate kotlin classes from JSON Schema`() {
+            // Arrange
+            val jsonSchema = readResourceAsString("geographical_location.schema.json")
+            val expected = readResourceAsString("GeographicalLocation.kt")
+
+            // Act
+            val actual = Kotlinify.fromJsonSchema(jsonSchema)
+                .toKotlin(packageName = PACKAGE_NAME, "GeographicalLocation.kt")
+
+            // Assert
+            assertThat(actual).isEqualTo(expected)
+        }
+
+        @ParameterizedTest(name = "should not generate a kotlin class from {0}")
+        @ArgumentsSource(JsonSchemaEmptyClassFixtures::class)
+        fun `should not generate a kotlin class`(jsonSchema: String) {
+            // Act
+            val actual = Kotlinify.fromJsonSchema(jsonSchema)
+                .toKotlin(packageName = PACKAGE_NAME, fileName = "EmptyClass.kt")
+
+            // Assert
+            assertThat(actual).isEqualTo(
+                """
+                package io.t28.kotlinify
+
+
+                """.trimIndent()
+            )
+        }
+    }
+
     companion object {
         private const val PACKAGE_NAME = "io.t28.kotlinify"
 
-        class ClassFixtures : ArgumentsProvider {
+        class JsonClassFixtures : ArgumentsProvider {
             override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> {
                 return Stream.of(
                     arguments("duplicated_keys_object.json", "DuplicatedKeyObject.kt"),
@@ -82,7 +118,7 @@ internal class KotlinifyTest {
             }
         }
 
-        class EmptyClassFixtures : ArgumentsProvider {
+        class JsonEmptyClassFixtures : ArgumentsProvider {
             override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> {
                 return Stream.of(
                     arguments("null"),
@@ -93,6 +129,61 @@ internal class KotlinifyTest {
                     arguments("[[[]]]"),
                     arguments("[1, 2, 3]"),
                     arguments("[[[1, 2, 3]]]"),
+                )
+            }
+        }
+
+        class JsonSchemaEmptyClassFixtures : ArgumentsProvider {
+            override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> {
+                return Stream.of(
+                    arguments(
+                        // language=json
+                        """
+                          {
+                            "type": "null"
+                          }
+                        """.trimIndent()
+                    ),
+                    arguments(
+                        // language=json
+                        """
+                          {
+                            "type": "boolean"
+                          }
+                        """.trimIndent()
+                    ),
+                    arguments(
+                        // language=json
+                        """
+                          {
+                            "type": "integer"
+                          }
+                        """.trimIndent()
+                    ),
+                    arguments(
+                        // language=json
+                        """
+                          {
+                            "type": "number"
+                          }
+                        """.trimIndent()
+                    ),
+                    arguments(
+                        // language=json
+                        """
+                          {
+                            "type": "string"
+                          }
+                        """.trimIndent()
+                    ),
+                    arguments(
+                        // language=json
+                        """
+                          {
+                            "type": "array"
+                          }
+                        """.trimIndent()
+                    ),
                 )
             }
         }

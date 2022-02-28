@@ -13,15 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.t28.kotlinify.serialization.serializers
 
-import io.t28.kotlinify.parser.BooleanDefinition
-import io.t28.kotlinify.parser.DataType
-import io.t28.kotlinify.parser.IntegerDefinition
-import io.t28.kotlinify.parser.NumberDefinition
-import io.t28.kotlinify.parser.PrimitiveDefinition
-import io.t28.kotlinify.parser.StringDefinition
+import io.t28.kotlinify.parser.jsonschema.BooleanDefinition
+import io.t28.kotlinify.parser.jsonschema.DataType
+import io.t28.kotlinify.parser.jsonschema.IntegerDefinition
+import io.t28.kotlinify.parser.jsonschema.NumberDefinition
+import io.t28.kotlinify.parser.jsonschema.PrimitiveDefinition
+import io.t28.kotlinify.parser.jsonschema.StringDefinition
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.KSerializer
@@ -35,8 +34,7 @@ import kotlinx.serialization.json.JsonDecoder
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
-@ExperimentalSerializationApi
-@InternalSerializationApi
+@OptIn(ExperimentalSerializationApi::class, InternalSerializationApi::class)
 @Serializer(forClass = PrimitiveDefinition::class)
 object PrimitiveDefinitionSerializer : KSerializer<PrimitiveDefinition> {
     private const val TYPE_FIELD = "type"

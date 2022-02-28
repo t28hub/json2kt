@@ -13,20 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.t28.kotlinify.parser.naming
+package io.t28.kotlinify.lang
 
-object TypeNamingStrategy : JavaNamingStrategy() {
-    override fun apply(name: String): String {
-        val javaName = name.toJavaIdentifier()
-        val parts = javaName.split(delimiter).filter(String::isNotEmpty)
-        val typeName = parts.joinToString("", "", "") { part ->
-            part.replaceFirstChar(Char::uppercaseChar)
-        }
+import kotlin.reflect.KType
+import kotlin.reflect.full.createType
 
-        return if (typeName[0].isJavaIdentifierStart()) {
-            typeName
-        } else {
-            "$delimiter$typeName"
-        }
-    }
+/**
+ * Represents an integer value.
+ *
+ * @param isNullable Whether this element is nullable.
+ */
+data class IntegerValue(
+    override val isNullable: Boolean = false
+) : PrimitiveValue() {
+    override val type: KType
+        get() = Int::class.createType(nullable = isNullable)
 }

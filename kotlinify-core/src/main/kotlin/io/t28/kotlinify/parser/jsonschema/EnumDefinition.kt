@@ -13,26 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.t28.kotlinify.parser
 
-import io.t28.kotlinify.serialization.serializers.DataTypeSerializer
+package io.t28.kotlinify.parser.jsonschema
+
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class JsonSchema(
-    @SerialName("\$id")
-    val id: String = "",
-    @SerialName("\$schema")
-    val schema: String,
-    @SerialName("\$comment")
-    val comment: String = "",
-    @SerialName("\$defs")
-    val defs: Map<String, Definition> = emptyMap(),
-    val properties: Map<String, Definition> = emptyMap(),
-    val required: Set<String> = emptySet(),
-    @Serializable(with = DataTypeSerializer::class)
-    override val type: DataType,
-    override val title: String = "",
-    override val description: String = "",
-) : DataDefinition()
+class EnumDefinition(
+    @SerialName("enum")
+    val values: Set<String>
+) : Definition {
+    init {
+        require(values.isNotEmpty()) {
+            "Empty values are not allowed"
+        }
+    }
+}

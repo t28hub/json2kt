@@ -27,7 +27,7 @@ data class ArrayValue(
     private val components: List<ValueNode> = emptyList(),
     override val isNullable: Boolean = false
 ) : ValueNode() {
-    constructor(value: ValueNode, isNullable: Boolean = false) : this(listOf(value), isNullable)
+    constructor(component: ValueNode, isNullable: Boolean = false) : this(listOf(component), isNullable)
 
     override fun toString(): String = buildString {
         append(ArrayValue::class.simpleName)

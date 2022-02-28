@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.t28.kotlinify.parser
 
-import com.google.common.truth.Truth.assertThat
+package io.t28.kotlinify.parser.jsonschema
+
+import com.google.common.truth.Truth
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -24,7 +25,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 @OptIn(ExperimentalSerializationApi::class)
-internal class JsonSchemaTest {
+internal class DocumentTest {
     private lateinit var json: Json
 
     @BeforeEach
@@ -65,23 +66,23 @@ internal class JsonSchemaTest {
         """.trimIndent()
 
         // Act
-        val actual =  json.decodeFromString<JsonSchema>(string)
+        val actual =  json.decodeFromString<Document>(string)
 
         // Assert
         with(actual) {
-            assertThat(id).isEqualTo("https://example.com/geographical-location.schema.json")
-            assertThat(schema).isEqualTo("https://json-schema.org/draft/2020-12/schema")
+            Truth.assertThat(`$id`).isEqualTo("https://example.com/geographical-location.schema.json")
+            Truth.assertThat(`$schema`).isEqualTo("https://json-schema.org/draft/2020-12/schema")
 
-            assertThat(type).isEqualTo(DataType.OBJECT)
-            assertThat(title).isEqualTo("Longitude and Latitude Values")
-            assertThat(description).isEqualTo("A geographical coordinate.")
+            Truth.assertThat(type).isEqualTo(DataType.OBJECT)
+            Truth.assertThat(title).isEqualTo("Longitude and Latitude Values")
+            Truth.assertThat(description).isEqualTo("A geographical coordinate.")
 
-            assertThat(required).apply {
+            Truth.assertThat(required).apply {
                 hasSize(2)
                 containsExactly("latitude", "longitude")
             }
 
-            assertThat(properties).apply {
+            Truth.assertThat(properties).apply {
                 hasSize(2)
                 containsEntry("latitude", NumberDefinition())
                 containsEntry("longitude", NumberDefinition())

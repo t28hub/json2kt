@@ -13,20 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.t28.kotlinify.parser.naming
+package io.t28.kotlinify.parser.jsonschema
 
-object TypeNamingStrategy : JavaNamingStrategy() {
-    override fun apply(name: String): String {
-        val javaName = name.toJavaIdentifier()
-        val parts = javaName.split(delimiter).filter(String::isNotEmpty)
-        val typeName = parts.joinToString("", "", "") { part ->
-            part.replaceFirstChar(Char::uppercaseChar)
-        }
+import kotlinx.serialization.Serializable
 
-        return if (typeName[0].isJavaIdentifierStart()) {
-            typeName
-        } else {
-            "$delimiter$typeName"
-        }
+@Serializable
+sealed class DataDefinition : Definition {
+    abstract val type: DataType
+    abstract val title: String?
+    abstract val description: String?
+
+    override fun toString() = buildString {
+        append(this@DataDefinition::class.simpleName)
+        append('(')
+        append("type=$type, ")
+        append("title=$title, ")
+        append("description=$description")
+        append(')')
     }
 }

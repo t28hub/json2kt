@@ -13,32 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.t28.kotlinify.parser
+package io.t28.kotlinify.parser.jsonschema
 
 import io.t28.kotlinify.serialization.serializers.DataTypeSerializer
 import kotlinx.serialization.Serializable
 
 @Serializable(with = DataTypeSerializer::class)
 enum class DataType(val typeName: String) {
-    // Representing a boolean value
+    // Represents a boolean
     BOOLEAN("boolean"),
 
-    // Representing an integer
+    // Represents an integer
     INTEGER("integer"),
 
-    // Representing an integer or float
+    // Represents an integer or float
     NUMBER("number"),
 
-    // Representing a string/text
+    // Represents a string/text
     STRING("string"),
 
-    // Representing an ordered list
+    // Represents an ordered list
     ARRAY("array"),
 
-    // Representing a key-value map
+    // Represents a key-value map
     OBJECT("object"),
 
-    // Representing a null
+    // Represents a null
     NULL("null");
 
     override fun toString(): String {
