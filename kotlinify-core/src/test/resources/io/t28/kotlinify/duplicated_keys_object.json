@@ -1,0 +1,13 @@
+{
+  "key": true,
+  "!key": 1,
+  "key!": "Alice",
+  "#key": null,
+  "key#": [],
+  "^key": {
+    "key": null
+  },
+  "key^": {
+    "key": null
+  }
+}

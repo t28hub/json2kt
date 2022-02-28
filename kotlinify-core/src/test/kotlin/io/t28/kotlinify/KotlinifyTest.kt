@@ -71,6 +71,7 @@ internal class KotlinifyTest {
         class ClassFixtures : ArgumentsProvider {
             override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> {
                 return Stream.of(
+                    arguments("duplicated_keys_object.json", "DuplicatedKeyObject.kt"),
                     arguments("empty_object.json", "EmptyObject.kt"),
                     arguments("github_search_issues.json", "GitHubSearchIssues.kt"),
                     arguments("github_user.json", "GitHubUser.kt"),
