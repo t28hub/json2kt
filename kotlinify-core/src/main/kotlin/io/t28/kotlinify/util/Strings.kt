@@ -15,12 +15,12 @@
  */
 package io.t28.kotlinify.util
 
-private const val DIRECTORY_SEPARATOR = '/'
-private const val EXTENSION_SEPARATOR = '.'
+private const val DIRECTORY_DELIMITER = '/'
+private const val EXTENSION_DELIMITER = '.'
 private const val NO_INDEX = -1
 
 fun String.getFilename(): String {
-    val directoryIndex = lastIndexOf(DIRECTORY_SEPARATOR)
+    val directoryIndex = lastIndexOf(DIRECTORY_DELIMITER)
     if (directoryIndex == NO_INDEX) {
         return this
     }
@@ -28,12 +28,12 @@ fun String.getFilename(): String {
 }
 
 fun String.removeFileExtension(): String {
-    val extensionIndex = lastIndexOf(EXTENSION_SEPARATOR)
+    val extensionIndex = lastIndexOf(EXTENSION_DELIMITER)
     if (extensionIndex == NO_INDEX) {
         return this
     }
 
-    val directoryIndex = lastIndexOf(DIRECTORY_SEPARATOR)
+    val directoryIndex = lastIndexOf(DIRECTORY_DELIMITER)
     if (directoryIndex > extensionIndex) {
         return this
     }

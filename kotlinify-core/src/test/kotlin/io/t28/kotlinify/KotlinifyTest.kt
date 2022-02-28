@@ -16,7 +16,6 @@
 package io.t28.kotlinify
 
 import com.google.common.truth.Truth.assertThat
-import io.t28.kotlinify.Resources.readResourceAsString
 import io.t28.kotlinify.util.getFilename
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.TestInstance
@@ -27,27 +26,7 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.ArgumentsProvider
 import org.junit.jupiter.params.provider.ArgumentsSource
-import java.io.IOException
-import java.io.InputStream
-import java.nio.charset.Charset
 import java.util.stream.Stream
-import kotlin.jvm.Throws
-
-object Resources {
-    @Throws(IOException::class)
-    fun Any.readResourceAsStream(path: String): InputStream {
-        val stream = this::class.java.getResourceAsStream(path)
-        requireNotNull(stream) { "Path '$path' does not exists" }
-        return stream
-    }
-
-    @Throws(IOException::class)
-    fun Any.readResourceAsString(path: String, charset: Charset = Charsets.UTF_8): String {
-        return readResourceAsStream(path).use { input ->
-            input.readBytes().toString(charset)
-        }
-    }
-}
 
 internal class KotlinifyTest {
     @Nested
@@ -93,8 +72,11 @@ internal class KotlinifyTest {
             override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> {
                 return Stream.of(
                     arguments("empty_object.json", "EmptyObject.kt"),
+                    arguments("github_search_issues.json", "GitHubSearchIssues.kt"),
                     arguments("github_user.json", "GitHubUser.kt"),
-                    arguments("github_user_emails.json", "GitHubUserEmails.kt")
+                    arguments("github_user_emails.json", "GitHubUserEmails.kt"),
+                    arguments("twitter_tweets_search.json", "TwitterTweetsSearch.kt"),
+                    arguments("twitter_users.json", "TwitterUsers.kt")
                 )
             }
         }
