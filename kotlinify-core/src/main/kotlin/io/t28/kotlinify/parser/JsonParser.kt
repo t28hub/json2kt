@@ -27,6 +27,7 @@ import io.t28.kotlinify.lang.StringValue
 import io.t28.kotlinify.lang.TypeNode
 import io.t28.kotlinify.lang.ValueNode
 import io.t28.kotlinify.parser.naming.NamingStrategy
+import io.t28.kotlinify.parser.naming.UniqueNamingStrategy
 import io.t28.kotlinify.util.addFirst
 import io.t28.kotlinify.util.firstOrElse
 import kotlinx.collections.immutable.toImmutableList
@@ -51,6 +52,8 @@ class JsonParser(
     private val typeNameStrategy: NamingStrategy,
     private val propertyNameStrategy: NamingStrategy
 ) : Parser {
+    private lateinit var uniqueTypeNameStrategy: NamingStrategy
+
     override fun parse(rootName: String, content: String): Collection<TypeNode> {
         val element = try {
             json.parseToJsonElement(content)
@@ -58,6 +61,7 @@ class JsonParser(
             throw ParseException("Invalid JSON string", e)
         }
 
+        uniqueTypeNameStrategy = UniqueNamingStrategy(typeNameStrategy)
         val types = when (element) {
             is JsonArray -> parseRoot(rootName, element)
             is JsonObject -> parseRoot(rootName, element)
@@ -94,10 +98,13 @@ class JsonParser(
     }
 
     private fun parse(typeName: String, element: JsonObject, typeNodes: MutableList<TypeNode>): ObjectValue {
+        val propertyNamingStrategy = UniqueNamingStrategy(this.propertyNameStrategy)
         // Use reversed entries to generate classes order by defined by the JSON.
         val properties = element.entries.reversed().map { (key, child) ->
-            val value = parse(key.toTypeName(), child, typeNodes)
-            PropertyNode(value = value, name = key.toPropertyName(), originalName = key)
+            val childTypeName = uniqueTypeNameStrategy.apply(key)
+            val propertyValue = parse(childTypeName, child, typeNodes)
+            val propertyName = propertyNamingStrategy.apply(key)
+            PropertyNode(value = propertyValue, name = propertyName, originalName = key)
         }
 
         val typeElement = TypeNode(name = typeName, properties = properties.reversed().toImmutableList())
@@ -113,13 +120,5 @@ class JsonParser(
             element.booleanOrNull != null -> BooleanValue()
             else -> NullValue
         }
-    }
-
-    private fun String.toTypeName(): String {
-        return typeNameStrategy.apply(this)
-    }
-
-    private fun String.toPropertyName(): String {
-        return propertyNameStrategy.apply(this)
     }
 }
