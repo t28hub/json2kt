@@ -1,0 +1,127 @@
+{
+  "data": [
+    {
+      "text": "Introducing a new Tweet field on v2 endpoints: “reply_settings“ shows how the Tweet author allowed others to reply to their post. This can help you filter only by Tweets you can reply to, or better analyze public conversations. Learn more about it here 👇 https://t.co/XR09zDvpmZ https://t.co/YIfg7F0En2",
+      "author_id": "2244994945",
+      "id": "1339981239294566401",
+      "lang": "en",
+      "conversation_id": "1339981239294566401",
+      "created_at": "2020-12-18T17:09:57.000Z"
+    },
+    {
+      "text": "Now in the new #TwitterAPI: user Tweet timeline and user mention timeline!nYou can now get Tweets composed by or mentioning an account with the #TwitterAPI. Check out today’s announcement for what’s new, use cases, and sample code 👇 https://t.co/L1PBSSjh1Q https://t.co/ydzhCIZ4Cy",
+      "author_id": "2244994945",
+      "id": "1339682027885522947",
+      "lang": "en",
+      "conversation_id": "1339682027885522947",
+      "created_at": "2020-12-17T21:21:00.000Z"
+    },
+    {
+      "text": "2021 can't come fast enough, but when it does, be on the lookout for functionality to follow/unfollow accounts, and manage and retrieve block and mute relationships using the new #TwitterAPI. Check out our roadmap to see what’s coming next! https://t.co/rspek8xGhV",
+      "author_id": "2244994945",
+      "id": "1339641862265696256",
+      "lang": "en",
+      "conversation_id": "1339641861263245315",
+      "created_at": "2020-12-17T18:41:23.000Z"
+    },
+    {
+      "text": "📣 We’re releasing new v2 endpoints today! The follows lookup endpoints enable you to retrieve a person’s follower and following relationships via the #TwitterAPI. Learn more 👇 https://t.co/YT13a2tPFE",
+      "author_id": "2244994945",
+      "id": "1339641861263245315",
+      "lang": "en",
+      "conversation_id": "1339641861263245315",
+      "created_at": "2020-12-17T18:41:23.000Z"
+    },
+    {
+      "text": "💡 Using Twitter data for academic research? Join our next livestream this Friday @ 9am PT on https://t.co/GrtBOXh5Y1!n n@SuhemParack will show how to get started with recent search &amp; filtered stream endpoints on the #TwitterAPI v2, the new Tweet payload, annotations, &amp; more. https://t.co/IraD2Z7wEg",
+      "author_id": "2244994945",
+      "id": "1338971066773905408",
+      "lang": "en",
+      "conversation_id": "1338971066773905408",
+      "created_at": "2020-12-15T22:15:53.000Z"
+    },
+    {
+      "text": "👂We want to hear what you think about our plans. As we continue to build our new product tracks, your feedback is essential to shaping the future of the Twitter API. Share your thoughts on this survey: https://t.co/dkIqFGPji7",
+      "author_id": "2244994945",
+      "id": "1337122535188652033",
+      "lang": "en",
+      "conversation_id": "1337122534173663235",
+      "created_at": "2020-12-10T19:50:29.000Z"
+    },
+    {
+      "text": "Is 2020 over yet?nDespite everything that happened this year, thousands of you still made the time to learn, play, and build incredible things on the new #TwitterAPI.nWe want to share some of your stories and give you a preview of what’s to come next year.nhttps://t.co/VpOKT22WgF",
+      "author_id": "2244994945",
+      "id": "1337122534173663235",
+      "lang": "en",
+      "conversation_id": "1337122534173663235",
+      "created_at": "2020-12-10T19:50:29.000Z"
+    },
+    {
+      "text": "🎧 Headphones on: watch @jessicagarson build an interactive app to write music using SuperCollider, Python, FoxDot, and the new Twitter API. Streaming Friday 1:30 ET on our new Twitch channel 🎶💻 https://t.co/SQziic6eyp",
+      "author_id": "2244994945",
+      "id": "1336463248510623745",
+      "lang": "en",
+      "conversation_id": "1336463248510623745",
+      "created_at": "2020-12-09T00:10:43.000Z"
+    },
+    {
+      "text": "Before we release new #TwitterAPI endpoints, we let developers test drive a prototype of our intended design. @i_am_daniele takes you behind the scenes of an endpoint in the making. https://t.co/NNTDnciwNq",
+      "author_id": "2244994945",
+      "id": "1334564488884862976",
+      "lang": "en",
+      "conversation_id": "1334564488884862976",
+      "created_at": "2020-12-03T18:25:43.000Z"
+    },
+    {
+      "text": "We’d love to see what you build with the new Twitter API v2!nnShare your work in our community forum and we might even send some cool swag to the first 10 developers who share what they build 👇nnhttps://t.co/m0jn5vkHRj",
+      "author_id": "2244994945",
+      "id": "1334200898042531841",
+      "lang": "en",
+      "conversation_id": "1334200897081987072",
+      "created_at": "2020-12-02T18:20:57.000Z"
+    }
+  ],
+  "includes": {
+    "users": [
+      {
+        "id": "2244994945",
+        "entities": {
+          "url": {
+            "urls": [
+              {
+                "start": 0,
+                "end": 23,
+                "url": "https://t.co/3ZX3TNiZCY",
+                "expanded_url": "https://developer.twitter.com/en/community",
+                "display_url": "developer.twitter.com/en/community"
+              }
+            ]
+          },
+          "description": {
+            "hashtags": [
+              {
+                "start": 17,
+                "end": 28,
+                "tag": "TwitterDev"
+              },
+              {
+                "start": 105,
+                "end": 116,
+                "tag": "TwitterAPI"
+              }
+            ]
+          }
+        },
+        "created_at": "2013-12-14T04:35:55.000Z",
+        "username": "TwitterDev",
+        "name": "Twitter Dev"
+      }
+    ]
+  },
+  "meta": {
+    "newest_id": "1339981239294566401",
+    "oldest_id": "1334200898042531841",
+    "result_count": 10,
+    "next_token": "b26v89c19zqg8o3fosetlg0yp2g8b5onm3alivsyjjm2l"
+  }
+}

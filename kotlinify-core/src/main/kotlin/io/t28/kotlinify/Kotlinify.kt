@@ -18,12 +18,19 @@ package io.t28.kotlinify
 import com.squareup.kotlinpoet.FileSpec
 import io.t28.kotlinify.parser.JsonParser
 import io.t28.kotlinify.generator.ClassGenerator
+import io.t28.kotlinify.parser.naming.PropertyNamingStrategy
+import io.t28.kotlinify.parser.naming.TypeNamingStrategy
 import io.t28.kotlinify.util.getFilename
 import io.t28.kotlinify.util.removeFileExtension
 
 object Kotlinify {
     fun fromJson(json: String): KotlinBuilder {
-        return KotlinBuilder(JsonParser(), json)
+        return KotlinBuilder(
+            JsonParser(
+                typeNameStrategy = TypeNamingStrategy(),
+                propertyNameStrategy = PropertyNamingStrategy()
+            ), json
+        )
     }
 
     class KotlinBuilder internal constructor(

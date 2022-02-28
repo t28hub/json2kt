@@ -26,6 +26,7 @@ import io.t28.kotlinify.lang.PropertyNode
 import io.t28.kotlinify.lang.StringValue
 import io.t28.kotlinify.lang.TypeNode
 import io.t28.kotlinify.lang.ValueNode
+import io.t28.kotlinify.parser.naming.NamingStrategy
 import io.t28.kotlinify.util.addFirst
 import io.t28.kotlinify.util.firstOrElse
 import kotlinx.collections.immutable.toImmutableList
@@ -45,7 +46,11 @@ import kotlinx.serialization.json.intOrNull
  *
  * @param json The instance of Json for deserialization.
  */
-class JsonParser(private val json: Json = Json) : Parser {
+class JsonParser(
+    private val json: Json = Json,
+    private val typeNameStrategy: NamingStrategy,
+    private val propertyNameStrategy: NamingStrategy
+) : Parser {
     override fun parse(rootName: String, content: String): Collection<TypeNode> {
         val element = try {
             json.parseToJsonElement(content)
@@ -64,20 +69,12 @@ class JsonParser(private val json: Json = Json) : Parser {
     private fun parseRoot(typeName: String, element: JsonArray): Collection<TypeNode> {
         val typeNodes = mutableListOf<TypeNode>()
         parse(typeName, element.firstOrElse(JsonNull), typeNodes)
-        typeNodes.reverse()
         return typeNodes.toList()
     }
 
     private fun parseRoot(typeName: String, element: JsonObject): Collection<TypeNode> {
         val typeNodes = mutableListOf<TypeNode>()
-        val properties = element.entries.map { (key, child) ->
-            val value = parse(key.toTypeName(), child, typeNodes)
-            PropertyNode(value = value, name = key.toPropertyName(), originalName = key)
-        }
-        typeNodes.reverse()
-
-        val rootType = TypeNode(name = typeName, properties = properties.toImmutableList())
-        typeNodes.addFirst(rootType)
+        parse(typeName, element, typeNodes)
         return typeNodes.toList()
     }
 
@@ -97,12 +94,13 @@ class JsonParser(private val json: Json = Json) : Parser {
     }
 
     private fun parse(typeName: String, element: JsonObject, typeNodes: MutableList<TypeNode>): ObjectValue {
-        val properties = element.entries.map { (key, child) ->
+        // Use reversed entries to generate classes order by defined by the JSON.
+        val properties = element.entries.reversed().map { (key, child) ->
             val value = parse(key.toTypeName(), child, typeNodes)
             PropertyNode(value = value, name = key.toPropertyName(), originalName = key)
         }
 
-        val typeElement = TypeNode(name = typeName, properties = properties.toImmutableList())
+        val typeElement = TypeNode(name = typeName, properties = properties.reversed().toImmutableList())
         typeNodes.addFirst(typeElement)
         return ObjectValue(reference = typeElement)
     }
@@ -118,10 +116,10 @@ class JsonParser(private val json: Json = Json) : Parser {
     }
 
     private fun String.toTypeName(): String {
-        return replaceFirstChar { it.uppercaseChar() }
+        return typeNameStrategy.apply(this)
     }
 
     private fun String.toPropertyName(): String {
-        return replaceFirstChar { it.lowercaseChar() }
+        return propertyNameStrategy.apply(this)
     }
 }
