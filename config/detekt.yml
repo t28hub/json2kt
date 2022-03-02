@@ -28,6 +28,12 @@ formatting:
   active: false
   autoCorrect: false
 
+naming:
+  active: true
+  ConstructorParameterNaming:
+    parameterPattern: '`?[a-z$][A-Za-z0-9]*`?'
+    privateParameterPattern: '`?[a-z$][A-Za-z0-9]*`?'
+
 style:
   active: true
   ForbiddenComment:

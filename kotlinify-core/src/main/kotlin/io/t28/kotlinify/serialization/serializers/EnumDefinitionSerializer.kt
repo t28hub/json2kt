@@ -15,7 +15,7 @@
  */
 package io.t28.kotlinify.serialization.serializers
 
-import io.t28.kotlinify.parser.EnumDefinition
+import io.t28.kotlinify.parser.jsonschema.EnumDefinition
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException

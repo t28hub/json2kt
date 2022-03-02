@@ -24,7 +24,7 @@ import io.t28.kotlinify.parser.naming.JavaNamingStrategy.Companion.isJavaIdentif
  * @param maxRetries The maximum number of retries.
  * @param reserved The reserved names.
  */
-class UniqueNamingStrategy internal constructor(
+internal class UniqueNamingStrategy internal constructor(
     private val namingStrategy: NamingStrategy,
     private val maxRetries: Int = DEFAULT_MAX_RETRIES,
     reserved: Set<String> = emptySet()

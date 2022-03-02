@@ -16,7 +16,7 @@
 package io.t28.kotlinify.serialization.serializers
 
 import com.google.common.truth.Truth.assertThat
-import io.t28.kotlinify.parser.DataType
+import io.t28.kotlinify.parser.jsonschema.DataType
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import org.intellij.lang.annotations.Language

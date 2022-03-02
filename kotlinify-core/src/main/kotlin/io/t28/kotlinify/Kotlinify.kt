@@ -18,6 +18,8 @@ package io.t28.kotlinify
 import com.squareup.kotlinpoet.FileSpec
 import io.t28.kotlinify.parser.JsonParser
 import io.t28.kotlinify.generator.ClassGenerator
+import io.t28.kotlinify.parser.JsonSchemaParser
+import io.t28.kotlinify.parser.Parser
 import io.t28.kotlinify.parser.naming.PropertyNamingStrategy
 import io.t28.kotlinify.parser.naming.TypeNamingStrategy
 import io.t28.kotlinify.util.getFilename
@@ -26,15 +28,26 @@ import io.t28.kotlinify.util.removeFileExtension
 object Kotlinify {
     fun fromJson(json: String): KotlinBuilder {
         return KotlinBuilder(
-            JsonParser(
-                typeNameStrategy = TypeNamingStrategy(),
-                propertyNameStrategy = PropertyNamingStrategy()
-            ), json
+            parser = JsonParser(
+                typeNameStrategy = TypeNamingStrategy,
+                propertyNameStrategy = PropertyNamingStrategy
+            ),
+            content = json
+        )
+    }
+
+    fun fromJsonSchema(jsonSchema: String): KotlinBuilder {
+        return KotlinBuilder(
+            parser = JsonSchemaParser(
+                typeNameStrategy = TypeNamingStrategy,
+                propertyNameStrategy = PropertyNamingStrategy
+            ),
+            content = jsonSchema
         )
     }
 
     class KotlinBuilder internal constructor(
-        private val parser: JsonParser,
+        private val parser: Parser,
         private val content: String
     ) {
         fun toKotlin(packageName: String, fileName: String): String {

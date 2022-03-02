@@ -15,7 +15,7 @@
  */
 package io.t28.kotlinify.parser.naming
 
-class PropertyNamingStrategy : JavaNamingStrategy() {
+object PropertyNamingStrategy : JavaNamingStrategy() {
     override fun apply(name: String): String {
         val javaName = name.toJavaIdentifier(delimiter)
         val parts = javaName.split(delimiter).filter(String::isNotEmpty)

@@ -18,7 +18,7 @@ package io.t28.kotlinify.parser
 import io.t28.kotlinify.lang.ArrayValue
 import io.t28.kotlinify.lang.BooleanValue
 import io.t28.kotlinify.lang.FloatValue
-import io.t28.kotlinify.lang.IntValue
+import io.t28.kotlinify.lang.IntegerValue
 import io.t28.kotlinify.lang.NullValue
 import io.t28.kotlinify.lang.ObjectValue
 import io.t28.kotlinify.lang.PrimitiveValue
@@ -107,15 +107,15 @@ class JsonParser(
             PropertyNode(value = propertyValue, name = propertyName, originalName = key)
         }
 
-        val typeElement = TypeNode(name = typeName, properties = properties.reversed().toImmutableList())
-        typeNodes.addFirst(typeElement)
-        return ObjectValue(reference = typeElement)
+        val typeNode = TypeNode(name = typeName, properties = properties.reversed().toImmutableList())
+        typeNodes.addFirst(typeNode)
+        return ObjectValue(reference = typeNode)
     }
 
     private fun parse(element: JsonPrimitive): PrimitiveValue {
         return when {
             element.isString -> StringValue()
-            element.intOrNull != null -> IntValue()
+            element.intOrNull != null -> IntegerValue()
             element.floatOrNull != null -> FloatValue()
             element.booleanOrNull != null -> BooleanValue()
             else -> NullValue
