@@ -17,35 +17,21 @@ package io.t28.kotlinify.lang
 
 import kotlinx.collections.immutable.toImmutableList
 
-/**
- * Represents a type element.
- *
- * @param name The name of this type.
- * @param properties The children of this type.
- */
-abstract class TypeNode(
-    val name: String,
-    internal val properties: Collection<PropertyNode>,
-) : Node {
+class EnumType(
+    name: String,
+    properties: Collection<PropertyNode> = emptyList(),
+    val constants: Collection<String> = emptySet()
+) : TypeNode(name, properties.toImmutableList()) {
     override fun toString(): String = buildString {
-        append(this@TypeNode::class.simpleName)
+        append(EnumType::class.simpleName)
         append("{")
         append("name=$name,")
-        append("properties=$properties")
+        append("properties=$properties,")
+        append("constants=$constants")
         append("}")
     }
 
-    override fun children(): Collection<PropertyNode> {
-        return properties.toImmutableList()
-    }
-
-    abstract fun <P, R> accept(visitor: Visitor<P, R>, parameter: P): R
-
-    interface Visitor<P, R> {
-        fun visitClass(node: ClassType, parameter: P): R
-
-        fun visitEnum(node: EnumType, parameter: P): R
-
-        fun visitInterface(node: InterfaceType, parameter: P): R
+    override fun <P, R> accept(visitor: Visitor<P, R>, parameter: P): R {
+        return visitor.visitEnum(this, parameter)
     }
 }

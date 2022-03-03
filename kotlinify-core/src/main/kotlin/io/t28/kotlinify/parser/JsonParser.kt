@@ -17,6 +17,7 @@ package io.t28.kotlinify.parser
 
 import io.t28.kotlinify.lang.ArrayValue
 import io.t28.kotlinify.lang.BooleanValue
+import io.t28.kotlinify.lang.ClassType
 import io.t28.kotlinify.lang.FloatValue
 import io.t28.kotlinify.lang.IntegerValue
 import io.t28.kotlinify.lang.NullValue
@@ -107,7 +108,7 @@ class JsonParser(
             PropertyNode(value = propertyValue, name = propertyName, originalName = key)
         }
 
-        val typeNode = TypeNode(name = typeName, properties = properties.reversed().toImmutableList())
+        val typeNode = ClassType(name = typeName, properties = properties.reversed().toImmutableList())
         typeNodes.addFirst(typeNode)
         return ObjectValue(reference = typeNode)
     }
