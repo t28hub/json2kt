@@ -25,13 +25,14 @@ import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asTypeName
 import io.t28.kotlinify.lang.ArrayValue
+import io.t28.kotlinify.lang.ClassType
 import io.t28.kotlinify.lang.ObjectValue
 import io.t28.kotlinify.lang.PrimitiveValue
 import io.t28.kotlinify.lang.TypeNode
 import io.t28.kotlinify.lang.ValueNode
 
-class ClassGenerator(protected val packageName: String) {
-    fun generate(node: TypeNode): TypeSpec {
+class ClassGenerator(override val packageName: String): TypeGenerator<ClassType> {
+    override fun generate(node: ClassType): TypeSpec {
         return node.asTypeSpec()
     }
 

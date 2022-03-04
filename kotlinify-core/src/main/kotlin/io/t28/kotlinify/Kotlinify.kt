@@ -16,8 +16,14 @@
 package io.t28.kotlinify
 
 import com.squareup.kotlinpoet.FileSpec
+import com.squareup.kotlinpoet.TypeSpec
 import io.t28.kotlinify.parser.JsonParser
 import io.t28.kotlinify.generator.ClassGenerator
+import io.t28.kotlinify.generator.EnumGenerator
+import io.t28.kotlinify.lang.ClassType
+import io.t28.kotlinify.lang.EnumType
+import io.t28.kotlinify.lang.InterfaceType
+import io.t28.kotlinify.lang.TypeNode
 import io.t28.kotlinify.parser.JsonSchemaParser
 import io.t28.kotlinify.parser.Parser
 import io.t28.kotlinify.parser.naming.PropertyNamingStrategy
@@ -52,9 +58,22 @@ object Kotlinify {
     ) {
         fun toKotlin(packageName: String, fileName: String): String {
             val classGenerator = ClassGenerator(packageName)
+            val enumGenerator = EnumGenerator(packageName)
             val typeName = fileName.getFilename().removeFileExtension()
             val typeSpecs = parser.parse(typeName, content).map { node ->
-                classGenerator.generate(node)
+                node.accept(object : TypeNode.Visitor<Unit, TypeSpec> {
+                    override fun visitClass(node: ClassType, parameter: Unit): TypeSpec {
+                        return classGenerator.generate(node)
+                    }
+
+                    override fun visitEnum(node: EnumType, parameter: Unit): TypeSpec {
+                        return enumGenerator.generate(node)
+                    }
+
+                    override fun visitInterface(node: InterfaceType, parameter: Unit): TypeSpec {
+                        TODO("Not yet implemented")
+                    }
+                }, Unit)
             }
             val fileSpec = FileSpec.builder(packageName, fileName).apply {
                 indent("    ")
@@ -62,6 +81,5 @@ object Kotlinify {
             }.build()
             return fileSpec.toString()
         }
-
     }
 }

@@ -19,6 +19,8 @@ import com.google.common.truth.Truth.assertThat
 import io.t28.kotlinify.assertThat
 import io.t28.kotlinify.isInstanceOf
 import io.t28.kotlinify.lang.BooleanValue
+import io.t28.kotlinify.lang.ClassType
+import io.t28.kotlinify.lang.EnumType
 import io.t28.kotlinify.lang.IntegerValue
 import io.t28.kotlinify.lang.StringValue
 import io.t28.kotlinify.parser.naming.PropertyNamingStrategy
@@ -60,6 +62,40 @@ internal class JsonSchemaParserTest {
 
         assertThat(actual).hasSize(1)
     }
+
+    @Test
+    fun `should parse enum type`() {
+        // language=json
+        val jsonSchema = """
+            {
+              "type": "object",
+              "properties": {
+                "country": {
+                  "enum": ["FR", "JP", "US"]
+                }
+              }
+            }
+        """.trimIndent()
+
+        // Act
+        val parser = JsonSchemaParser(
+            typeNameStrategy = TypeNamingStrategy,
+            propertyNameStrategy = PropertyNamingStrategy
+        )
+        val actual = parser.parse("Example", jsonSchema).toList()
+
+        // Assert
+        assertThat(actual).hasSize(2)
+        assertThat(actual[0]).apply {
+            isInstanceOf<ClassType>()
+            hasName("Example")
+        }
+        assertThat(actual[1]).apply {
+            isInstanceOf<EnumType>()
+            hasName("Country")
+        }
+    }
+
     @Test
     fun `should return parsed object`() {
         // language=json

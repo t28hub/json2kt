@@ -17,7 +17,9 @@ package io.t28.kotlinify.parser
 
 import io.t28.kotlinify.lang.ArrayValue
 import io.t28.kotlinify.lang.BooleanValue
+import io.t28.kotlinify.lang.ClassType
 import io.t28.kotlinify.lang.DoubleValue
+import io.t28.kotlinify.lang.EnumType
 import io.t28.kotlinify.lang.IntegerValue
 import io.t28.kotlinify.lang.NullValue
 import io.t28.kotlinify.lang.ObjectValue
@@ -31,6 +33,7 @@ import io.t28.kotlinify.parser.jsonschema.BooleanDefinition
 import io.t28.kotlinify.parser.jsonschema.DataType
 import io.t28.kotlinify.parser.jsonschema.Definition
 import io.t28.kotlinify.parser.jsonschema.Document
+import io.t28.kotlinify.parser.jsonschema.EnumDefinition
 import io.t28.kotlinify.parser.jsonschema.IntegerDefinition
 import io.t28.kotlinify.parser.jsonschema.NullDefinition
 import io.t28.kotlinify.parser.jsonschema.NumberDefinition
@@ -84,6 +87,7 @@ class JsonSchemaParser(
     private fun parse(typeName: String, definition: Definition, typeNodes: MutableList<TypeNode>): ValueNode {
         return when (definition) {
             is ArrayDefinition -> parse(typeName, definition, typeNodes)
+            is EnumDefinition -> parse(typeName, definition, typeNodes)
             is ObjectDefinition -> parse(typeName, definition, typeNodes)
             is PrimitiveDefinition -> parse(definition)
             is NullDefinition -> NullValue
@@ -98,6 +102,12 @@ class JsonSchemaParser(
         return ArrayValue(component, isNullable)
     }
 
+    private fun parse(typeName: String, definition: EnumDefinition, typeNodes: MutableList<TypeNode>): ObjectValue {
+        val typeNode = EnumType(name = typeName, constants = definition.values.toImmutableList())
+        typeNodes.addFirst(typeNode)
+        return ObjectValue(reference = typeNode)
+    }
+
     private fun parse(typeName: String, definition: ObjectDefinition, typeNodes: MutableList<TypeNode>): ObjectValue {
         val propertyNamingStrategy = UniqueNamingStrategy(this.propertyNameStrategy)
         val properties = definition.properties.map { (name, property) ->
@@ -107,7 +117,7 @@ class JsonSchemaParser(
             PropertyNode(value = propertyValue, name = propertyName, originalName = name)
         }
 
-        val typeNode = TypeNode(name = typeName, properties = properties.toImmutableList())
+        val typeNode = ClassType(name = typeName, properties = properties.toImmutableList())
         typeNodes.addFirst(typeNode)
         return ObjectValue(reference = typeNode)
     }
