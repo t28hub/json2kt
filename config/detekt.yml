@@ -53,4 +53,4 @@ style:
     excludeGuardClauses: true
   UnusedPrivateMember:
     active: true
-    allowedNames: '(_|ignored|expected|serialVersionUID)'
+    allowedNames: '(_|ignored|expected|serialVersionUID|setUp|tearDown)'

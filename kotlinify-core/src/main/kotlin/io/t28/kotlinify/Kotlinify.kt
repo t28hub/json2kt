@@ -15,71 +15,35 @@
  */
 package io.t28.kotlinify
 
-import com.squareup.kotlinpoet.FileSpec
-import com.squareup.kotlinpoet.TypeSpec
 import io.t28.kotlinify.parser.JsonParser
-import io.t28.kotlinify.generator.ClassGenerator
-import io.t28.kotlinify.generator.EnumGenerator
-import io.t28.kotlinify.lang.ClassType
-import io.t28.kotlinify.lang.EnumType
-import io.t28.kotlinify.lang.InterfaceType
-import io.t28.kotlinify.lang.TypeNode
 import io.t28.kotlinify.parser.JsonSchemaParser
-import io.t28.kotlinify.parser.Parser
-import io.t28.kotlinify.parser.naming.PropertyNamingStrategy
-import io.t28.kotlinify.parser.naming.TypeNamingStrategy
-import io.t28.kotlinify.util.getFilename
-import io.t28.kotlinify.util.removeFileExtension
 
-object Kotlinify {
-    fun fromJson(json: String): KotlinBuilder {
-        return KotlinBuilder(
+class Kotlinify private constructor(private val configuration: Configuration) {
+    constructor(init: Configuration.Builder.() -> Unit) : this(
+        configuration = Configuration.builder().apply(init).build()
+    )
+
+    fun fromJson(content: String): FileBuilder {
+        return FileBuilder(
             parser = JsonParser(
-                typeNameStrategy = TypeNamingStrategy,
-                propertyNameStrategy = PropertyNamingStrategy
+                json = configuration.json,
+                typeNameStrategy = configuration.typeNameStrategy,
+                propertyNameStrategy = configuration.propertyNameStrategy
             ),
-            content = json
+            indent = configuration.indent,
+            content = content
         )
     }
 
-    fun fromJsonSchema(jsonSchema: String): KotlinBuilder {
-        return KotlinBuilder(
+    fun fromJsonSchema(content: String): FileBuilder {
+        return FileBuilder(
             parser = JsonSchemaParser(
-                typeNameStrategy = TypeNamingStrategy,
-                propertyNameStrategy = PropertyNamingStrategy
+                json = configuration.json,
+                typeNameStrategy = configuration.typeNameStrategy,
+                propertyNameStrategy = configuration.propertyNameStrategy
             ),
-            content = jsonSchema
+            indent = configuration.indent,
+            content = content
         )
-    }
-
-    class KotlinBuilder internal constructor(
-        private val parser: Parser,
-        private val content: String
-    ) {
-        fun toKotlin(packageName: String, fileName: String): String {
-            val classGenerator = ClassGenerator(packageName)
-            val enumGenerator = EnumGenerator(packageName)
-            val typeName = fileName.getFilename().removeFileExtension()
-            val typeSpecs = parser.parse(typeName, content).map { node ->
-                node.accept(object : TypeNode.Visitor<Unit, TypeSpec> {
-                    override fun visitClass(node: ClassType, parameter: Unit): TypeSpec {
-                        return classGenerator.generate(node)
-                    }
-
-                    override fun visitEnum(node: EnumType, parameter: Unit): TypeSpec {
-                        return enumGenerator.generate(node)
-                    }
-
-                    override fun visitInterface(node: InterfaceType, parameter: Unit): TypeSpec {
-                        TODO("Not yet implemented")
-                    }
-                }, Unit)
-            }
-            val fileSpec = FileSpec.builder(packageName, fileName).apply {
-                indent("    ")
-                typeSpecs.forEach(this::addType)
-            }.build()
-            return fileSpec.toString()
-        }
     }
 }
