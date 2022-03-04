@@ -17,6 +17,7 @@ package io.t28.kotlinify
 
 import com.google.common.truth.Truth.assertThat
 import io.t28.kotlinify.util.getFilename
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -30,6 +31,13 @@ import org.junit.jupiter.params.provider.ArgumentsSource
 import java.util.stream.Stream
 
 internal class KotlinifyTest {
+    private lateinit var kotlinify: Kotlinify
+
+    @BeforeEach
+    private fun setUp() {
+        kotlinify = Kotlinify { }
+    }
+
     @Nested
     @TestInstance(PER_CLASS)
     inner class JsonTest {
@@ -41,7 +49,7 @@ internal class KotlinifyTest {
             val output = readResourceAsString(kotlinFilepath)
 
             // Act
-            val actual = Kotlinify.fromJson(input)
+            val actual = kotlinify.fromJson(input)
                 .toKotlin(packageName = PACKAGE_NAME, fileName = kotlinFilepath.getFilename())
 
             // Assert
@@ -52,7 +60,7 @@ internal class KotlinifyTest {
         @ArgumentsSource(JsonEmptyClassFixtures::class)
         fun `should not generate a kotlin class`(json: String) {
             // Act
-            val actual = Kotlinify.fromJson(json)
+            val actual = kotlinify.fromJson(json)
                 .toKotlin(packageName = PACKAGE_NAME, fileName = "EmptyClass.kt")
 
             // Assert
@@ -76,7 +84,7 @@ internal class KotlinifyTest {
             val expected = readResourceAsString("GeographicalLocation.kt")
 
             // Act
-            val actual = Kotlinify.fromJsonSchema(jsonSchema)
+            val actual = kotlinify.fromJsonSchema(jsonSchema)
                 .toKotlin(packageName = PACKAGE_NAME, "GeographicalLocation.kt")
 
             // Assert
@@ -87,7 +95,7 @@ internal class KotlinifyTest {
         @ArgumentsSource(JsonSchemaEmptyClassFixtures::class)
         fun `should not generate a kotlin class`(jsonSchema: String) {
             // Act
-            val actual = Kotlinify.fromJsonSchema(jsonSchema)
+            val actual = kotlinify.fromJsonSchema(jsonSchema)
                 .toKotlin(packageName = PACKAGE_NAME, fileName = "EmptyClass.kt")
 
             // Assert
