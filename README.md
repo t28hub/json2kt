@@ -1,6 +1,7 @@
 Kotlinify
 =====
-[![Build Project](https://github.com/t28hub/kotlinify/actions/workflows/build.yml/badge.svg)](https://github.com/t28hub/kotlinify/actions/workflows/build.yml)
+[![Build Status](https://github.com/t28hub/kotlinify/actions/workflows/build.yml/badge.svg)](https://github.com/t28hub/kotlinify/actions/workflows/build.yml)
+[![Codecov Status](https://codecov.io/gh/t28hub/kotlinify/branch/main/graph/badge.svg?token=05DB475U8M)](https://codecov.io/gh/t28hub/kotlinify)
 
 ## License
 
