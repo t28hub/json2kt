@@ -18,7 +18,7 @@ import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 import io.gitlab.arturbosch.detekt.report.ReportMergeTask
 import kotlin.jvm.Throws
-import kotlinx.kover.api.CoverageEngine
+import kotlinx.kover.api.CoverageEngine.INTELLIJ
 
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
@@ -29,7 +29,7 @@ plugins {
 
 kover {
     isDisabled = false
-    coverageEngine.set(CoverageEngine.JACOCO)
+    coverageEngine.set(INTELLIJ)
 }
 
 /**
