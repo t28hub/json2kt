@@ -19,7 +19,7 @@ jobs:
     steps:
       # Checkout current repository
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       # Setup Java 11 environment
       - name: Setup Java 11
@@ -66,7 +66,7 @@ jobs:
     steps:
       # Check out current repository
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       # Validate gradle wrapper
       - name: Validate Gradle Wrapper
@@ -83,7 +83,7 @@ jobs:
     steps:
       # Check out current repository
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       # Validate gradle wrapper
       - name: Validate gradle wrapper
