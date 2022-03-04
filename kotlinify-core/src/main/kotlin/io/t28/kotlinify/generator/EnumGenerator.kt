@@ -18,15 +18,15 @@ package io.t28.kotlinify.generator
 import com.squareup.kotlinpoet.TypeSpec
 import io.t28.kotlinify.lang.EnumType
 
-class EnumGenerator(override val packageName: String) : TypeGenerator<EnumType> {
+class EnumGenerator(packageName: String) : TypeSpecGenerator<EnumType>(packageName) {
     override fun generate(node: EnumType): TypeSpec {
-        return node.asTypeSpec()
-    }
-
-    fun EnumType.asTypeSpec(): TypeSpec {
-        return TypeSpec.enumBuilder(name).apply {
-            enumConstants += constants.map { constant ->
+        return TypeSpec.enumBuilder(node.name).apply {
+            enumConstants += node.constants.map { constant ->
                 constant to TypeSpec.anonymousClassBuilder().build()
+            }
+
+            annotationSpecs += node.annotations.map { annotation ->
+                annotation.asAnnotationSpec()
             }
         }.build()
     }

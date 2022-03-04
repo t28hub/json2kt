@@ -15,41 +15,27 @@
  */
 package io.t28.kotlinify.generator
 
-import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterSpec
-import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
-import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeSpec
-import com.squareup.kotlinpoet.asTypeName
-import io.t28.kotlinify.lang.ArrayValue
 import io.t28.kotlinify.lang.ClassType
-import io.t28.kotlinify.lang.ObjectValue
-import io.t28.kotlinify.lang.PrimitiveValue
 import io.t28.kotlinify.lang.TypeNode
-import io.t28.kotlinify.lang.ValueNode
 
-class ClassGenerator(override val packageName: String): TypeGenerator<ClassType> {
+class ClassGenerator(packageName: String) : TypeSpecGenerator<ClassType>(packageName) {
     override fun generate(node: ClassType): TypeSpec {
-        return node.asTypeSpec()
-    }
-
-    private fun TypeNode.asTypeSpec(): TypeSpec {
-        return TypeSpec.classBuilder(name).apply {
-            if (hasChildren) {
+        return TypeSpec.classBuilder(node.name).apply {
+            if (node.hasChildren) {
                 modifiers += KModifier.DATA
             }
 
-            propertySpecs += children().map { property ->
-                val propertyName = property.name
-                val propertyType = property.value.asTypeName(packageName)
-                PropertySpec.builder(propertyName, propertyType).apply {
-                    modifiers += KModifier.PUBLIC
-                    mutable(false)
-                    initializer(propertyName)
-                }.build()
+            annotationSpecs += node.annotations.map { annotation ->
+                annotation.asAnnotationSpec()
+            }
+
+            propertySpecs += node.children().map { property ->
+                property.asPropertySpec()
             }
 
             primaryConstructor(FunSpec.constructorBuilder().apply {
@@ -58,17 +44,5 @@ class ClassGenerator(override val packageName: String): TypeGenerator<ClassType>
                 }
             }.build())
         }.build()
-    }
-
-    private fun ValueNode.asTypeName(packageName: String): TypeName {
-        val typeName = when (this) {
-            is ArrayValue -> {
-                val typeArgument = componentType().asTypeName(packageName)
-                List::class.asTypeName().parameterizedBy(typeArgument)
-            }
-            is ObjectValue -> ClassName(packageName, reference.name)
-            is PrimitiveValue -> type.asTypeName()
-        }
-        return typeName.copy(nullable = isNullable)
     }
 }

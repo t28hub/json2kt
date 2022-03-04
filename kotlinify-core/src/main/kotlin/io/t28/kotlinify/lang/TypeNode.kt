@@ -21,16 +21,19 @@ import kotlinx.collections.immutable.toImmutableList
  * Represents a type element.
  *
  * @param name The name of this type.
+ * @param annotations The annotated annotations fo this type.
  * @param properties The children of this type.
  */
 abstract class TypeNode(
     val name: String,
+    override val annotations: Collection<AnnotationValue>,
     internal val properties: Collection<PropertyNode>,
-) : Node {
+) : AnnotatedNode() {
     override fun toString(): String = buildString {
         append(this@TypeNode::class.simpleName)
         append("{")
         append("name=$name,")
+        append("annotations=$annotations,")
         append("properties=$properties")
         append("}")
     }

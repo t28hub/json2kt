@@ -19,8 +19,9 @@ import kotlinx.collections.immutable.toImmutableList
 
 class InterfaceType(
     name: String,
+    annotations: Collection<AnnotationValue> = emptyList(),
     properties: Collection<PropertyNode> = emptyList(),
-) : TypeNode(name, properties.toImmutableList()) {
+) : TypeNode(name, annotations.toImmutableList(), properties.toImmutableList()) {
     override fun <P, R> accept(visitor: Visitor<P, R>, parameter: P): R {
         return visitor.visitInterface(this, parameter)
     }
