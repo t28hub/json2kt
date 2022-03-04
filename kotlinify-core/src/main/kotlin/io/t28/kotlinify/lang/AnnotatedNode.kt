@@ -13,17 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.t28.kotlinify.lang
 
 import kotlinx.collections.immutable.toImmutableList
 
-class ClassType(
-    name: String,
-    annotations: Collection<AnnotationValue> = emptyList(),
-    properties: Collection<PropertyNode> = emptyList(),
-) : TypeNode(name, annotations.toImmutableList(), properties.toImmutableList()) {
-    override fun <P, R> accept(visitor: Visitor<P, R>, parameter: P): R {
-        return visitor.visitClass(this, parameter)
+/**
+ * Represents an annotated node.
+ */
+sealed class AnnotatedNode : Node {
+    /**
+     * Annotated annotations on this node.
+     */
+    abstract val annotations: Collection<AnnotationValue>
+
+    /**
+     * Finds annotations by using the [filter].
+     *
+     * @param filter The filter function.
+     */
+    fun findAnnotations(filter: (AnnotationValue) -> Boolean): Collection<AnnotationValue> {
+        return annotations.filter(filter).toImmutableList()
     }
 }

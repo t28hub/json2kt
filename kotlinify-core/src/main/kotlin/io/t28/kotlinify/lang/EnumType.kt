@@ -19,13 +19,15 @@ import kotlinx.collections.immutable.toImmutableList
 
 class EnumType(
     name: String,
+    annotations: Collection<AnnotationValue> = emptyList(),
     properties: Collection<PropertyNode> = emptyList(),
     val constants: Collection<String> = emptySet()
-) : TypeNode(name, properties.toImmutableList()) {
+) : TypeNode(name, annotations.toImmutableList(), properties.toImmutableList()) {
     override fun toString(): String = buildString {
         append(EnumType::class.simpleName)
         append("{")
         append("name=$name,")
+        append("annotations=$annotations,")
         append("properties=$properties,")
         append("constants=$constants")
         append("}")

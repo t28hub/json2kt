@@ -13,13 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.t28.kotlinify.generator
+package io.t28.kotlinify.lang
 
-import com.squareup.kotlinpoet.TypeSpec
-import io.t28.kotlinify.lang.TypeNode
+import kotlin.reflect.KClass
 
-interface TypeGenerator<T : TypeNode> {
-    val packageName: String
-
-    fun generate(node: T): TypeSpec
+class AnnotationValue(
+    val type: KClass<out Annotation>,
+    val members: Map<String, Any> = emptyMap()
+) {
+    override fun toString() = buildString {
+        append(AnnotationValue::class.simpleName)
+        append("{")
+        append("type=${type.simpleName}")
+        append("members=$members")
+        append("}")
+    }
 }

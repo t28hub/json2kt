@@ -21,23 +21,42 @@ package io.t28.kotlinify.lang
  * @param value The value of this property.
  * @param name The name of this property.
  * @param originalName The original name of this property.
+ * @param annotations The annotated annotations fo this type.
  */
-data class PropertyNode(
+class PropertyNode(
     val value: ValueNode,
     val name: String,
     val originalName: String,
-) : Node {
+    val mutable: Boolean = false,
+    override val annotations: Collection<AnnotationValue> = emptyList()
+) : AnnotatedNode() {
+    internal constructor(
+        value: ValueNode,
+        name: String,
+        mutable: Boolean = false,
+        annotations: Collection<AnnotationValue> = emptyList()
+    ) : this(
+        value = value,
+        name = name,
+        originalName = name,
+        mutable = mutable,
+        annotations = annotations
+    )
+
     init {
         require(name.isNotEmpty()) { "Name is empty string" }
         require(originalName.isNotEmpty()) { "Original name is empty string" }
     }
+
 
     override fun toString(): String = buildString {
         append(PropertyNode::class.simpleName)
         append("{")
         append("value=$value,")
         append("name=$name,")
-        append("originalName=$originalName")
+        append("originalName=$originalName,")
+        append("mutable=$mutable,")
+        append("annotations=$annotations")
         append("}")
     }
 
