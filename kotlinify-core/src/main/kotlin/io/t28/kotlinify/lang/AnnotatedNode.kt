@@ -16,6 +16,7 @@
 package io.t28.kotlinify.lang
 
 import kotlinx.collections.immutable.toImmutableList
+import kotlin.reflect.KClass
 
 /**
  * Represents an annotated node.
@@ -24,14 +25,25 @@ sealed class AnnotatedNode : Node {
     /**
      * Annotated annotations on this node.
      */
-    abstract val annotations: Collection<AnnotationValue>
+    abstract val annotations: List<AnnotationValue>
+
+    inline fun <reified T : Annotation> hasAnnotation(): Boolean {
+        return hasAnnotation(T::class)
+    }
+
+    fun <T : Annotation> hasAnnotation(annotationClass: KClass<T>): Boolean {
+        val found = findAnnotations { annotation ->
+            annotation.type == annotationClass
+        }
+        return found.isNotEmpty()
+    }
 
     /**
      * Finds annotations by using the [filter].
      *
      * @param filter The filter function.
      */
-    fun findAnnotations(filter: (AnnotationValue) -> Boolean): Collection<AnnotationValue> {
+    fun findAnnotations(filter: (AnnotationValue) -> Boolean): List<AnnotationValue> {
         return annotations.filter(filter).toImmutableList()
     }
 }

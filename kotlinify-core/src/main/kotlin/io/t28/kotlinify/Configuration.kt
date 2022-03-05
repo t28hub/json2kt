@@ -15,9 +15,12 @@
  */
 package io.t28.kotlinify
 
+import io.t28.kotlinify.interceptor.PropertyInterceptor
+import io.t28.kotlinify.interceptor.TypeInterceptor
 import io.t28.kotlinify.parser.naming.NamingStrategy
 import io.t28.kotlinify.parser.naming.PropertyNamingStrategy
 import io.t28.kotlinify.parser.naming.TypeNamingStrategy
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.serialization.json.Json
 
 /**
@@ -33,6 +36,8 @@ class Configuration internal constructor(
     val indentSize: Int,
     val typeNameStrategy: NamingStrategy,
     val propertyNameStrategy: NamingStrategy,
+    val typeInterceptors: List<TypeInterceptor>,
+    val propertyInterceptors: List<PropertyInterceptor>
 ) {
     val indent: String
         get() = " ".repeat(indentSize)
@@ -47,7 +52,10 @@ class Configuration internal constructor(
         }
     }
 
-    class Builder internal constructor() {
+    class Builder internal constructor(
+        val typeInterceptors: MutableList<TypeInterceptor> = mutableListOf(),
+        val propertyInterceptors: MutableList<PropertyInterceptor> = mutableListOf()
+    ) {
         var json: Json = Json {
             ignoreUnknownKeys = true
         }
@@ -64,6 +72,8 @@ class Configuration internal constructor(
                 indentSize = indentSize,
                 typeNameStrategy = typeNameStrategy,
                 propertyNameStrategy = propertyNameStrategy,
+                typeInterceptors = typeInterceptors.toImmutableList(),
+                propertyInterceptors = propertyInterceptors.toImmutableList()
             )
         }
 

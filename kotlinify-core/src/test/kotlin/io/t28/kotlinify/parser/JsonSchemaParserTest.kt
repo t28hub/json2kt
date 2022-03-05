@@ -19,8 +19,6 @@ import com.google.common.truth.Truth.assertThat
 import io.t28.kotlinify.assertThat
 import io.t28.kotlinify.isInstanceOf
 import io.t28.kotlinify.lang.BooleanValue
-import io.t28.kotlinify.lang.ClassType
-import io.t28.kotlinify.lang.EnumType
 import io.t28.kotlinify.lang.IntegerValue
 import io.t28.kotlinify.lang.StringValue
 import io.t28.kotlinify.parser.naming.PropertyNamingStrategy
@@ -87,11 +85,11 @@ internal class JsonSchemaParserTest {
         // Assert
         assertThat(actual).hasSize(2)
         assertThat(actual[0]).apply {
-            isInstanceOf<ClassType>()
+            isClass()
             hasName("Example")
         }
         assertThat(actual[1]).apply {
-            isInstanceOf<EnumType>()
+            isEnum()
             hasName("Country")
         }
     }

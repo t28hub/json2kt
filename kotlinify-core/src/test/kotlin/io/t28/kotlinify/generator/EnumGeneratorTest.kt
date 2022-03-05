@@ -17,7 +17,8 @@ package io.t28.kotlinify.generator
 
 import com.google.common.truth.Truth.assertThat
 import io.t28.kotlinify.lang.AnnotationValue
-import io.t28.kotlinify.lang.EnumType
+import io.t28.kotlinify.lang.TypeNode
+import io.t28.kotlinify.lang.TypeNode.TypeKind.ENUM
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -32,7 +33,7 @@ internal class EnumGeneratorTest {
     @Test
     fun `should generate an enum class`() {
         // Arrange
-        val node = EnumType("EnumTest")
+        val node = TypeNode(name = "EnumTest", kind = ENUM, enumConstants = emptySet())
 
         // Act
         val actual = enumGenerator.generate(node)
@@ -47,9 +48,10 @@ internal class EnumGeneratorTest {
     @Test
     fun `should generate an enum class with constants`() {
         // Arrange
-        val node = EnumType(
+        val node = TypeNode(
             name = "EnumTest",
-            constants = setOf("FOO", "BAR", "BAZ")
+            kind = ENUM,
+            enumConstants = setOf("FOO", "BAR", "BAZ")
         )
 
         // Act
@@ -70,9 +72,10 @@ internal class EnumGeneratorTest {
     @Test
     fun `should generate an enum class with annotations`() {
         // Arrange
-        val node = EnumType(
+        val node = TypeNode(
             name = "EnumTest",
-            constants = setOf("FOO", "BAR", "BAZ"),
+            kind = ENUM,
+            enumConstants = setOf("FOO", "BAR", "BAZ"),
             annotations = listOf(
                 AnnotationValue(
                     type = Deprecated::class,

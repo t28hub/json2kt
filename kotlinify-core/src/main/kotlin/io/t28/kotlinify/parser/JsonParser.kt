@@ -17,7 +17,6 @@ package io.t28.kotlinify.parser
 
 import io.t28.kotlinify.lang.ArrayValue
 import io.t28.kotlinify.lang.BooleanValue
-import io.t28.kotlinify.lang.ClassType
 import io.t28.kotlinify.lang.FloatValue
 import io.t28.kotlinify.lang.IntegerValue
 import io.t28.kotlinify.lang.NullValue
@@ -26,6 +25,7 @@ import io.t28.kotlinify.lang.PrimitiveValue
 import io.t28.kotlinify.lang.PropertyNode
 import io.t28.kotlinify.lang.StringValue
 import io.t28.kotlinify.lang.TypeNode
+import io.t28.kotlinify.lang.TypeNode.TypeKind.CLASS
 import io.t28.kotlinify.lang.ValueNode
 import io.t28.kotlinify.parser.naming.NamingStrategy
 import io.t28.kotlinify.parser.naming.UniqueNamingStrategy
@@ -108,7 +108,11 @@ class JsonParser(
             PropertyNode(value = propertyValue, name = propertyName, originalName = key)
         }
 
-        val typeNode = ClassType(name = typeName, properties = properties.reversed().toImmutableList())
+        val typeNode = TypeNode(
+            name = typeName,
+            kind = CLASS,
+            properties = properties.reversed().toImmutableList()
+        )
         typeNodes.addFirst(typeNode)
         return ObjectValue(reference = typeNode)
     }

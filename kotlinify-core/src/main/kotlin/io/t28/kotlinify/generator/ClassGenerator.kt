@@ -18,13 +18,11 @@ package io.t28.kotlinify.generator
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterSpec
-import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
-import io.t28.kotlinify.lang.ClassType
 import io.t28.kotlinify.lang.TypeNode
 
-class ClassGenerator(packageName: String) : TypeSpecGenerator<ClassType>(packageName) {
-    override fun generate(node: ClassType): TypeSpec {
+class ClassGenerator(packageName: String) : TypeSpecGenerator(packageName) {
+    override fun generate(node: TypeNode): TypeSpec {
         return TypeSpec.classBuilder(node.name).apply {
             if (node.hasChildren) {
                 modifiers += KModifier.DATA

@@ -15,39 +15,30 @@
  */
 package io.t28.kotlinify.lang
 
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
+
 /**
- * Represents a property element.
+ * Represents a property node.
  *
  * @param value The value of this property.
  * @param name The name of this property.
  * @param originalName The original name of this property.
+ * @param isMutable Whether the property is mutable.
  * @param annotations The annotated annotations fo this type.
  */
 class PropertyNode(
     val value: ValueNode,
     val name: String,
     val originalName: String,
-    val mutable: Boolean = false,
-    override val annotations: Collection<AnnotationValue> = emptyList()
+    val isMutable: Boolean = false,
+    override val annotations: ImmutableList<AnnotationValue> = persistentListOf()
 ) : AnnotatedNode() {
-    internal constructor(
-        value: ValueNode,
-        name: String,
-        mutable: Boolean = false,
-        annotations: Collection<AnnotationValue> = emptyList()
-    ) : this(
-        value = value,
-        name = name,
-        originalName = name,
-        mutable = mutable,
-        annotations = annotations
-    )
-
     init {
         require(name.isNotEmpty()) { "Name is empty string" }
         require(originalName.isNotEmpty()) { "Original name is empty string" }
     }
-
 
     override fun toString(): String = buildString {
         append(PropertyNode::class.simpleName)
@@ -55,12 +46,27 @@ class PropertyNode(
         append("value=$value,")
         append("name=$name,")
         append("originalName=$originalName,")
-        append("mutable=$mutable,")
+        append("isMutable=$isMutable,")
         append("annotations=$annotations")
         append("}")
     }
 
     override fun children(): Collection<Node> {
         return emptyList()
+    }
+
+    fun copy(
+        name: String = this.name,
+        value: ValueNode = this.value,
+        isMutable: Boolean = this.isMutable,
+        annotations: List<AnnotationValue> = this.annotations
+    ): PropertyNode {
+        return PropertyNode(
+            name = name,
+            originalName = this.originalName,
+            value = value,
+            isMutable = isMutable,
+            annotations = annotations.toImmutableList()
+        )
     }
 }

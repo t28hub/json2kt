@@ -32,8 +32,8 @@ import io.t28.kotlinify.lang.PropertyNode
 import io.t28.kotlinify.lang.TypeNode
 import io.t28.kotlinify.lang.ValueNode
 
-abstract class TypeSpecGenerator<T : TypeNode>(private val packageName: String) {
-    abstract fun generate(node: T): TypeSpec
+abstract class TypeSpecGenerator(private val packageName: String) {
+    abstract fun generate(node: TypeNode): TypeSpec
 
     protected fun AnnotationValue.asAnnotationSpec(): AnnotationSpec {
         return AnnotationSpec.builder(type.asTypeName()).apply {
@@ -47,7 +47,7 @@ abstract class TypeSpecGenerator<T : TypeNode>(private val packageName: String) 
     protected fun PropertyNode.asPropertySpec(): PropertySpec {
         return PropertySpec.builder(name, value.asTypeName(packageName)).apply {
             modifiers += KModifier.PUBLIC
-            mutable(mutable)
+            mutable(isMutable)
             initializer(name)
             annotations += this@asPropertySpec.annotations.map { annotation ->
                 annotation.asAnnotationSpec()
