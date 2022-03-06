@@ -15,11 +15,15 @@
  */
 package io.t28.kotlinify.lang
 
+import com.google.common.truth.Fact.simpleFact
 import com.google.common.truth.FailureMetadata
 import com.google.common.truth.IterableSubject
 import com.google.common.truth.StringSubject
 import com.google.common.truth.Subject
 import com.google.common.truth.Truth
+import io.t28.kotlinify.lang.TypeNode.TypeKind.CLASS
+import io.t28.kotlinify.lang.TypeNode.TypeKind.ENUM
+import io.t28.kotlinify.lang.TypeNode.TypeKind.INTERFACE
 
 /**
  * [Truth] subject implementation for [TypeNode].
@@ -27,6 +31,24 @@ import com.google.common.truth.Truth
 class TypeNodeSubject(metadata: FailureMetadata, private val actual: TypeNode) : Subject(metadata, actual) {
     fun hasName(expectedName: String) {
         return name().isEqualTo(expectedName)
+    }
+
+    fun isClass() {
+        if (actual.kind != CLASS) {
+            failWithActual(simpleFact("expected kind to be ${CLASS}, but was ${actual.kind}"))
+        }
+    }
+
+    fun isEnum() {
+        if (actual.kind != ENUM) {
+            failWithActual(simpleFact("expected kind to be ${ENUM}, but was ${actual.kind}"))
+        }
+    }
+
+    fun isInterface() {
+        if (actual.kind != INTERFACE) {
+            failWithActual(simpleFact("expected kind to be ${INTERFACE}, but was ${actual.kind}"))
+        }
     }
 
     fun name(): StringSubject {

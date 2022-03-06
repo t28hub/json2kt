@@ -15,8 +15,10 @@
  */
 package io.t28.kotlinify
 
+import io.t28.kotlinify.interceptor.Execution
 import io.t28.kotlinify.parser.JsonParser
 import io.t28.kotlinify.parser.JsonSchemaParser
+import io.t28.kotlinify.parser.Parser
 
 class Kotlinify private constructor(private val configuration: Configuration) {
     constructor(init: Configuration.Builder.() -> Unit) : this(
@@ -24,23 +26,33 @@ class Kotlinify private constructor(private val configuration: Configuration) {
     )
 
     fun fromJson(content: String): FileBuilder {
-        return FileBuilder(
+        return from(
             parser = JsonParser(
                 json = configuration.json,
                 typeNameStrategy = configuration.typeNameStrategy,
                 propertyNameStrategy = configuration.propertyNameStrategy
             ),
-            indent = configuration.indent,
             content = content
         )
     }
 
     fun fromJsonSchema(content: String): FileBuilder {
-        return FileBuilder(
+        return from(
             parser = JsonSchemaParser(
                 json = configuration.json,
                 typeNameStrategy = configuration.typeNameStrategy,
                 propertyNameStrategy = configuration.propertyNameStrategy
+            ),
+            content = content
+        )
+    }
+
+    private fun from(content: String, parser: Parser): FileBuilder {
+        return FileBuilder(
+            parser = parser,
+            execution = Execution(
+                typeInterceptors = configuration.typeInterceptors,
+                propertyInterceptors = configuration.propertyInterceptors
             ),
             indent = configuration.indent,
             content = content

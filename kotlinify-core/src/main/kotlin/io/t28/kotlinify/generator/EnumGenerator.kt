@@ -16,12 +16,12 @@
 package io.t28.kotlinify.generator
 
 import com.squareup.kotlinpoet.TypeSpec
-import io.t28.kotlinify.lang.EnumType
+import io.t28.kotlinify.lang.TypeNode
 
-class EnumGenerator(packageName: String) : TypeSpecGenerator<EnumType>(packageName) {
-    override fun generate(node: EnumType): TypeSpec {
+class EnumGenerator(packageName: String) : TypeSpecGenerator(packageName) {
+    override fun generate(node: TypeNode): TypeSpec {
         return TypeSpec.enumBuilder(node.name).apply {
-            enumConstants += node.constants.map { constant ->
+            enumConstants += node.enumConstants.map { constant ->
                 constant to TypeSpec.anonymousClassBuilder().build()
             }
 

@@ -13,16 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.t28.kotlinify.lang
+package io.t28.kotlinify.interceptor
 
-import kotlinx.collections.immutable.toImmutableList
+import io.t28.kotlinify.lang.Node
 
-class InterfaceType(
-    name: String,
-    annotations: Collection<AnnotationValue> = emptyList(),
-    properties: Collection<PropertyNode> = emptyList(),
-) : TypeNode(name, annotations.toImmutableList(), properties.toImmutableList()) {
-    override fun <P, R> accept(visitor: Visitor<P, R>, parameter: P): R {
-        return visitor.visitInterface(this, parameter)
-    }
+interface Interceptor<T : Node> {
+    fun intercept(node: T): T
 }

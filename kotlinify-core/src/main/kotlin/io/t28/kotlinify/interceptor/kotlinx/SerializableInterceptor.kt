@@ -13,17 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package io.t28.kotlinify.interceptor.kotlinx
 
-package io.t28.kotlinify.lang
+import io.t28.kotlinify.interceptor.TypeInterceptor
+import io.t28.kotlinify.lang.AnnotationValue
+import io.t28.kotlinify.lang.TypeNode
+import kotlinx.serialization.Serializable
 
-import kotlinx.collections.immutable.toImmutableList
+object SerializableInterceptor : TypeInterceptor {
+    override fun intercept(node: TypeNode): TypeNode {
+        if (node.hasAnnotation<Serializable>()) {
+            return node
+        }
 
-class ClassType(
-    name: String,
-    annotations: Collection<AnnotationValue> = emptyList(),
-    properties: Collection<PropertyNode> = emptyList(),
-) : TypeNode(name, annotations.toImmutableList(), properties.toImmutableList()) {
-    override fun <P, R> accept(visitor: Visitor<P, R>, parameter: P): R {
-        return visitor.visitClass(this, parameter)
+        val annotations = node.annotations.toMutableList()
+        annotations += AnnotationValue(type = Serializable::class)
+        return node.copy(annotations = annotations)
     }
 }

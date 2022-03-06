@@ -15,26 +15,49 @@
  */
 package io.t28.kotlinify.lang
 
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableSet
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toImmutableSet
 
 /**
  * Represents a type element.
  *
  * @param name The name of this type.
- * @param annotations The annotated annotations fo this type.
- * @param properties The children of this type.
+ * @param kind The kind of this type.
+ * @param properties The properties of this type.
+ * @param enumConstants The enum constants of this type.
+ * @param annotations The annotated annotations of this type.
  */
-abstract class TypeNode(
+class TypeNode(
     val name: String,
-    override val annotations: Collection<AnnotationValue>,
-    internal val properties: Collection<PropertyNode>,
+    val kind: TypeKind,
+    val properties: ImmutableList<PropertyNode> = persistentListOf(),
+    val enumConstants: ImmutableSet<String> = persistentSetOf(),
+    override val annotations: ImmutableList<AnnotationValue> = persistentListOf(),
 ) : AnnotatedNode() {
+    constructor(
+        name: String,
+        kind: TypeKind,
+        properties: List<PropertyNode> = emptyList(),
+        annotations: List<AnnotationValue> = emptyList(),
+        enumConstants: Set<String> = emptySet()
+    ) : this(
+        name = name,
+        kind = kind,
+        properties = properties.toImmutableList(),
+        annotations = annotations.toImmutableList(),
+        enumConstants = enumConstants.toImmutableSet()
+    )
+
     override fun toString(): String = buildString {
         append(this@TypeNode::class.simpleName)
         append("{")
         append("name=$name,")
-        append("annotations=$annotations,")
-        append("properties=$properties")
+        append("properties=$properties,")
+        append("annotations=$annotations")
         append("}")
     }
 
@@ -42,13 +65,24 @@ abstract class TypeNode(
         return properties.toImmutableList()
     }
 
-    abstract fun <P, R> accept(visitor: Visitor<P, R>, parameter: P): R
+    fun copy(
+        kind: TypeKind = this.kind,
+        properties: List<PropertyNode> = this.properties,
+        annotations: List<AnnotationValue> = this.annotations,
+        enumConstants: Set<String> = this.enumConstants
+    ): TypeNode {
+        return TypeNode(
+            name = name,
+            kind = kind,
+            properties = properties.toImmutableList(),
+            annotations = annotations.toImmutableList(),
+            enumConstants = enumConstants.toImmutableSet()
+        )
+    }
 
-    interface Visitor<P, R> {
-        fun visitClass(node: ClassType, parameter: P): R
-
-        fun visitEnum(node: EnumType, parameter: P): R
-
-        fun visitInterface(node: InterfaceType, parameter: P): R
+    enum class TypeKind {
+        CLASS,
+        ENUM,
+        INTERFACE
     }
 }

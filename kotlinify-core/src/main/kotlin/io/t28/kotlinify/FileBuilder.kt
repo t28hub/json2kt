@@ -17,19 +17,19 @@
 package io.t28.kotlinify
 
 import com.squareup.kotlinpoet.FileSpec
-import com.squareup.kotlinpoet.TypeSpec
 import io.t28.kotlinify.generator.ClassGenerator
 import io.t28.kotlinify.generator.EnumGenerator
-import io.t28.kotlinify.lang.ClassType
-import io.t28.kotlinify.lang.EnumType
-import io.t28.kotlinify.lang.InterfaceType
-import io.t28.kotlinify.lang.TypeNode
+import io.t28.kotlinify.interceptor.Execution
+import io.t28.kotlinify.lang.TypeNode.TypeKind.CLASS
+import io.t28.kotlinify.lang.TypeNode.TypeKind.ENUM
+import io.t28.kotlinify.lang.TypeNode.TypeKind.INTERFACE
 import io.t28.kotlinify.parser.Parser
 import io.t28.kotlinify.util.getFilename
 import io.t28.kotlinify.util.removeFileExtension
 
 class FileBuilder internal constructor(
     private val parser: Parser,
+    private val execution: Execution,
     private val content: String,
     private val indent: String,
 ) {
@@ -38,20 +38,15 @@ class FileBuilder internal constructor(
         val enumGenerator = EnumGenerator(packageName)
         val typeName = fileName.getFilename().removeFileExtension()
         val typeSpecs = parser.parse(typeName, content).map { node ->
-            node.accept(object : TypeNode.Visitor<Unit, TypeSpec> {
-                override fun visitClass(node: ClassType, parameter: Unit): TypeSpec {
-                    return classGenerator.generate(node)
-                }
-
-                override fun visitEnum(node: EnumType, parameter: Unit): TypeSpec {
-                    return enumGenerator.generate(node)
-                }
-
-                override fun visitInterface(node: InterfaceType, parameter: Unit): TypeSpec {
-                    TODO("Not yet implemented")
-                }
-            }, Unit)
+            val proceeded = execution.execute(node)
+            val generator = when (proceeded.kind) {
+                CLASS -> classGenerator
+                ENUM -> enumGenerator
+                INTERFACE -> TODO()
+            }
+            generator.generate(proceeded)
         }
+
         val fileSpec = FileSpec.builder(packageName, fileName).apply {
             indent(indent)
             typeSpecs.forEach(this::addType)

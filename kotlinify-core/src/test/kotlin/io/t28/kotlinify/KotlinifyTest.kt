@@ -16,6 +16,8 @@
 package io.t28.kotlinify
 
 import com.google.common.truth.Truth.assertThat
+import io.t28.kotlinify.interceptor.kotlinx.SerialNameInterceptor
+import io.t28.kotlinify.interceptor.kotlinx.SerializableInterceptor
 import io.t28.kotlinify.util.getFilename
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -36,6 +38,59 @@ internal class KotlinifyTest {
     @BeforeEach
     private fun setUp() {
         kotlinify = Kotlinify { }
+    }
+
+    @Test
+    fun `should generate a kotlin class with interceptors`() {
+        // Arrange
+        val json = """
+        |{
+        |  "id": 1,
+        |  "login": "Octcat",
+        |  "plan": {
+        |    "name": "Pro",
+        |    "space": 976562499
+        |  }
+        |}
+        """.trimMargin()
+
+        // Act
+        val actual = Kotlinify {
+            indentSize = 2
+            typeInterceptors += SerializableInterceptor
+            propertyInterceptors += SerialNameInterceptor
+        }.fromJson(json).toKotlin(PACKAGE_NAME, "User")
+
+        // Assert
+        assertThat(actual).isEqualTo(
+            """
+            |package io.t28.kotlinify
+            |
+            |import kotlin.Int
+            |import kotlin.String
+            |import kotlinx.serialization.SerialName
+            |import kotlinx.serialization.Serializable
+            |
+            |@Serializable
+            |public data class User(
+            |  @SerialName
+            |  public val id: Int,
+            |  @SerialName
+            |  public val login: String,
+            |  @SerialName
+            |  public val plan: Plan
+            |)
+            |
+            |@Serializable
+            |public data class Plan(
+            |  @SerialName
+            |  public val name: String,
+            |  @SerialName
+            |  public val space: Int
+            |)
+            |
+            """.trimMargin()
+        )
     }
 
     @Nested

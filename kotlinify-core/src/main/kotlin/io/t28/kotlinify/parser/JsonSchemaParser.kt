@@ -17,9 +17,7 @@ package io.t28.kotlinify.parser
 
 import io.t28.kotlinify.lang.ArrayValue
 import io.t28.kotlinify.lang.BooleanValue
-import io.t28.kotlinify.lang.ClassType
 import io.t28.kotlinify.lang.DoubleValue
-import io.t28.kotlinify.lang.EnumType
 import io.t28.kotlinify.lang.IntegerValue
 import io.t28.kotlinify.lang.NullValue
 import io.t28.kotlinify.lang.ObjectValue
@@ -27,6 +25,8 @@ import io.t28.kotlinify.lang.PrimitiveValue
 import io.t28.kotlinify.lang.PropertyNode
 import io.t28.kotlinify.lang.StringValue
 import io.t28.kotlinify.lang.TypeNode
+import io.t28.kotlinify.lang.TypeNode.TypeKind.CLASS
+import io.t28.kotlinify.lang.TypeNode.TypeKind.ENUM
 import io.t28.kotlinify.lang.ValueNode
 import io.t28.kotlinify.parser.jsonschema.ArrayDefinition
 import io.t28.kotlinify.parser.jsonschema.BooleanDefinition
@@ -44,7 +44,6 @@ import io.t28.kotlinify.parser.naming.NamingStrategy
 import io.t28.kotlinify.parser.naming.UniqueNamingStrategy
 import io.t28.kotlinify.util.addFirst
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -103,7 +102,11 @@ class JsonSchemaParser(
     }
 
     private fun parse(typeName: String, definition: EnumDefinition, typeNodes: MutableList<TypeNode>): ObjectValue {
-        val typeNode = EnumType(name = typeName, constants = definition.values.toImmutableList())
+        val typeNode = TypeNode(
+            name = typeName,
+            kind = ENUM,
+            enumConstants = definition.values
+        )
         typeNodes.addFirst(typeNode)
         return ObjectValue(reference = typeNode)
     }
@@ -117,7 +120,11 @@ class JsonSchemaParser(
             PropertyNode(value = propertyValue, name = propertyName, originalName = name)
         }
 
-        val typeNode = ClassType(name = typeName, properties = properties.toImmutableList())
+        val typeNode = TypeNode(
+            name = typeName,
+            kind = CLASS,
+            properties = properties
+        )
         typeNodes.addFirst(typeNode)
         return ObjectValue(reference = typeNode)
     }

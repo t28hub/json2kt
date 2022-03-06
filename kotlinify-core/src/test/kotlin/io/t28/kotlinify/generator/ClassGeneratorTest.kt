@@ -17,10 +17,12 @@ package io.t28.kotlinify.generator
 
 import com.google.common.truth.Truth.assertThat
 import io.t28.kotlinify.lang.AnnotationValue
-import io.t28.kotlinify.lang.ClassType
 import io.t28.kotlinify.lang.IntegerValue
 import io.t28.kotlinify.lang.PropertyNode
 import io.t28.kotlinify.lang.StringValue
+import io.t28.kotlinify.lang.TypeNode
+import io.t28.kotlinify.lang.TypeNode.TypeKind.CLASS
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.junit.jupiter.api.BeforeEach
@@ -37,7 +39,7 @@ internal class ClassGeneratorTest {
     @Test
     fun `should generate an empty class`() {
         // Arrange
-        val node = ClassType(name = "EmptyClass")
+        val node = TypeNode(name = "EmptyClass", kind = CLASS, properties = emptyList())
 
         // Act
         val actual = classGenerator.generate(node)
@@ -52,8 +54,9 @@ internal class ClassGeneratorTest {
     @Test
     fun `should generate a class with annotations`() {
         // Arrange
-        val node = ClassType(
+        val node = TypeNode(
             name = "DeprecatedClass",
+            kind = CLASS,
             annotations = listOf(
                 AnnotationValue(
                     type = Deprecated::class,
@@ -76,15 +79,18 @@ internal class ClassGeneratorTest {
     @Test
     fun `should generate a class with properties`() {
         // Arrange
-        val node = ClassType(
+        val node = TypeNode(
             name = "User",
+            kind = CLASS,
             properties = listOf(
                 PropertyNode(
                     name = "id",
+                    originalName = "id",
                     value = IntegerValue(),
                 ),
                 PropertyNode(
                     name = "name",
+                    originalName = "name",
                     value = StringValue(isNullable = true)
                 )
             )
@@ -106,8 +112,9 @@ internal class ClassGeneratorTest {
     @Test
     fun `should generate a class with annotations and properties`() {
         // Arrange
-        val node = ClassType(
+        val node = TypeNode(
             name = "User",
+            kind = CLASS,
             annotations = listOf(
                 AnnotationValue(
                     type = Serializable::class
@@ -116,8 +123,9 @@ internal class ClassGeneratorTest {
             properties = listOf(
                 PropertyNode(
                     name = "id",
+                    originalName= "_id",
                     value = IntegerValue(),
-                    annotations = listOf(
+                    annotations = persistentListOf(
                         AnnotationValue(
                             type = SerialName::class,
                             members = mapOf("value" to "_id")
@@ -126,6 +134,7 @@ internal class ClassGeneratorTest {
                 ),
                 PropertyNode(
                     name = "name",
+                    originalName= "name",
                     value = StringValue(isNullable = true)
                 )
             )
