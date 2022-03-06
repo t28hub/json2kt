@@ -17,10 +17,15 @@ package io.t28.kotlinify
 
 import com.google.common.truth.Subject
 import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertAbout
 import io.t28.kotlinify.lang.PropertyNode
 import io.t28.kotlinify.lang.PropertyNodeSubject
+import io.t28.kotlinify.lang.RootNode
+import io.t28.kotlinify.lang.RootNodeSubject
 import io.t28.kotlinify.lang.TypeNode
 import io.t28.kotlinify.lang.TypeNodeSubject
+import io.t28.kotlinify.util.Ref
+import io.t28.kotlinify.util.RefSubject
 import kotlin.reflect.KClass
 
 fun Subject.isInstanceOf(clazz: KClass<*>) {
@@ -32,9 +37,17 @@ inline fun <reified T> Subject.isInstanceOf() {
 }
 
 fun assertThat(actual: PropertyNode): PropertyNodeSubject {
-    return Truth.assertAbout(PropertyNodeSubject.factory()).that(actual)
+    return assertAbout(PropertyNodeSubject.factory()).that(actual)
+}
+
+fun assertThat(actual: RootNode): RootNodeSubject {
+    return assertAbout(RootNodeSubject.factory()).that(actual)
 }
 
 fun assertThat(actual: TypeNode): TypeNodeSubject {
-    return Truth.assertAbout(TypeNodeSubject.factory()).that(actual)
+    return assertAbout(TypeNodeSubject.factory()).that(actual)
+}
+
+fun <T : Any> assertThat(actual: Ref<T>): RefSubject<T> {
+    return assertAbout(RefSubject.factory<T>()).that(actual)
 }

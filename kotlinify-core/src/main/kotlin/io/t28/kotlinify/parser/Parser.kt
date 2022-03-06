@@ -15,19 +15,21 @@
  */
 package io.t28.kotlinify.parser
 
-import io.t28.kotlinify.lang.TypeNode
+import io.t28.kotlinify.lang.RootNode
 import kotlin.jvm.Throws
 
 /**
- * Parser to deserialize from string.
+ * Parse input to RootNode.
+ *
+ * @param T The type of input.
  */
-interface Parser {
+interface Parser<T> {
     /**
-     * Parse string to collection of [TypeNode].
+     * Parse input as a [RootNode].
      *
      * @param rootName The name of root type.
-     * @param content The string content to be parsed.
+     * @param content The content to be parsed.
      */
     @Throws(ParseException::class)
-    fun parse(rootName: String, content: String): Collection<TypeNode>
+    fun parse(rootName: String, content: T): RootNode
 }

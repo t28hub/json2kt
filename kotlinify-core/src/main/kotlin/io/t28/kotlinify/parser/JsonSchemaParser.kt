@@ -23,6 +23,7 @@ import io.t28.kotlinify.lang.NullValue
 import io.t28.kotlinify.lang.ObjectValue
 import io.t28.kotlinify.lang.PrimitiveValue
 import io.t28.kotlinify.lang.PropertyNode
+import io.t28.kotlinify.lang.RootNode
 import io.t28.kotlinify.lang.StringValue
 import io.t28.kotlinify.lang.TypeNode
 import io.t28.kotlinify.lang.TypeNode.TypeKind.CLASS
@@ -30,7 +31,8 @@ import io.t28.kotlinify.lang.TypeNode.TypeKind.ENUM
 import io.t28.kotlinify.lang.ValueNode
 import io.t28.kotlinify.parser.jsonschema.ArrayDefinition
 import io.t28.kotlinify.parser.jsonschema.BooleanDefinition
-import io.t28.kotlinify.parser.jsonschema.DataType
+import io.t28.kotlinify.parser.jsonschema.DataType.ARRAY
+import io.t28.kotlinify.parser.jsonschema.DataType.OBJECT
 import io.t28.kotlinify.parser.jsonschema.Definition
 import io.t28.kotlinify.parser.jsonschema.Document
 import io.t28.kotlinify.parser.jsonschema.EnumDefinition
@@ -42,8 +44,6 @@ import io.t28.kotlinify.parser.jsonschema.PrimitiveDefinition
 import io.t28.kotlinify.parser.jsonschema.StringDefinition
 import io.t28.kotlinify.parser.naming.NamingStrategy
 import io.t28.kotlinify.parser.naming.UniqueNamingStrategy
-import io.t28.kotlinify.util.addFirst
-import kotlinx.collections.immutable.toImmutableList
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -56,85 +56,93 @@ class JsonSchemaParser(
     private val json: Json = Json { ignoreUnknownKeys = true },
     private val typeNameStrategy: NamingStrategy,
     private val propertyNameStrategy: NamingStrategy
-) : Parser {
-    override fun parse(rootName: String, content: String): Collection<TypeNode> {
+) : Parser<String> {
+    override fun parse(rootName: String, content: String): RootNode {
         val document = try {
             json.decodeFromString<Document>(content)
         } catch (e: SerializationException) {
             throw ParseException("Invalid JSON Schema string", e)
         }
 
-        return when (document.type) {
-            DataType.ARRAY -> parseArray(rootName, document.asArray())
-            DataType.OBJECT -> parseObject(rootName, document.asObject())
-            else -> emptyList()
-        }
-    }
-
-    private fun parseArray(typeName: String, definition: ArrayDefinition): Collection<TypeNode> {
-        val typeNodes = mutableListOf<TypeNode>()
-        parse(typeName, definition, typeNodes)
-        return typeNodes.toImmutableList()
-    }
-
-    private fun parseObject(typeName: String, definition: ObjectDefinition): Collection<TypeNode> {
-        val typeNodes = mutableListOf<TypeNode>()
-        parse(typeName, definition, typeNodes)
-        return typeNodes.toImmutableList()
-    }
-
-    private fun parse(typeName: String, definition: Definition, typeNodes: MutableList<TypeNode>): ValueNode {
-        return when (definition) {
-            is ArrayDefinition -> parse(typeName, definition, typeNodes)
-            is EnumDefinition -> parse(typeName, definition, typeNodes)
-            is ObjectDefinition -> parse(typeName, definition, typeNodes)
-            is PrimitiveDefinition -> parse(definition)
-            is NullDefinition -> NullValue
-            else -> throw IllegalStateException("Type '$definition' is not supported")
-        }
-    }
-
-    private fun parse(typeName: String, definition: ArrayDefinition, typeNodes: MutableList<TypeNode>): ArrayValue {
-        val firstItem: Definition = definition.firstOrElse(NullDefinition())
-        val component = parse(typeName, firstItem, typeNodes)
-        val isNullable = definition.isEmpty() or definition.containsNull()
-        return ArrayValue(component, isNullable)
-    }
-
-    private fun parse(typeName: String, definition: EnumDefinition, typeNodes: MutableList<TypeNode>): ObjectValue {
-        val typeNode = TypeNode(
-            name = typeName,
-            kind = ENUM,
-            enumConstants = definition.values
+        val internalParser = InternalParser(
+            typeNameStrategy = UniqueNamingStrategy(typeNameStrategy),
+            propertyNameStrategy = propertyNameStrategy
         )
-        typeNodes.addFirst(typeNode)
-        return ObjectValue(reference = typeNode)
+        return internalParser.parse(rootName, document)
     }
 
-    private fun parse(typeName: String, definition: ObjectDefinition, typeNodes: MutableList<TypeNode>): ObjectValue {
-        val propertyNamingStrategy = UniqueNamingStrategy(this.propertyNameStrategy)
-        val properties = definition.properties.map { (name, property) ->
-            val childTypeName = typeNameStrategy.apply(name)
-            val propertyName = propertyNamingStrategy.apply(name)
-            val propertyValue = parse(childTypeName, property, typeNodes)
-            PropertyNode(value = propertyValue, name = propertyName, originalName = name)
+    // Define [InternalParser] to prevent pollution of [JsonSchemaParser]
+    internal class InternalParser(
+        private val typeNameStrategy: NamingStrategy,
+        private val propertyNameStrategy: NamingStrategy,
+    ) : Parser<Document> {
+        private lateinit var rootNode: RootNode
+
+        override fun parse(rootName: String, content: Document): RootNode {
+            rootNode = RootNode()
+            when (content.type) {
+                ARRAY -> parse(rootName, content.asArray())
+                OBJECT -> parse(rootName, content.asObject())
+                else -> {
+                    // do nothing
+                }
+            }
+            return rootNode
         }
 
-        val typeNode = TypeNode(
-            name = typeName,
-            kind = CLASS,
-            properties = properties
-        )
-        typeNodes.addFirst(typeNode)
-        return ObjectValue(reference = typeNode)
-    }
+        private fun parse(typeName: String, definition: Definition): ValueNode {
+            return when (definition) {
+                is ArrayDefinition -> parse(typeName, definition)
+                is EnumDefinition -> parse(typeName, definition)
+                is ObjectDefinition -> parse(typeName, definition)
+                is PrimitiveDefinition -> parse(definition)
+                is NullDefinition -> NullValue
+                else -> throw IllegalStateException("Type '$definition' is not supported")
+            }
+        }
 
-    private fun parse(definition: PrimitiveDefinition): PrimitiveValue {
-        return when (definition) {
-            is BooleanDefinition -> BooleanValue()
-            is IntegerDefinition -> IntegerValue()
-            is NumberDefinition -> DoubleValue()
-            is StringDefinition -> StringValue()
+        private fun parse(typeName: String, definition: ArrayDefinition): ArrayValue {
+            val firstItem: Definition = definition.firstOrElse(NullDefinition())
+            val component = parse(typeName, firstItem)
+            val isNullable = definition.isEmpty() or definition.containsNull()
+            return ArrayValue(component, isNullable)
+        }
+
+        private fun parse(typeName: String, definition: EnumDefinition): ObjectValue {
+            val typeNode = TypeNode(
+                name = typeName,
+                kind = ENUM,
+                enumConstants = definition.values
+            )
+            val typeNodeRef = rootNode.add(typeNode)
+            return ObjectValue(reference = typeNodeRef)
+        }
+
+        private fun parse(typeName: String, definition: ObjectDefinition): ObjectValue {
+            val propertyNameStrategy = UniqueNamingStrategy(this.propertyNameStrategy)
+            val properties = definition.properties.map { (name, property) ->
+                val childTypeName = typeNameStrategy.apply(name)
+                val propertyName = propertyNameStrategy.apply(name)
+                val propertyValue = parse(childTypeName, property)
+                PropertyNode(value = propertyValue, name = propertyName, originalName = name)
+            }
+
+            val typeNode = TypeNode(
+                name = typeName,
+                kind = CLASS,
+                properties = properties
+            )
+            val typeNodeRef = rootNode.add(typeNode)
+            return ObjectValue(reference = typeNodeRef)
+        }
+
+        private fun parse(definition: PrimitiveDefinition): PrimitiveValue {
+            return when (definition) {
+                is BooleanDefinition -> BooleanValue()
+                is IntegerDefinition -> IntegerValue()
+                is NumberDefinition -> DoubleValue()
+                is StringDefinition -> StringValue()
+            }
         }
     }
 }

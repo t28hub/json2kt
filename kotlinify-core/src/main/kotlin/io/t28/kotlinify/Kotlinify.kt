@@ -47,7 +47,7 @@ class Kotlinify private constructor(private val configuration: Configuration) {
         )
     }
 
-    private fun from(content: String, parser: Parser): FileBuilder {
+    private fun from(content: String, parser: Parser<String>): FileBuilder {
         return FileBuilder(
             parser = parser,
             execution = Execution(

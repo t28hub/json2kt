@@ -15,20 +15,25 @@
  */
 package io.t28.kotlinify.util
 
-private const val FIRST_INDEX = 0
+import com.google.common.truth.FailureMetadata
+import com.google.common.truth.Subject
+import com.google.common.truth.Truth
 
 /**
- * Return the first element, or [defaultValue] if the list is empty.
+ * [Truth] subject implementation for [Ref].
  */
-fun <T> List<T>.firstOrElse(defaultValue: T): T {
-    return if (isEmpty()) defaultValue else this[FIRST_INDEX]
-}
+class RefSubject<T : Any>(metadata: FailureMetadata, private val actual: Ref<T>) : Subject(metadata, actual) {
+    fun hasValue(expectedValue: T) {
+        value().isEqualTo(expectedValue)
+    }
 
-/**
- * Insert an element at first index.
- *
- * @param element The element to be inserted.
- */
-fun <E> MutableList<E>.addFirst(element: E) {
-    add(FIRST_INDEX, element)
+    fun value(): Subject {
+        return check("value").that(actual.get())
+    }
+
+    companion object {
+        fun <T : Any> factory() = Factory<RefSubject<T>, Ref<T>> { metadata, actual ->
+            RefSubject(metadata, actual)
+        }
+    }
 }

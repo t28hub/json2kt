@@ -22,7 +22,7 @@ package io.t28.kotlinify.lang
  * @param isNullable Whether this value is nullable.
  */
 class ObjectValue(
-    val reference: TypeNode,
+    val reference: TypeNodeRef,
     override val isNullable: Boolean = false
 ) : ValueNode() {
     override fun toString(): String = buildString {

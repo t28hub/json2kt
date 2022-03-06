@@ -41,6 +41,17 @@ class TypeNode(
     constructor(
         name: String,
         kind: TypeKind,
+    ) : this(
+        name = name,
+        kind = kind,
+        properties = emptyList(),
+        annotations = emptyList(),
+        enumConstants = emptySet()
+    )
+
+    constructor(
+        name: String,
+        kind: TypeKind,
         properties: List<PropertyNode> = emptyList(),
         annotations: List<AnnotationValue> = emptyList(),
         enumConstants: Set<String> = emptySet()
@@ -66,6 +77,7 @@ class TypeNode(
     }
 
     fun copy(
+        name: String = this.name,
         kind: TypeKind = this.kind,
         properties: List<PropertyNode> = this.properties,
         annotations: List<AnnotationValue> = this.annotations,

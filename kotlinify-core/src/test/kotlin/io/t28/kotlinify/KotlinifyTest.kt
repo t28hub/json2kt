@@ -16,8 +16,12 @@
 package io.t28.kotlinify
 
 import com.google.common.truth.Truth.assertThat
+import io.t28.kotlinify.interceptor.PropertyInterceptor
+import io.t28.kotlinify.interceptor.TypeInterceptor
 import io.t28.kotlinify.interceptor.kotlinx.SerialNameInterceptor
 import io.t28.kotlinify.interceptor.kotlinx.SerializableInterceptor
+import io.t28.kotlinify.lang.PropertyNode
+import io.t28.kotlinify.lang.TypeNode
 import io.t28.kotlinify.util.getFilename
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -58,7 +62,21 @@ internal class KotlinifyTest {
         val actual = Kotlinify {
             indentSize = 2
             typeInterceptors += SerializableInterceptor
+            typeInterceptors += object : TypeInterceptor {
+                override fun intercept(node: TypeNode): TypeNode {
+                    return node.copy(
+                        name = "My${node.name}Json"
+                    )
+                }
+            }
             propertyInterceptors += SerialNameInterceptor
+            propertyInterceptors += object : PropertyInterceptor {
+                override fun intercept(node: PropertyNode): PropertyNode {
+                    return node.copy(
+                        name = "m${node.name.replaceFirstChar(Char::uppercaseChar)}"
+                    )
+                }
+            }
         }.fromJson(json).toKotlin(PACKAGE_NAME, "User")
 
         // Assert
@@ -72,21 +90,21 @@ internal class KotlinifyTest {
             |import kotlinx.serialization.Serializable
             |
             |@Serializable
-            |public data class User(
+            |public data class MyUserJson(
             |  @SerialName
-            |  public val id: Int,
+            |  public val mId: Int,
             |  @SerialName
-            |  public val login: String,
+            |  public val mLogin: String,
             |  @SerialName
-            |  public val plan: Plan
+            |  public val mPlan: MyPlanJson
             |)
             |
             |@Serializable
-            |public data class Plan(
+            |public data class MyPlanJson(
             |  @SerialName
-            |  public val name: String,
+            |  public val mName: String,
             |  @SerialName
-            |  public val space: Int
+            |  public val mSpace: Int
             |)
             |
             """.trimMargin()
