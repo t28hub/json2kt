@@ -55,6 +55,10 @@ class PropertyNode(
         return emptyList()
     }
 
+    fun hasSameOriginalName(): Boolean {
+        return name == originalName
+    }
+
     fun copy(
         name: String = this.name,
         value: ValueNode = this.value,

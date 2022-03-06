@@ -45,7 +45,7 @@ jobs:
           path: |
             ./kotlinify-core/build/reports/tests
             ./kotlinify-idea-plugin/build/reports/tests
-        if: ${{ always() }}
+        if: ${{ failure() }}
 
       # Upload coverage reports to Codecov
       - name: Upload coverage reports ☂️

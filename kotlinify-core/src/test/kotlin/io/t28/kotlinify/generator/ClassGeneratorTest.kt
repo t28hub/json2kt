@@ -17,6 +17,7 @@ package io.t28.kotlinify.generator
 
 import com.google.common.truth.Truth.assertThat
 import io.t28.kotlinify.lang.AnnotationValue
+import io.t28.kotlinify.lang.AnnotationValue.Companion.annotation
 import io.t28.kotlinify.lang.IntegerValue
 import io.t28.kotlinify.lang.PropertyNode
 import io.t28.kotlinify.lang.StringValue
@@ -45,10 +46,12 @@ internal class ClassGeneratorTest {
         val actual = classGenerator.generate(node)
 
         // Assert
-        assertThat(actual.toString()).isEqualTo("""
+        assertThat(actual.toString()).isEqualTo(
+            """
         |public class EmptyClass()
         |
-        """.trimMargin())
+        """.trimMargin()
+        )
     }
 
     @Test
@@ -58,9 +61,13 @@ internal class ClassGeneratorTest {
             name = "DeprecatedClass",
             kind = CLASS,
             annotations = listOf(
-                AnnotationValue(
-                    type = Deprecated::class,
-                    members = mapOf("message" to "This class is deprecated")
+                annotation<Deprecated>(
+                    AnnotationValue.Member(
+                        name = "message",
+                        value = """
+                            "This class is deprecated"
+                        """.trimIndent()
+                    )
                 )
             )
         )
@@ -69,11 +76,13 @@ internal class ClassGeneratorTest {
         val actual = classGenerator.generate(node)
 
         // Assert
-        assertThat(actual.toString()).isEqualTo("""
+        assertThat(actual.toString()).isEqualTo(
+            """
         |@kotlin.Deprecated(message = "This class is deprecated")
         |public class DeprecatedClass()
         |
-        """.trimMargin())
+        """.trimMargin()
+        )
     }
 
     @Test
@@ -100,13 +109,15 @@ internal class ClassGeneratorTest {
         val actual = classGenerator.generate(node)
 
         // Assert
-        assertThat(actual.toString()).isEqualTo("""
+        assertThat(actual.toString()).isEqualTo(
+            """
         |public data class User(
         |  public val id: kotlin.Int,
         |  public val name: kotlin.String?
         |)
         |
-        """.trimMargin())
+        """.trimMargin()
+        )
     }
 
     @Test
@@ -123,18 +134,22 @@ internal class ClassGeneratorTest {
             properties = listOf(
                 PropertyNode(
                     name = "id",
-                    originalName= "_id",
+                    originalName = "_id",
                     value = IntegerValue(),
                     annotations = persistentListOf(
-                        AnnotationValue(
-                            type = SerialName::class,
-                            members = mapOf("value" to "_id")
+                        annotation<SerialName>(
+                            AnnotationValue.Member(
+                                name = "value",
+                                value = """
+                                    "_id"
+                                """.trimIndent()
+                            )
                         )
                     )
                 ),
                 PropertyNode(
                     name = "name",
-                    originalName= "name",
+                    originalName = "name",
                     value = StringValue(isNullable = true)
                 )
             )
@@ -144,7 +159,8 @@ internal class ClassGeneratorTest {
         val actual = classGenerator.generate(node)
 
         // Assert
-        assertThat(actual.toString()).isEqualTo("""
+        assertThat(actual.toString()).isEqualTo(
+            """
         |@kotlinx.serialization.Serializable
         |public data class User(
         |  @kotlinx.serialization.SerialName(value = "_id")
@@ -152,7 +168,8 @@ internal class ClassGeneratorTest {
         |  public val name: kotlin.String?
         |)
         |
-        """.trimMargin())
+        """.trimMargin()
+        )
     }
 
     companion object {

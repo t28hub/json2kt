@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.t28.kotlinify.interceptor.kotlinx
+package io.t28.kotlinify.interceptor.gson
 
+import com.google.gson.annotations.SerializedName
 import io.t28.kotlinify.interceptor.PropertyInterceptor
-import io.t28.kotlinify.lang.AnnotationValue
 import io.t28.kotlinify.lang.AnnotationValue.Companion.annotation
+import io.t28.kotlinify.lang.AnnotationValue.Member
 import io.t28.kotlinify.lang.PropertyNode
-import kotlinx.serialization.SerialName
-import kotlin.reflect.jvm.internal.impl.descriptors.annotations.AnnotationDescriptor
+import kotlinx.collections.immutable.toImmutableList
 
-object SerialNameInterceptor : PropertyInterceptor {
+object SerializedNameInterceptor : PropertyInterceptor {
     override fun intercept(node: PropertyNode): PropertyNode {
-        if (node.hasAnnotation<SerialName>()) {
+        if (node.hasAnnotation<SerializedName>()) {
             return node
         }
 
@@ -33,14 +33,14 @@ object SerialNameInterceptor : PropertyInterceptor {
         }
 
         val annotations = node.annotations.toMutableList()
-        annotations += annotation<SerialName>(
-            AnnotationValue.Member(
+        annotations += annotation<SerializedName>(
+            Member(
                 name = "value",
                 value = """
                     "${node.originalName}"
                 """.trimIndent()
             )
         )
-        return node.copy(annotations = annotations)
+        return node.copy(annotations = annotations.toImmutableList())
     }
 }

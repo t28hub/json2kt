@@ -27,6 +27,10 @@ dependencies {
     implementation(deps.kotlinx.serialization.json)
     implementation(deps.kotlinpoet)
 
+    // Supported libraries
+    implementation(deps.gson)
+    implementation(deps.jackson.annotations)
+
     testImplementation(deps.junit)
     testImplementation(deps.kotlin.test)
     testImplementation(deps.truth)
