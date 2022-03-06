@@ -38,8 +38,7 @@ abstract class TypeSpecGenerator(private val packageName: String) {
     protected fun AnnotationValue.asAnnotationSpec(): AnnotationSpec {
         return AnnotationSpec.builder(type.asTypeName()).apply {
             members += this@asAnnotationSpec.members.map { (key, value) ->
-                val format = if (value is String) "$key = %S" else "$key = %L"
-                CodeBlock.of(format, value)
+                CodeBlock.of("$key = %L", value)
             }
         }.build()
     }

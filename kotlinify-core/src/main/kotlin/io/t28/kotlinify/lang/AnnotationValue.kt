@@ -15,11 +15,12 @@
  */
 package io.t28.kotlinify.lang
 
+import kotlinx.collections.immutable.toImmutableList
 import kotlin.reflect.KClass
 
 class AnnotationValue(
     val type: KClass<out Annotation>,
-    val members: Map<String, Any> = emptyMap()
+    val members: List<Member> = emptyList()
 ) {
     override fun toString() = buildString {
         append(AnnotationValue::class.simpleName)
@@ -28,4 +29,16 @@ class AnnotationValue(
         append("members=$members")
         append("}")
     }
+
+    companion object {
+        inline fun <reified T : Annotation> annotation(vararg members: Member): AnnotationValue {
+            return AnnotationValue(type = T::class, members = members.toList().toImmutableList())
+        }
+
+        fun member(name: String, value: String): Member {
+            return Member(name = name, value = value)
+        }
+    }
+
+    data class Member(val name: String, val value: String)
 }

@@ -13,34 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.t28.kotlinify.interceptor.kotlinx
+package io.t28.kotlinify.interceptor.jackson
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import io.t28.kotlinify.interceptor.PropertyInterceptor
 import io.t28.kotlinify.lang.AnnotationValue
 import io.t28.kotlinify.lang.AnnotationValue.Companion.annotation
 import io.t28.kotlinify.lang.PropertyNode
-import kotlinx.serialization.SerialName
-import kotlin.reflect.jvm.internal.impl.descriptors.annotations.AnnotationDescriptor
+import kotlinx.collections.immutable.toImmutableList
 
-object SerialNameInterceptor : PropertyInterceptor {
+object JsonPropertyInterceptor : PropertyInterceptor {
     override fun intercept(node: PropertyNode): PropertyNode {
-        if (node.hasAnnotation<SerialName>()) {
-            return node
-        }
-
-        if (node.hasSameOriginalName()) {
+        if (node.hasAnnotation<JsonProperty>()) {
             return node
         }
 
         val annotations = node.annotations.toMutableList()
-        annotations += annotation<SerialName>(
-            AnnotationValue.Member(
-                name = "value",
-                value = """
-                    "${node.originalName}"
-                """.trimIndent()
+        annotations += if (node.hasSameOriginalName()) {
+            annotation<JsonProperty>()
+        } else {
+            annotation<JsonProperty>(
+                AnnotationValue.Member(
+                    name = "value",
+                    value = """
+                        "${node.originalName}"
+                    """.trimIndent()
+                )
             )
-        )
-        return node.copy(annotations = annotations)
+        }
+        return node.copy(annotations = annotations.toImmutableList())
     }
 }

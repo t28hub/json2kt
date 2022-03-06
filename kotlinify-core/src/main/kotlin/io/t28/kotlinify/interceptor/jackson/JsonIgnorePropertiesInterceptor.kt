@@ -13,22 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.t28.kotlinify.interceptor.kotlinx
+package io.t28.kotlinify.interceptor.jackson
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import io.t28.kotlinify.interceptor.TypeInterceptor
 import io.t28.kotlinify.lang.AnnotationValue
 import io.t28.kotlinify.lang.AnnotationValue.Companion.annotation
 import io.t28.kotlinify.lang.TypeNode
-import kotlinx.serialization.Serializable
+import kotlinx.collections.immutable.toImmutableList
 
-object SerializableInterceptor : TypeInterceptor {
+object JsonIgnorePropertiesInterceptor : TypeInterceptor {
     override fun intercept(node: TypeNode): TypeNode {
-        if (node.hasAnnotation<Serializable>()) {
+        if (node.hasAnnotation<JsonIgnoreProperties>()) {
             return node
         }
 
         val annotations = node.annotations.toMutableList()
-        annotations += annotation<Serializable>()
-        return node.copy(annotations = annotations)
+        annotations += annotation<JsonIgnoreProperties>(
+            AnnotationValue.Member(
+                name = "ignoreUnknown",
+                value = "true"
+            )
+        )
+        return node.copy(annotations = annotations.toImmutableList())
     }
 }

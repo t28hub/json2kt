@@ -17,6 +17,7 @@ package io.t28.kotlinify.generator
 
 import com.google.common.truth.Truth.assertThat
 import io.t28.kotlinify.lang.AnnotationValue
+import io.t28.kotlinify.lang.AnnotationValue.Companion.annotation
 import io.t28.kotlinify.lang.TypeNode
 import io.t28.kotlinify.lang.TypeNode.TypeKind.ENUM
 import org.junit.jupiter.api.BeforeEach
@@ -77,9 +78,13 @@ internal class EnumGeneratorTest {
             kind = ENUM,
             enumConstants = setOf("FOO", "BAR", "BAZ"),
             annotations = listOf(
-                AnnotationValue(
-                    type = Deprecated::class,
-                    members = mapOf("member" to "This enum class is deprecated")
+                annotation<Deprecated>(
+                    AnnotationValue.Member(
+                        name = "member",
+                        value = """
+                            "This enum class is deprecated"
+                        """.trimIndent()
+                    )
                 )
             )
         )

@@ -18,6 +18,9 @@ package io.t28.kotlinify
 import com.google.common.truth.Truth.assertThat
 import io.t28.kotlinify.interceptor.PropertyInterceptor
 import io.t28.kotlinify.interceptor.TypeInterceptor
+import io.t28.kotlinify.interceptor.gson.SerializedNameInterceptor
+import io.t28.kotlinify.interceptor.jackson.JsonIgnorePropertiesInterceptor
+import io.t28.kotlinify.interceptor.jackson.JsonPropertyInterceptor
 import io.t28.kotlinify.interceptor.kotlinx.SerialNameInterceptor
 import io.t28.kotlinify.interceptor.kotlinx.SerializableInterceptor
 import io.t28.kotlinify.lang.PropertyNode
@@ -61,7 +64,6 @@ internal class KotlinifyTest {
         // Act
         val actual = Kotlinify {
             indentSize = 2
-            typeInterceptors += SerializableInterceptor
             typeInterceptors += object : TypeInterceptor {
                 override fun intercept(node: TypeNode): TypeNode {
                     return node.copy(
@@ -69,7 +71,8 @@ internal class KotlinifyTest {
                     )
                 }
             }
-            propertyInterceptors += SerialNameInterceptor
+            typeInterceptors += SerializableInterceptor
+
             propertyInterceptors += object : PropertyInterceptor {
                 override fun intercept(node: PropertyNode): PropertyNode {
                     return node.copy(
@@ -77,7 +80,8 @@ internal class KotlinifyTest {
                     )
                 }
             }
-        }.fromJson(json).toKotlin(PACKAGE_NAME, "User")
+            propertyInterceptors += SerialNameInterceptor
+        }.fromJson(json).toKotlin(ROOT_PACKAGE_NAME, "User")
 
         // Assert
         assertThat(actual).isEqualTo(
@@ -91,24 +95,74 @@ internal class KotlinifyTest {
             |
             |@Serializable
             |public data class MyUserJson(
-            |  @SerialName
+            |  @SerialName(value = "id")
             |  public val mId: Int,
-            |  @SerialName
+            |  @SerialName(value = "login")
             |  public val mLogin: String,
-            |  @SerialName
+            |  @SerialName(value = "plan")
             |  public val mPlan: MyPlanJson
             |)
             |
             |@Serializable
             |public data class MyPlanJson(
-            |  @SerialName
+            |  @SerialName(value = "name")
             |  public val mName: String,
-            |  @SerialName
+            |  @SerialName(value = "space")
             |  public val mSpace: Int
             |)
             |
             """.trimMargin()
         )
+    }
+
+    @Nested
+    inner class SupportedLibraryTest {
+        @Test
+        fun `should add kotlinx annotations`() {
+            // Arrange
+            val input = readResourceAsString("github_user.json")
+            val expected = readResourceAsString("kotlinx/GitHubUser.kt")
+
+            // Act
+            val actual = Kotlinify {
+                typeInterceptors += SerializableInterceptor
+                propertyInterceptors += SerialNameInterceptor
+            }.fromJson(input).toKotlin("${ROOT_PACKAGE_NAME}.kotlinx", "GitHubUser.kt")
+
+            // Assert
+            assertThat(actual).isEqualTo(expected)
+        }
+
+        @Test
+        fun `should add Gson annotations`() {
+            // Arrange
+            val input = readResourceAsString("github_user.json")
+            val expected = readResourceAsString("gson/GitHubUser.kt")
+
+            // Act
+            val actual = Kotlinify {
+                propertyInterceptors += SerializedNameInterceptor
+            }.fromJson(input).toKotlin("${ROOT_PACKAGE_NAME}.gson", "GitHubUser.kt")
+
+            // Assert
+            assertThat(actual).isEqualTo(expected)
+        }
+
+        @Test
+        fun `should add Jackson annotations`() {
+            // Arrange
+            val input = readResourceAsString("github_user.json")
+            val expected = readResourceAsString("jackson/GitHubUser.kt")
+
+            // Act
+            val actual = Kotlinify {
+                typeInterceptors += JsonIgnorePropertiesInterceptor
+                propertyInterceptors += JsonPropertyInterceptor
+            }.fromJson(input).toKotlin("${ROOT_PACKAGE_NAME}.jackson", "GitHubUser.kt")
+
+            // Assert
+            assertThat(actual).isEqualTo(expected)
+        }
     }
 
     @Nested
@@ -123,7 +177,7 @@ internal class KotlinifyTest {
 
             // Act
             val actual = kotlinify.fromJson(input)
-                .toKotlin(packageName = PACKAGE_NAME, fileName = kotlinFilepath.getFilename())
+                .toKotlin(packageName = ROOT_PACKAGE_NAME, fileName = kotlinFilepath.getFilename())
 
             // Assert
             assertThat(actual).isEqualTo(output)
@@ -134,15 +188,15 @@ internal class KotlinifyTest {
         fun `should not generate a kotlin class`(json: String) {
             // Act
             val actual = kotlinify.fromJson(json)
-                .toKotlin(packageName = PACKAGE_NAME, fileName = "EmptyClass.kt")
+                .toKotlin(packageName = ROOT_PACKAGE_NAME, fileName = "EmptyClass.kt")
 
             // Assert
             assertThat(actual).isEqualTo(
                 """
-                package io.t28.kotlinify
-
-
-                """.trimIndent()
+                |package io.t28.kotlinify
+                |
+                |
+                """.trimMargin()
             )
         }
     }
@@ -158,7 +212,7 @@ internal class KotlinifyTest {
 
             // Act
             val actual = kotlinify.fromJsonSchema(jsonSchema)
-                .toKotlin(packageName = PACKAGE_NAME, "GeographicalLocation.kt")
+                .toKotlin(packageName = ROOT_PACKAGE_NAME, "GeographicalLocation.kt")
 
             // Assert
             assertThat(actual).isEqualTo(expected)
@@ -169,21 +223,21 @@ internal class KotlinifyTest {
         fun `should not generate a kotlin class`(jsonSchema: String) {
             // Act
             val actual = kotlinify.fromJsonSchema(jsonSchema)
-                .toKotlin(packageName = PACKAGE_NAME, fileName = "EmptyClass.kt")
+                .toKotlin(packageName = ROOT_PACKAGE_NAME, fileName = "EmptyClass.kt")
 
             // Assert
             assertThat(actual).isEqualTo(
                 """
-                package io.t28.kotlinify
-
-
-                """.trimIndent()
+                |package io.t28.kotlinify
+                |
+                |
+                """.trimMargin()
             )
         }
     }
 
     companion object {
-        private const val PACKAGE_NAME = "io.t28.kotlinify"
+        private const val ROOT_PACKAGE_NAME = "io.t28.kotlinify"
 
         class JsonClassFixtures : ArgumentsProvider {
             override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> {
@@ -220,50 +274,50 @@ internal class KotlinifyTest {
                     arguments(
                         // language=json
                         """
-                          {
-                            "type": "null"
-                          }
-                        """.trimIndent()
+                        |{
+                        |  "type": "null"
+                        |}
+                        """.trimMargin()
                     ),
                     arguments(
                         // language=json
                         """
-                          {
-                            "type": "boolean"
-                          }
-                        """.trimIndent()
+                        |{
+                        |  "type": "boolean"
+                        |}
+                        """.trimMargin()
                     ),
                     arguments(
                         // language=json
                         """
-                          {
-                            "type": "integer"
-                          }
-                        """.trimIndent()
+                        |{
+                        |  "type": "integer"
+                        |}
+                        """.trimMargin()
                     ),
                     arguments(
                         // language=json
                         """
-                          {
-                            "type": "number"
-                          }
-                        """.trimIndent()
+                        |{
+                        |  "type": "number"
+                        |}
+                        """.trimMargin()
                     ),
                     arguments(
                         // language=json
                         """
-                          {
-                            "type": "string"
-                          }
-                        """.trimIndent()
+                        |{
+                        |  "type": "string"
+                        |}
+                        """.trimMargin()
                     ),
                     arguments(
                         // language=json
                         """
-                          {
-                            "type": "array"
-                          }
-                        """.trimIndent()
+                        |{
+                        |  "type": "array"
+                        |}
+                        """.trimMargin()
                     ),
                 )
             }
