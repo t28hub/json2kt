@@ -54,7 +54,6 @@ jobs:
           directory: ./build/reports/kover
           files: kotlinify-core.xml,kotlinify-idea-plugin.xml
           fail_ci_if_error: true
-          verbose: true
 
       # Upload coverage reports as an Artifact
       - name: Upload coverage reports ⬆️
