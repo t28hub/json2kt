@@ -15,10 +15,10 @@
  */
 package io.t28.kotlinify.parser
 
-import com.google.common.truth.Truth.assertThat
 import io.t28.kotlinify.assertThat
 import io.t28.kotlinify.isInstanceOf
 import io.t28.kotlinify.lang.BooleanValue
+import io.t28.kotlinify.lang.DoubleValue
 import io.t28.kotlinify.lang.IntegerValue
 import io.t28.kotlinify.lang.StringValue
 import io.t28.kotlinify.parser.naming.PropertyNamingStrategy
@@ -58,7 +58,23 @@ internal class JsonSchemaParserTest {
         )
         val actual = parser.parse("Example", jsonSchema)
 
-        assertThat(actual).hasSize(1)
+        assertThat(actual).apply {
+            hasSize(1)
+            childrenAt(0).apply {
+                hasName("Example")
+                properties().hasSize(2)
+
+                propertyAt(0).apply {
+                    hasName("latitude")
+                    value().isInstanceOf<DoubleValue>()
+                }
+
+                propertyAt(1).apply {
+                    hasName("longitude")
+                    value().isInstanceOf<DoubleValue>()
+                }
+            }
+        }
     }
 
     @Test
@@ -80,17 +96,19 @@ internal class JsonSchemaParserTest {
             typeNameStrategy = TypeNamingStrategy,
             propertyNameStrategy = PropertyNamingStrategy
         )
-        val actual = parser.parse("Example", jsonSchema).toList()
+        val actual = parser.parse("Example", jsonSchema)
 
         // Assert
-        assertThat(actual).hasSize(2)
-        assertThat(actual[0]).apply {
-            isClass()
-            hasName("Example")
-        }
-        assertThat(actual[1]).apply {
-            isEnum()
-            hasName("Country")
+        assertThat(actual).apply {
+            hasSize(2)
+            childrenAt(0).apply {
+                isClass()
+                hasName("Example")
+            }
+            childrenAt(1).apply {
+                isEnum()
+                hasName("Country")
+            }
         }
     }
 
@@ -122,27 +140,30 @@ internal class JsonSchemaParserTest {
         val actual = parser.parse("Example", jsonSchema)
 
         // Assert
-        assertThat(actual).hasSize(1)
-        assertThat(actual.toList()[0]).apply {
-            hasName("Example")
-            properties().hasSize(3)
+        assertThat(actual).apply {
+            hasSize(1)
 
-            propertyAt(0).apply {
-                hasName("foo")
-                hasOriginalName("foo")
-                value().isInstanceOf<StringValue>()
-            }
+            childrenAt(0).apply {
+                hasName("Example")
+                properties().hasSize(3)
 
-            propertyAt(1).apply {
-                hasName("bar")
-                hasOriginalName("bar")
-                value().isInstanceOf<IntegerValue>()
-            }
+                propertyAt(0).apply {
+                    hasName("foo")
+                    hasOriginalName("foo")
+                    value().isInstanceOf<StringValue>()
+                }
 
-            propertyAt(2).apply {
-                hasName("baz")
-                hasOriginalName("baz")
-                value().isInstanceOf<BooleanValue>()
+                propertyAt(1).apply {
+                    hasName("bar")
+                    hasOriginalName("bar")
+                    value().isInstanceOf<IntegerValue>()
+                }
+
+                propertyAt(2).apply {
+                    hasName("baz")
+                    hasOriginalName("baz")
+                    value().isInstanceOf<BooleanValue>()
+                }
             }
         }
     }

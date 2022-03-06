@@ -61,7 +61,10 @@ abstract class TypeSpecGenerator(private val packageName: String) {
                 val typeArgument = componentType().asTypeName(packageName)
                 List::class.asTypeName().parameterizedBy(typeArgument)
             }
-            is ObjectValue -> ClassName(packageName, reference.name)
+            is ObjectValue -> {
+                val typeNode = reference.get()
+                ClassName(packageName, typeNode.name)
+            }
             is PrimitiveValue -> type.asTypeName()
         }
         return typeName.copy(nullable = isNullable)
