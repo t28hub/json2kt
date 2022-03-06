@@ -19,6 +19,9 @@ private const val DIRECTORY_DELIMITER = '/'
 private const val EXTENSION_DELIMITER = '.'
 private const val NO_INDEX = -1
 
+/**
+ * Returns filename from given string.
+ */
 fun String.getFilename(): String {
     val directoryIndex = lastIndexOf(DIRECTORY_DELIMITER)
     if (directoryIndex == NO_INDEX) {
@@ -27,6 +30,9 @@ fun String.getFilename(): String {
     return substring(directoryIndex + 1)
 }
 
+/**
+ * Removes file extension from given string.
+ */
 fun String.removeFileExtension(): String {
     val extensionIndex = lastIndexOf(EXTENSION_DELIMITER)
     if (extensionIndex == NO_INDEX) {
