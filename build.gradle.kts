@@ -27,11 +27,6 @@ plugins {
     alias(deps.plugins.kotlinx.kover)
 }
 
-kover {
-    isDisabled = false
-    coverageEngine.set(INTELLIJ)
-}
-
 /**
  * Retrieve a property by key as a String
  *
@@ -43,6 +38,11 @@ kover {
 fun properties(key: String): String {
     val property = project.findProperty(key)
     return property?.toString() ?: throw MissingPropertyException("Property '$key' does not exist")
+}
+
+kover {
+    isDisabled = false
+    coverageEngine.set(INTELLIJ)
 }
 
 allprojects {
