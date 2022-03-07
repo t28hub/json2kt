@@ -37,8 +37,8 @@ abstract class TypeSpecGenerator(private val packageName: String) {
 
     protected fun AnnotationValue.asAnnotationSpec(): AnnotationSpec {
         return AnnotationSpec.builder(type.asTypeName()).apply {
-            members += this@asAnnotationSpec.members.map { (key, value) ->
-                CodeBlock.of("$key = %L", value)
+            members += this@asAnnotationSpec.members.map { member ->
+                CodeBlock.of(member)
             }
         }.build()
     }

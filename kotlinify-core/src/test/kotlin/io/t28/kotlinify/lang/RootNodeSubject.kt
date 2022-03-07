@@ -19,10 +19,9 @@ import com.google.common.truth.FailureMetadata
 import com.google.common.truth.IterableSubject
 import com.google.common.truth.Subject
 import com.google.common.truth.Subject.Factory
-import com.google.common.truth.Truth
 
 /**
- * [Truth] subject implementation for [RootNode].
+ * [Subject] implementation for [RootNode].
  */
 class RootNodeSubject(metadata: FailureMetadata, private val actual: RootNode) : Subject(metadata, actual) {
     fun hasSize(expectedSize: Int) {

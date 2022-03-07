@@ -16,7 +16,6 @@
 package io.t28.kotlinify.interceptor.kotlinx
 
 import io.t28.kotlinify.interceptor.TypeInterceptor
-import io.t28.kotlinify.lang.AnnotationValue
 import io.t28.kotlinify.lang.AnnotationValue.Companion.annotation
 import io.t28.kotlinify.lang.TypeNode
 import kotlinx.serialization.Serializable

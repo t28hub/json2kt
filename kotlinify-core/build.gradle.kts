@@ -28,9 +28,13 @@ dependencies {
     implementation(deps.kotlinpoet)
 
     // Supported libraries
+    implementation(deps.fastjson)
     implementation(deps.gson)
     implementation(deps.jackson.annotations)
+    implementation(deps.klaxon)
+    implementation(deps.moshi)
 
+    // Testing libraries
     testImplementation(deps.junit)
     testImplementation(deps.kotlin.test)
     testImplementation(deps.truth)

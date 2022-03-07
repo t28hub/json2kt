@@ -18,27 +18,25 @@ package io.t28.kotlinify.lang
 import kotlinx.collections.immutable.toImmutableList
 import kotlin.reflect.KClass
 
-class AnnotationValue(
-    val type: KClass<out Annotation>,
-    val members: List<Member> = emptyList()
+class AnnotationValue private constructor(
+    internal val type: KClass<out Annotation>,
+    internal val members: List<String>
 ) {
     override fun toString() = buildString {
         append(AnnotationValue::class.simpleName)
         append("{")
-        append("type=${type.simpleName}")
+        append("type=${type.simpleName},")
         append("members=$members")
         append("}")
     }
 
     companion object {
-        inline fun <reified T : Annotation> annotation(vararg members: Member): AnnotationValue {
-            return AnnotationValue(type = T::class, members = members.toList().toImmutableList())
+        inline fun <reified T : Annotation> annotation(vararg members: String): AnnotationValue {
+            return annotation(T::class, members.toList())
         }
 
-        fun member(name: String, value: String): Member {
-            return Member(name = name, value = value)
+        fun <T : Annotation> annotation(type: KClass<T>, members: List<String>): AnnotationValue {
+            return AnnotationValue(type = type, members = members.toImmutableList())
         }
     }
-
-    data class Member(val name: String, val value: String)
 }

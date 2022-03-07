@@ -20,13 +20,12 @@ import com.google.common.truth.FailureMetadata
 import com.google.common.truth.IterableSubject
 import com.google.common.truth.StringSubject
 import com.google.common.truth.Subject
-import com.google.common.truth.Truth
 import io.t28.kotlinify.lang.TypeNode.TypeKind.CLASS
 import io.t28.kotlinify.lang.TypeNode.TypeKind.ENUM
 import io.t28.kotlinify.lang.TypeNode.TypeKind.INTERFACE
 
 /**
- * [Truth] subject implementation for [TypeNode].
+ * [Subject] subject implementation for [TypeNode].
  */
 class TypeNodeSubject(metadata: FailureMetadata, private val actual: TypeNode) : Subject(metadata, actual) {
     fun hasName(expectedName: String) {
@@ -60,9 +59,19 @@ class TypeNodeSubject(metadata: FailureMetadata, private val actual: TypeNode) :
     }
 
     fun propertyAt(index: Int): PropertyNodeSubject {
-        return check("properties[$index]")
+        return check("properties[%s]", index)
             .about(PropertyNodeSubject.factory())
             .that(actual.properties.toList()[index])
+    }
+
+    fun annotations(): IterableSubject {
+        return check("annotations").that(actual.annotations)
+    }
+
+    fun annotationAt(index: Int): AnnotationValueSubject {
+        return check("properties[%s]", index)
+            .about(AnnotationValueSubject.factory())
+            .that(actual.annotations[index])
     }
 
     companion object {

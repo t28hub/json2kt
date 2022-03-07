@@ -18,6 +18,8 @@ package io.t28.kotlinify
 import com.google.common.truth.Subject
 import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertAbout
+import io.t28.kotlinify.lang.AnnotationValue
+import io.t28.kotlinify.lang.AnnotationValueSubject
 import io.t28.kotlinify.lang.PropertyNode
 import io.t28.kotlinify.lang.PropertyNodeSubject
 import io.t28.kotlinify.lang.RootNode
@@ -34,6 +36,10 @@ fun Subject.isInstanceOf(clazz: KClass<*>) {
 
 inline fun <reified T> Subject.isInstanceOf() {
     isInstanceOf(T::class.java)
+}
+
+fun assertThat(actual: AnnotationValue): AnnotationValueSubject {
+    return assertAbout(AnnotationValueSubject.factory()).that(actual)
 }
 
 fun assertThat(actual: PropertyNode): PropertyNodeSubject {

@@ -16,11 +16,9 @@
 package io.t28.kotlinify.interceptor.kotlinx
 
 import io.t28.kotlinify.interceptor.PropertyInterceptor
-import io.t28.kotlinify.lang.AnnotationValue
 import io.t28.kotlinify.lang.AnnotationValue.Companion.annotation
 import io.t28.kotlinify.lang.PropertyNode
 import kotlinx.serialization.SerialName
-import kotlin.reflect.jvm.internal.impl.descriptors.annotations.AnnotationDescriptor
 
 object SerialNameInterceptor : PropertyInterceptor {
     override fun intercept(node: PropertyNode): PropertyNode {
@@ -34,12 +32,9 @@ object SerialNameInterceptor : PropertyInterceptor {
 
         val annotations = node.annotations.toMutableList()
         annotations += annotation<SerialName>(
-            AnnotationValue.Member(
-                name = "value",
-                value = """
-                    "${node.originalName}"
-                """.trimIndent()
-            )
+            """
+            |value = "${node.originalName}"
+            """.trimMargin()
         )
         return node.copy(annotations = annotations)
     }

@@ -83,7 +83,7 @@ jobs:
   build-idea-plugin:
     needs: [ check ]
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       # Check out current repository
       - name: Checkout repository 🚦

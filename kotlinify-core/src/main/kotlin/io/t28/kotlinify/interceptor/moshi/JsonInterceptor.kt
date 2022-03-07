@@ -13,17 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.t28.kotlinify.interceptor.gson
+package io.t28.kotlinify.interceptor.moshi
 
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
 import io.t28.kotlinify.interceptor.PropertyInterceptor
 import io.t28.kotlinify.lang.AnnotationValue.Companion.annotation
 import io.t28.kotlinify.lang.PropertyNode
 import kotlinx.collections.immutable.toImmutableList
 
-object SerializedNameInterceptor : PropertyInterceptor {
+object JsonInterceptor : PropertyInterceptor {
+    @Suppress("DuplicatedCode")
     override fun intercept(node: PropertyNode): PropertyNode {
-        if (node.hasAnnotation<SerializedName>()) {
+        if (node.hasAnnotation<Json>()) {
             return node
         }
 
@@ -32,9 +33,9 @@ object SerializedNameInterceptor : PropertyInterceptor {
         }
 
         val annotations = node.annotations.toMutableList()
-        annotations += annotation<SerializedName>(
+        annotations += annotation<Json>(
             """
-            |value = "${node.originalName}"
+            |name = "${node.originalName}"
             """.trimMargin()
         )
         return node.copy(annotations = annotations.toImmutableList())

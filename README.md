@@ -4,8 +4,20 @@ Kotlinify
 [![Codecov Status](https://codecov.io/gh/t28hub/kotlinify/branch/main/graph/badge.svg?token=05DB475U8M)](https://codecov.io/gh/t28hub/kotlinify)
 [![FOSSA Status](https://app.fossa.com/api/projects/custom%2B14538%2Fgit%40github.com%3At28hub%2Fkotlinify.git.svg?type=shield)](https://app.fossa.com/projects/custom%2B14538%2Fgit%40github.com%3At28hub%2Fkotlinify.git?ref=badge_shield)
 
-## License
+Supported formats.
+- JSON
+- JSON Schema
 
+
+Supported libraries.
+- [fastjson](https://github.com/alibaba/fastjson)
+- [Gson](https://github.com/google/gson)
+- [Jackson](https://github.com/FasterXML/jackson)
+- [Klaxon](https://github.com/cbeust/klaxon)
+- [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization)
+- [Moshi](https://github.com/square/moshi)
+
+## License
 ```
 Copyright (c) 2022 Tatsuya Maki
 
