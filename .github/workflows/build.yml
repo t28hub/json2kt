@@ -37,6 +37,10 @@ jobs:
       - name: Collect reports 📋
         run: ./gradlew detektMergeReports koverCollectReports --parallel
 
+      # Analyze code quality using SonarQube
+      - name: Analyze code quality 🔍
+        run: ./gradlew sonarqube
+
       # Upload test reports
       - name: Upload test reports ⬆️
         uses: actions/upload-artifact@v2

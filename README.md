@@ -2,6 +2,7 @@ Kotlinify
 =====
 [![Build Status](https://github.com/t28hub/kotlinify/actions/workflows/build.yml/badge.svg)](https://github.com/t28hub/kotlinify/actions/workflows/build.yml)
 [![Codecov Status](https://codecov.io/gh/t28hub/kotlinify/branch/main/graph/badge.svg?token=05DB475U8M)](https://codecov.io/gh/t28hub/kotlinify)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=t28hub_kotlinify&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=t28hub_kotlinify)
 [![FOSSA Status](https://app.fossa.com/api/projects/custom%2B14538%2Fgit%40github.com%3At28hub%2Fkotlinify.git.svg?type=shield)](https://app.fossa.com/projects/custom%2B14538%2Fgit%40github.com%3At28hub%2Fkotlinify.git?ref=badge_shield)
 
 Supported formats.

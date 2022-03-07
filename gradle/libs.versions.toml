@@ -13,6 +13,7 @@ kotlinx-serialization = "1.3.2"
 kotlinpoet = "1.10.2"
 logansquare = "1.3.6"
 moshi = "1.13.0"
+sonarqube = "3.3"
 truth = "1.1.3"
 
 [plugins]
@@ -21,6 +22,7 @@ intellij = { id = "org.jetbrains.intellij", version.ref = "intellij" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinx-kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kotlinx-kover" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+sonarqube = { id = "org.sonarqube", version.ref = "sonarqube" }
 
 [libraries]
 fastjson = { module = "com.alibaba:fastjson", version.ref = "fastjson" }

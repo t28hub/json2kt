@@ -25,11 +25,7 @@ plugins {
     alias(deps.plugins.detekt)
     alias(deps.plugins.kotlin.jvm)
     alias(deps.plugins.kotlinx.kover)
-}
-
-kover {
-    isDisabled = false
-    coverageEngine.set(INTELLIJ)
+    alias(deps.plugins.sonarqube)
 }
 
 /**
@@ -43,6 +39,22 @@ kover {
 fun properties(key: String): String {
     val property = project.findProperty(key)
     return property?.toString() ?: throw MissingPropertyException("Property '$key' does not exist")
+}
+
+kover {
+    isDisabled = false
+    coverageEngine.set(INTELLIJ)
+}
+
+sonarqube {
+    properties {
+        property("sonar.host.url", properties("sonarqube.url"))
+        property("sonar.organization", properties("sonarqube.organization"))
+        property("sonar.projectKey", properties("sonarqube.project.key"))
+        property("sonar.projectName", properties("sonarqube.project.name"))
+        property("sonar.kotlin.detekt.reportPaths", "build/reports/detekt/*.xml")
+        property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/kover/*.xml")
+    }
 }
 
 allprojects {
