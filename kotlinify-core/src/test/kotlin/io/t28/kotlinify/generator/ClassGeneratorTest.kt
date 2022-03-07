@@ -16,7 +16,6 @@
 package io.t28.kotlinify.generator
 
 import com.google.common.truth.Truth.assertThat
-import io.t28.kotlinify.lang.AnnotationValue
 import io.t28.kotlinify.lang.AnnotationValue.Companion.annotation
 import io.t28.kotlinify.lang.IntegerValue
 import io.t28.kotlinify.lang.PropertyNode
@@ -62,12 +61,9 @@ internal class ClassGeneratorTest {
             kind = CLASS,
             annotations = listOf(
                 annotation<Deprecated>(
-                    AnnotationValue.Member(
-                        name = "message",
-                        value = """
-                            "This class is deprecated"
-                        """.trimIndent()
-                    )
+                    """
+                    |message = "This class is deprecated"
+                    """.trimMargin()
                 )
             )
         )
@@ -127,9 +123,7 @@ internal class ClassGeneratorTest {
             name = "User",
             kind = CLASS,
             annotations = listOf(
-                AnnotationValue(
-                    type = Serializable::class
-                )
+                annotation<Serializable>()
             ),
             properties = listOf(
                 PropertyNode(
@@ -138,12 +132,9 @@ internal class ClassGeneratorTest {
                     value = IntegerValue(),
                     annotations = persistentListOf(
                         annotation<SerialName>(
-                            AnnotationValue.Member(
-                                name = "value",
-                                value = """
-                                    "_id"
-                                """.trimIndent()
-                            )
+                            """
+                            |value = "_id"
+                            """.trimMargin()
                         )
                     )
                 ),

@@ -16,12 +16,12 @@
 package io.t28.kotlinify.lang
 
 import com.google.common.truth.FailureMetadata
+import com.google.common.truth.IterableSubject
 import com.google.common.truth.StringSubject
 import com.google.common.truth.Subject
-import com.google.common.truth.Truth
 
 /**
- * [Truth] subject implementation for [PropertyNode].
+ * [Subject] implementation for [PropertyNode].
  */
 class PropertyNodeSubject(metadata: FailureMetadata, private val actual: PropertyNode) : Subject(metadata, actual) {
     fun hasName(expectedName: String) {
@@ -42,6 +42,16 @@ class PropertyNodeSubject(metadata: FailureMetadata, private val actual: Propert
 
     fun originalName(): StringSubject {
         return check("originalName").that(actual.originalName)
+    }
+
+    fun annotations(): IterableSubject {
+        return check("annotations").that(actual.annotations)
+    }
+
+    fun annotationAt(index: Int): AnnotationValueSubject {
+        return check("annotations[%s]", index)
+            .about(AnnotationValueSubject.factory())
+            .that(actual.annotations[index])
     }
 
     companion object {

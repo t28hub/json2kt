@@ -17,7 +17,6 @@ package io.t28.kotlinify.interceptor.jackson
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import io.t28.kotlinify.interceptor.TypeInterceptor
-import io.t28.kotlinify.lang.AnnotationValue
 import io.t28.kotlinify.lang.AnnotationValue.Companion.annotation
 import io.t28.kotlinify.lang.TypeNode
 import kotlinx.collections.immutable.toImmutableList
@@ -30,10 +29,9 @@ object JsonIgnorePropertiesInterceptor : TypeInterceptor {
 
         val annotations = node.annotations.toMutableList()
         annotations += annotation<JsonIgnoreProperties>(
-            AnnotationValue.Member(
-                name = "ignoreUnknown",
-                value = "true"
-            )
+            """
+            |ignoreUnknown = true
+            """.trimMargin()
         )
         return node.copy(annotations = annotations.toImmutableList())
     }

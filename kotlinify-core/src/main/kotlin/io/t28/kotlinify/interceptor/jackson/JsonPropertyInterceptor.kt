@@ -17,7 +17,6 @@ package io.t28.kotlinify.interceptor.jackson
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.t28.kotlinify.interceptor.PropertyInterceptor
-import io.t28.kotlinify.lang.AnnotationValue
 import io.t28.kotlinify.lang.AnnotationValue.Companion.annotation
 import io.t28.kotlinify.lang.PropertyNode
 import kotlinx.collections.immutable.toImmutableList
@@ -33,12 +32,9 @@ object JsonPropertyInterceptor : PropertyInterceptor {
             annotation<JsonProperty>()
         } else {
             annotation<JsonProperty>(
-                AnnotationValue.Member(
-                    name = "value",
-                    value = """
-                        "${node.originalName}"
-                    """.trimIndent()
-                )
+                """
+                |value = "${node.originalName}"
+                """.trimMargin()
             )
         }
         return node.copy(annotations = annotations.toImmutableList())

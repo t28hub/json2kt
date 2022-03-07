@@ -17,10 +17,9 @@ package io.t28.kotlinify.util
 
 import com.google.common.truth.FailureMetadata
 import com.google.common.truth.Subject
-import com.google.common.truth.Truth
 
 /**
- * [Truth] subject implementation for [Ref].
+ * [Subject] implementation for [Ref].
  */
 class RefSubject<T : Any>(metadata: FailureMetadata, private val actual: Ref<T>) : Subject(metadata, actual) {
     fun hasValue(expectedValue: T) {
