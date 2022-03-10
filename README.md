@@ -1,7 +1,9 @@
 Kotlinify
 =====
 [![Build Status](https://github.com/t28hub/kotlinify/actions/workflows/build.yml/badge.svg)](https://github.com/t28hub/kotlinify/actions/workflows/build.yml)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/c973e6ca45ba46aab97054d295dd4a85)](https://www.codacy.com/gh/t28hub/kotlinify/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=t28hub/kotlinify&amp;utm_campaign=Badge_Grade)
 [![Codecov Status](https://codecov.io/gh/t28hub/kotlinify/branch/main/graph/badge.svg?token=05DB475U8M)](https://codecov.io/gh/t28hub/kotlinify)
+[![DeepSource](https://deepsource.io/gh/t28hub/kotlinify.svg/?label=active+issues&token=8tFk61YmUjAe37v4oJ-iYe4D)](https://deepsource.io/gh/t28hub/kotlinify/?ref=repository-badge)
 [![FOSSA Status](https://app.fossa.com/api/projects/custom%2B14538%2Fgit%40github.com%3At28hub%2Fkotlinify.git.svg?type=shield)](https://app.fossa.com/projects/custom%2B14538%2Fgit%40github.com%3At28hub%2Fkotlinify.git?ref=badge_shield)
 
 Supported formats.
