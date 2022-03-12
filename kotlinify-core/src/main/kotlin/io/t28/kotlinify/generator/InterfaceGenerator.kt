@@ -15,17 +15,30 @@
  */
 package io.t28.kotlinify.generator
 
+import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
+import io.t28.kotlinify.lang.PropertyNode
 import io.t28.kotlinify.lang.TypeNode
 
-internal class EnumGenerator(packageName: String) : TypeSpecGenerator(packageName) {
+internal class InterfaceGenerator(packageName: String) : TypeSpecGenerator(packageName) {
     override fun generate(node: TypeNode): TypeSpec {
-        return TypeSpec.enumBuilder(node.name).apply {
-            enumConstants += node.enumConstants.map { constant ->
-                constant to TypeSpec.anonymousClassBuilder().build()
+        return TypeSpec.interfaceBuilder(node.name).apply {
+            annotationSpecs += node.annotations.map { annotation ->
+                annotation.asAnnotationSpec()
             }
 
-            annotationSpecs += node.annotations.map { annotation ->
+            propertySpecs += node.children().map { property ->
+                property.asPropertySpec()
+            }
+        }.build()
+    }
+
+    private fun PropertyNode.asPropertySpec(): PropertySpec {
+        return PropertySpec.builder(name, value.asTypeName(packageName)).apply {
+            modifiers += KModifier.PUBLIC
+            mutable(isMutable)
+            annotations += this@asPropertySpec.annotations.map { annotation ->
                 annotation.asAnnotationSpec()
             }
         }.build()
