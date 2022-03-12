@@ -18,10 +18,12 @@ package io.t28.kotlinify.generator
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterSpec
+import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
+import io.t28.kotlinify.lang.PropertyNode
 import io.t28.kotlinify.lang.TypeNode
 
-class ClassGenerator(packageName: String) : TypeSpecGenerator(packageName) {
+internal class ClassGenerator(packageName: String) : TypeSpecGenerator(packageName) {
     override fun generate(node: TypeNode): TypeSpec {
         return TypeSpec.classBuilder(node.name).apply {
             if (node.hasChildren) {
@@ -41,6 +43,17 @@ class ClassGenerator(packageName: String) : TypeSpecGenerator(packageName) {
                     ParameterSpec.builder(propertySpec.name, propertySpec.type).build()
                 }
             }.build())
+        }.build()
+    }
+
+    private fun PropertyNode.asPropertySpec(): PropertySpec {
+        return PropertySpec.builder(name, value.asTypeName(packageName)).apply {
+            modifiers += KModifier.PUBLIC
+            mutable(isMutable)
+            initializer(name)
+            annotations += this@asPropertySpec.annotations.map { annotation ->
+                annotation.asAnnotationSpec()
+            }
         }.build()
     }
 }

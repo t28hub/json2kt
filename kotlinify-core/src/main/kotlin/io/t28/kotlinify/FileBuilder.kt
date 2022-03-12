@@ -18,6 +18,7 @@ package io.t28.kotlinify
 import com.squareup.kotlinpoet.FileSpec
 import io.t28.kotlinify.generator.ClassGenerator
 import io.t28.kotlinify.generator.EnumGenerator
+import io.t28.kotlinify.generator.InterfaceGenerator
 import io.t28.kotlinify.interceptor.Execution
 import io.t28.kotlinify.lang.TypeNode.TypeKind.CLASS
 import io.t28.kotlinify.lang.TypeNode.TypeKind.ENUM
@@ -44,12 +45,13 @@ class FileBuilder internal constructor(
 
         val classGenerator = ClassGenerator(packageName)
         val enumGenerator = EnumGenerator(packageName)
+        val interfaceGenerator = InterfaceGenerator(packageName)
         val typeSpecs = children.map { nodeRef ->
             val typeNode = nodeRef.get()
             val generator = when (typeNode.kind) {
                 CLASS -> classGenerator
                 ENUM -> enumGenerator
-                INTERFACE -> TODO()
+                INTERFACE -> interfaceGenerator
             }
             generator.generate(typeNode)
         }

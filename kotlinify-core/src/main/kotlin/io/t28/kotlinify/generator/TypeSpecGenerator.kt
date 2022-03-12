@@ -18,9 +18,7 @@ package io.t28.kotlinify.generator
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
-import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asTypeName
@@ -28,28 +26,16 @@ import io.t28.kotlinify.lang.AnnotationValue
 import io.t28.kotlinify.lang.ArrayValue
 import io.t28.kotlinify.lang.ObjectValue
 import io.t28.kotlinify.lang.PrimitiveValue
-import io.t28.kotlinify.lang.PropertyNode
 import io.t28.kotlinify.lang.TypeNode
 import io.t28.kotlinify.lang.ValueNode
 
-abstract class TypeSpecGenerator(private val packageName: String) {
+abstract class TypeSpecGenerator(protected val packageName: String) {
     abstract fun generate(node: TypeNode): TypeSpec
 
     protected fun AnnotationValue.asAnnotationSpec(): AnnotationSpec {
         return AnnotationSpec.builder(type.asTypeName()).apply {
             members += this@asAnnotationSpec.members.map { member ->
                 CodeBlock.of(member)
-            }
-        }.build()
-    }
-
-    protected fun PropertyNode.asPropertySpec(): PropertySpec {
-        return PropertySpec.builder(name, value.asTypeName(packageName)).apply {
-            modifiers += KModifier.PUBLIC
-            mutable(isMutable)
-            initializer(name)
-            annotations += this@asPropertySpec.annotations.map { annotation ->
-                annotation.asAnnotationSpec()
             }
         }.build()
     }
