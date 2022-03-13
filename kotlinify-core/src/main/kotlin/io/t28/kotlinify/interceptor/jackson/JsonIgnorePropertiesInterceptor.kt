@@ -17,12 +17,13 @@ package io.t28.kotlinify.interceptor.jackson
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import io.t28.kotlinify.interceptor.TypeInterceptor
-import io.t28.kotlinify.lang.AnnotationValue.Companion.annotation
-import io.t28.kotlinify.lang.TypeNode
+import io.t28.kotlinify.lang.TypeElement
+import io.t28.kotlinify.lang.annotation
+import io.t28.kotlinify.lang.hasAnnotation
 import kotlinx.collections.immutable.toImmutableList
 
 object JsonIgnorePropertiesInterceptor : TypeInterceptor {
-    override fun intercept(node: TypeNode): TypeNode {
+    override fun intercept(node: TypeElement): TypeElement {
         if (node.hasAnnotation<JsonIgnoreProperties>()) {
             return node
         }

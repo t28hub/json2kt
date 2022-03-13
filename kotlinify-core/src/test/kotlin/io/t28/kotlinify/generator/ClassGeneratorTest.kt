@@ -16,12 +16,12 @@
 package io.t28.kotlinify.generator
 
 import com.google.common.truth.Truth.assertThat
-import io.t28.kotlinify.lang.AnnotationValue.Companion.annotation
-import io.t28.kotlinify.lang.IntegerValue
-import io.t28.kotlinify.lang.PropertyNode
-import io.t28.kotlinify.lang.StringValue
-import io.t28.kotlinify.lang.TypeNode
-import io.t28.kotlinify.lang.TypeNode.TypeKind.CLASS
+import io.t28.kotlinify.lang.impl.IntegerValue
+import io.t28.kotlinify.lang.impl.PropertyElementImpl
+import io.t28.kotlinify.lang.impl.StringValue
+import io.t28.kotlinify.lang.impl.TypeElementImpl
+import io.t28.kotlinify.lang.TypeKind.CLASS
+import io.t28.kotlinify.lang.annotation
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -39,7 +39,7 @@ internal class ClassGeneratorTest {
     @Test
     fun `should generate an empty class`() {
         // Arrange
-        val node = TypeNode(name = "EmptyClass", kind = CLASS, properties = emptyList())
+        val node = TypeElementImpl(name = "EmptyClass", kind = CLASS, properties = emptyList())
 
         // Act
         val actual = classGenerator.generate(node)
@@ -56,7 +56,7 @@ internal class ClassGeneratorTest {
     @Test
     fun `should generate a class with annotations`() {
         // Arrange
-        val node = TypeNode(
+        val node = TypeElementImpl(
             name = "DeprecatedClass",
             kind = CLASS,
             annotations = listOf(
@@ -84,19 +84,19 @@ internal class ClassGeneratorTest {
     @Test
     fun `should generate a class with properties`() {
         // Arrange
-        val node = TypeNode(
+        val node = TypeElementImpl(
             name = "User",
             kind = CLASS,
             properties = listOf(
-                PropertyNode(
+                PropertyElementImpl(
                     name = "id",
                     originalName = "id",
-                    value = IntegerValue(),
+                    type = IntegerValue(),
                 ),
-                PropertyNode(
+                PropertyElementImpl(
                     name = "name",
                     originalName = "name",
-                    value = StringValue(isNullable = true)
+                    type = StringValue(isNullable = true)
                 )
             )
         )
@@ -119,29 +119,29 @@ internal class ClassGeneratorTest {
     @Test
     fun `should generate a class with annotations and properties`() {
         // Arrange
-        val node = TypeNode(
+        val node = TypeElementImpl(
             name = "User",
             kind = CLASS,
             annotations = listOf(
                 annotation<Serializable>()
             ),
             properties = listOf(
-                PropertyNode(
+                PropertyElementImpl(
                     name = "id",
                     originalName = "_id",
-                    value = IntegerValue(),
+                    type = IntegerValue(),
                     annotations = persistentListOf(
                         annotation<SerialName>(
                             """
-                            |value = "_id"
+                            |type = "_id"
                             """.trimMargin()
                         )
                     )
                 ),
-                PropertyNode(
+                PropertyElementImpl(
                     name = "name",
                     originalName = "name",
-                    value = StringValue(isNullable = true)
+                    type = StringValue(isNullable = true)
                 )
             )
         )
@@ -154,7 +154,7 @@ internal class ClassGeneratorTest {
             """
         |@kotlinx.serialization.Serializable
         |public data class User(
-        |  @kotlinx.serialization.SerialName(value = "_id")
+        |  @kotlinx.serialization.SerialName(type = "_id")
         |  public val id: kotlin.Int,
         |  public val name: kotlin.String?
         |)

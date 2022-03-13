@@ -18,24 +18,24 @@ package io.t28.kotlinify.generator
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
-import io.t28.kotlinify.lang.PropertyNode
-import io.t28.kotlinify.lang.TypeNode
+import io.t28.kotlinify.lang.PropertyElement
+import io.t28.kotlinify.lang.TypeElement
 
 internal class InterfaceGenerator(packageName: String) : TypeSpecGenerator(packageName) {
-    override fun generate(node: TypeNode): TypeSpec {
+    override fun generate(node: TypeElement): TypeSpec {
         return TypeSpec.interfaceBuilder(node.name).apply {
             annotationSpecs += node.annotations.map { annotation ->
                 annotation.asAnnotationSpec()
             }
 
-            propertySpecs += node.children().map { property ->
+            propertySpecs += node.properties.map { property ->
                 property.asPropertySpec()
             }
         }.build()
     }
 
-    private fun PropertyNode.asPropertySpec(): PropertySpec {
-        return PropertySpec.builder(name, value.asTypeName(packageName)).apply {
+    private fun PropertyElement.asPropertySpec(): PropertySpec {
+        return PropertySpec.builder(name, type.asTypeName(packageName)).apply {
             modifiers += KModifier.PUBLIC
             mutable(isMutable)
             annotations += this@asPropertySpec.annotations.map { annotation ->

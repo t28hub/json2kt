@@ -15,7 +15,7 @@
  */
 package io.t28.kotlinify.parser
 
-import io.t28.kotlinify.lang.RootNode
+import io.t28.kotlinify.lang.RootElement
 import kotlin.jvm.Throws
 
 /**
@@ -25,11 +25,11 @@ import kotlin.jvm.Throws
  */
 interface Parser<T> {
     /**
-     * Parse input as a [RootNode].
+     * Parse input as a [RootElement].
      *
      * @param rootName The name of root type.
      * @param content The content to be parsed.
      */
     @Throws(ParseException::class)
-    fun parse(rootName: String, content: T): RootNode
+    fun parse(rootName: String, content: T): RootElement
 }

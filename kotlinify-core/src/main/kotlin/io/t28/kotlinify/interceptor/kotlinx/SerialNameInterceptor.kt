@@ -16,17 +16,18 @@
 package io.t28.kotlinify.interceptor.kotlinx
 
 import io.t28.kotlinify.interceptor.PropertyInterceptor
-import io.t28.kotlinify.lang.AnnotationValue.Companion.annotation
-import io.t28.kotlinify.lang.PropertyNode
+import io.t28.kotlinify.lang.PropertyElement
+import io.t28.kotlinify.lang.annotation
+import io.t28.kotlinify.lang.hasAnnotation
 import kotlinx.serialization.SerialName
 
 object SerialNameInterceptor : PropertyInterceptor {
-    override fun intercept(node: PropertyNode): PropertyNode {
+    override fun intercept(node: PropertyElement): PropertyElement {
         if (node.hasAnnotation<SerialName>()) {
             return node
         }
 
-        if (node.hasSameOriginalName()) {
+        if (node.name == node.originalName) {
             return node
         }
 

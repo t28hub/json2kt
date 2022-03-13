@@ -26,11 +26,11 @@ import io.t28.kotlinify.lang.AnnotationValue
 import io.t28.kotlinify.lang.ArrayValue
 import io.t28.kotlinify.lang.ObjectValue
 import io.t28.kotlinify.lang.PrimitiveValue
-import io.t28.kotlinify.lang.TypeNode
-import io.t28.kotlinify.lang.ValueNode
+import io.t28.kotlinify.lang.TypeElement
+import io.t28.kotlinify.lang.ValueElement
 
 abstract class TypeSpecGenerator(protected val packageName: String) {
-    abstract fun generate(node: TypeNode): TypeSpec
+    abstract fun generate(node: TypeElement): TypeSpec
 
     protected fun AnnotationValue.asAnnotationSpec(): AnnotationSpec {
         return AnnotationSpec.builder(type.asTypeName()).apply {
@@ -40,15 +40,15 @@ abstract class TypeSpecGenerator(protected val packageName: String) {
         }.build()
     }
 
-    protected fun ValueNode.asTypeName(packageName: String): TypeName {
+    protected fun ValueElement.asTypeName(packageName: String): TypeName {
         val typeName = when (this) {
             is ArrayValue -> {
-                val typeArgument = componentType().asTypeName(packageName)
+                val typeArgument = componentType.asTypeName(packageName)
                 List::class.asTypeName().parameterizedBy(typeArgument)
             }
             is ObjectValue -> {
-                val typeNode = reference.get()
-                ClassName(packageName, typeNode.name)
+                val typeElement = definition
+                ClassName(packageName, typeElement.name)
             }
             is PrimitiveValue -> type.asTypeName()
         }

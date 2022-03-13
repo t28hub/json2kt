@@ -20,14 +20,14 @@ import com.google.common.truth.FailureMetadata
 import com.google.common.truth.IterableSubject
 import com.google.common.truth.StringSubject
 import com.google.common.truth.Subject
-import io.t28.kotlinify.lang.TypeNode.TypeKind.CLASS
-import io.t28.kotlinify.lang.TypeNode.TypeKind.ENUM
-import io.t28.kotlinify.lang.TypeNode.TypeKind.INTERFACE
+import io.t28.kotlinify.lang.TypeKind.CLASS
+import io.t28.kotlinify.lang.TypeKind.ENUM
+import io.t28.kotlinify.lang.TypeKind.INTERFACE
 
 /**
- * [Subject] subject implementation for [TypeNode].
+ * [Subject] subject implementation for [TypeElement].
  */
-class TypeNodeSubject(metadata: FailureMetadata, private val actual: TypeNode) : Subject(metadata, actual) {
+class TypeNodeSubject(metadata: FailureMetadata, private val actual: TypeElement) : Subject(metadata, actual) {
     fun hasName(expectedName: String) {
         return name().isEqualTo(expectedName)
     }
@@ -55,7 +55,7 @@ class TypeNodeSubject(metadata: FailureMetadata, private val actual: TypeNode) :
     }
 
     fun properties(): IterableSubject {
-        return check("properties").that(actual.children())
+        return check("properties").that(actual.properties)
     }
 
     fun propertyAt(index: Int): PropertyNodeSubject {
@@ -75,7 +75,7 @@ class TypeNodeSubject(metadata: FailureMetadata, private val actual: TypeNode) :
     }
 
     companion object {
-        fun factory() = Factory<TypeNodeSubject, TypeNode> { metadata, actual ->
+        fun factory() = Factory<TypeNodeSubject, TypeElement> { metadata, actual ->
             TypeNodeSubject(metadata, actual)
         }
     }

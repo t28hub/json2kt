@@ -17,9 +17,9 @@ package io.t28.kotlinify.interceptor.jackson
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.t28.kotlinify.assertThat
-import io.t28.kotlinify.lang.AnnotationValue.Companion.annotation
-import io.t28.kotlinify.lang.PropertyNode
-import io.t28.kotlinify.lang.StringValue
+import io.t28.kotlinify.lang.annotation
+import io.t28.kotlinify.lang.impl.PropertyElementImpl
+import io.t28.kotlinify.lang.impl.StringValue
 import kotlinx.collections.immutable.persistentListOf
 import org.junit.jupiter.api.Test
 
@@ -27,8 +27,8 @@ internal class JsonPropertyInterceptorTest {
     @Test
     fun `intercept should add @JsonProperty`() {
         // Arrange
-        val property = PropertyNode(
-            value = StringValue(),
+        val property = PropertyElementImpl(
+            type = StringValue(),
             name = "name",
             originalName = "_name"
         )
@@ -57,8 +57,8 @@ internal class JsonPropertyInterceptorTest {
     @Test
     fun `intercept should add @JsonProperty when 'name' == 'originalName'`() {
         // Arrange
-        val property = PropertyNode(
-            value = StringValue(),
+        val property = PropertyElementImpl(
+            type = StringValue(),
             name = "name",
             originalName = "name"
         )
@@ -82,8 +82,8 @@ internal class JsonPropertyInterceptorTest {
     @Test
     fun `intercept should skip when property has @JsonProperty`() {
         // Arrange
-        val property = PropertyNode(
-            value = StringValue(),
+        val property = PropertyElementImpl(
+            type = StringValue(),
             name = "name",
             originalName = "name",
             annotations = persistentListOf(

@@ -17,16 +17,16 @@ package io.t28.kotlinify.interceptor.jackson
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import io.t28.kotlinify.assertThat
-import io.t28.kotlinify.lang.AnnotationValue.Companion.annotation
-import io.t28.kotlinify.lang.TypeNode
-import io.t28.kotlinify.lang.TypeNode.TypeKind.CLASS
+import io.t28.kotlinify.lang.impl.TypeElementImpl
+import io.t28.kotlinify.lang.TypeKind.CLASS
+import io.t28.kotlinify.lang.annotation
 import org.junit.jupiter.api.Test
 
 internal class JsonIgnorePropertiesInterceptorTest {
     @Test
     fun `intercept should add @JsonIgnoreProperties`() {
         // Arrange
-        val type = TypeNode(
+        val type = TypeElementImpl(
             name = "Example",
             kind = CLASS
         )
@@ -54,7 +54,7 @@ internal class JsonIgnorePropertiesInterceptorTest {
     @Test
     fun `intercept should skip when type has @JsonIgnoreProperties`() {
         // Arrange
-        val type = TypeNode(
+        val type = TypeElementImpl(
             name = "Example",
             kind = CLASS,
             annotations = listOf(

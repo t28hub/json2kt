@@ -13,16 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.t28.kotlinify.lang
 
-import kotlin.reflect.KType
+package io.t28.kotlinify.lang.impl
+
+import io.t28.kotlinify.lang.AnnotationValue
+import kotlin.reflect.KClass
 
 /**
- * Represents a primitive value element.
+ * Implementation of [AnnotationValue].
+ *
+ * @param type The type of [Annotation].
+ * @param members The members of this annotation value.
  */
-interface PrimitiveValue : ValueElement {
-    /**
-     * The type of this value.
-     */
-    val type: KType
+internal class AnnotationValueImpl(
+    override val type: KClass<out Annotation>,
+    override val members: List<String>
+): AnnotationValue {
+    override fun toString() = buildString {
+        append(AnnotationValue::class.simpleName)
+        append("{")
+        append("type=${type.simpleName},")
+        append("members=$members")
+        append("}")
+    }
 }

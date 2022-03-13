@@ -13,25 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.t28.kotlinify.lang
+package io.t28.kotlinify.lang.impl
+
+import io.t28.kotlinify.lang.ObjectValue
+import io.t28.kotlinify.lang.TypeElement
+import io.t28.kotlinify.lang.TypeElementRef
 
 /**
- * Represents a value element.
+ * Implementation of [ObjectValue].
+ *
+ * @param reference The reference element of this value.
+ * @param isNullable Whether this value is nullable.
  */
-sealed class ValueNode : Node {
-    /**
-     * Whether this value is nullable.
-     */
-    abstract val isNullable: Boolean
+internal class ObjectValueImpl(
+    private val reference: TypeElementRef,
+    override val isNullable: Boolean = false
+) : ObjectValue {
+    override val definition: TypeElement
+        get() = reference.get()
 
     override fun toString(): String = buildString {
-        append(this@ValueNode::class.simpleName)
+        append(ObjectValue::class.simpleName)
         append("{")
+        append("declaration=$definition,")
         append("isNullable=$isNullable")
         append("}")
-    }
-
-    override fun children(): Collection<Node> {
-        return emptyList()
     }
 }

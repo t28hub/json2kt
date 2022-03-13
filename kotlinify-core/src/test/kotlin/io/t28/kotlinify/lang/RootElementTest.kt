@@ -17,38 +17,37 @@ package io.t28.kotlinify.lang
 
 import com.google.common.truth.Truth.assertThat
 import io.t28.kotlinify.assertThat
-import io.t28.kotlinify.lang.TypeNode.TypeKind.CLASS
+import io.t28.kotlinify.lang.TypeKind.CLASS
+import io.t28.kotlinify.lang.impl.TypeElementImpl
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-internal class RootNodeTest {
-    private lateinit var rootNode: RootNode
+internal class RootElementTest {
+    private lateinit var rootNode: RootElement
 
     @BeforeEach
     fun setUp() {
-        rootNode = RootNode()
+        rootNode = RootElement()
     }
 
     @Test
     fun `toString should return string representation`() {
         // Arrange
-        rootNode.add(TypeNode(name = "MyClass", kind = CLASS))
+        rootNode.add(TypeElementImpl(name = "MyClass", kind = CLASS))
 
         // Act
         val actual = rootNode.toString()
 
         // Assert
-        assertThat(actual).isEqualTo(
-            """
-            RootNode{[TypeNode{name=MyClass,properties=[],annotations=[]}]}
-        """.trimIndent()
-        )
+        assertThat(actual).isEqualTo("""
+        |RootElement{[TypeElementImpl{name=MyClass,kind=CLASS,properties=[],annotations=[],enumConstants=[]}]}
+        """.trimMargin())
     }
 
     @Test
     fun `children should return child nodes`() {
         // Arrange
-        val childNode = TypeNode(name = "MyClass", kind = CLASS)
+        val childNode = TypeElementImpl(name = "MyClass", kind = CLASS)
         rootNode.add(childNode)
 
         // Act
@@ -73,7 +72,7 @@ internal class RootNodeTest {
     @Test
     fun `add should add a child node and reference`() {
         // Arrange
-        val childNode = TypeNode(name = "MyClass", kind = CLASS)
+        val childNode = TypeElementImpl(name = "MyClass", kind = CLASS)
 
         // Act
         val actual = rootNode.add(childNode)

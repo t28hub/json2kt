@@ -21,9 +21,9 @@ import com.google.common.truth.StringSubject
 import com.google.common.truth.Subject
 
 /**
- * [Subject] implementation for [PropertyNode].
+ * [Subject] implementation for [PropertyElement].
  */
-class PropertyNodeSubject(metadata: FailureMetadata, private val actual: PropertyNode) : Subject(metadata, actual) {
+class PropertyNodeSubject(metadata: FailureMetadata, private val actual: PropertyElement) : Subject(metadata, actual) {
     fun hasName(expectedName: String) {
         return name().isEqualTo(expectedName)
     }
@@ -32,8 +32,8 @@ class PropertyNodeSubject(metadata: FailureMetadata, private val actual: Propert
         return originalName().isEqualTo(expectedName)
     }
 
-    fun value(): Subject {
-        return check("value").that(actual.value)
+    fun type(): Subject {
+        return check("value").that(actual.type)
     }
 
     fun name(): StringSubject {
@@ -55,7 +55,7 @@ class PropertyNodeSubject(metadata: FailureMetadata, private val actual: Propert
     }
 
     companion object {
-        fun factory() = Factory<PropertyNodeSubject, PropertyNode> { metadata, actual ->
+        fun factory() = Factory<PropertyNodeSubject, PropertyElement> { metadata, actual ->
             PropertyNodeSubject(metadata, actual)
         }
     }
