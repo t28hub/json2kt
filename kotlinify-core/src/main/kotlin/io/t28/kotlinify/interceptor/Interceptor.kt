@@ -15,8 +15,8 @@
  */
 package io.t28.kotlinify.interceptor
 
-import io.t28.kotlinify.lang.Node
+import io.t28.kotlinify.lang.Element
 
-interface Interceptor<T : Node> {
+interface Interceptor<T : Element> {
     fun intercept(node: T): T
 }

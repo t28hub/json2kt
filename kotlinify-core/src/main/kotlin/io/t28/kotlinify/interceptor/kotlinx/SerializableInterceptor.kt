@@ -16,12 +16,13 @@
 package io.t28.kotlinify.interceptor.kotlinx
 
 import io.t28.kotlinify.interceptor.TypeInterceptor
-import io.t28.kotlinify.lang.AnnotationValue.Companion.annotation
-import io.t28.kotlinify.lang.TypeNode
+import io.t28.kotlinify.lang.TypeElement
+import io.t28.kotlinify.lang.annotation
+import io.t28.kotlinify.lang.hasAnnotation
 import kotlinx.serialization.Serializable
 
 object SerializableInterceptor : TypeInterceptor {
-    override fun intercept(node: TypeNode): TypeNode {
+    override fun intercept(node: TypeElement): TypeElement {
         if (node.hasAnnotation<Serializable>()) {
             return node
         }

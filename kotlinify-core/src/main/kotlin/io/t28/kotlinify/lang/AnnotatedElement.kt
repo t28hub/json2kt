@@ -15,14 +15,12 @@
  */
 package io.t28.kotlinify.lang
 
-import kotlin.reflect.KType
-
 /**
- * Represents a primitive value element.
+ * Represents an annotated node.
  */
-interface PrimitiveValue : ValueElement {
+interface AnnotatedElement : Element {
     /**
-     * The type of this value.
+     * Annotated annotations on this node.
      */
-    val type: KType
+    val annotations: List<AnnotationValue>
 }

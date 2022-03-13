@@ -17,10 +17,10 @@ package io.t28.kotlinify.parser
 
 import io.t28.kotlinify.assertThat
 import io.t28.kotlinify.isInstanceOf
-import io.t28.kotlinify.lang.BooleanValue
-import io.t28.kotlinify.lang.DoubleValue
-import io.t28.kotlinify.lang.IntegerValue
-import io.t28.kotlinify.lang.StringValue
+import io.t28.kotlinify.lang.impl.BooleanValue
+import io.t28.kotlinify.lang.impl.DoubleValue
+import io.t28.kotlinify.lang.impl.IntegerValue
+import io.t28.kotlinify.lang.impl.StringValue
 import io.t28.kotlinify.parser.naming.PropertyNamingStrategy
 import io.t28.kotlinify.parser.naming.TypeNamingStrategy
 import org.junit.jupiter.api.Test
@@ -66,12 +66,12 @@ internal class JsonSchemaParserTest {
 
                 propertyAt(0).apply {
                     hasName("latitude")
-                    value().isInstanceOf<DoubleValue>()
+                    type().isInstanceOf<DoubleValue>()
                 }
 
                 propertyAt(1).apply {
                     hasName("longitude")
-                    value().isInstanceOf<DoubleValue>()
+                    type().isInstanceOf<DoubleValue>()
                 }
             }
         }
@@ -150,19 +150,19 @@ internal class JsonSchemaParserTest {
                 propertyAt(0).apply {
                     hasName("foo")
                     hasOriginalName("foo")
-                    value().isInstanceOf<StringValue>()
+                    type().isInstanceOf<StringValue>()
                 }
 
                 propertyAt(1).apply {
                     hasName("bar")
                     hasOriginalName("bar")
-                    value().isInstanceOf<IntegerValue>()
+                    type().isInstanceOf<IntegerValue>()
                 }
 
                 propertyAt(2).apply {
                     hasName("baz")
                     hasOriginalName("baz")
-                    value().isInstanceOf<BooleanValue>()
+                    type().isInstanceOf<BooleanValue>()
                 }
             }
         }

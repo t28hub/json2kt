@@ -20,9 +20,9 @@ import io.t28.kotlinify.generator.ClassGenerator
 import io.t28.kotlinify.generator.EnumGenerator
 import io.t28.kotlinify.generator.InterfaceGenerator
 import io.t28.kotlinify.interceptor.Execution
-import io.t28.kotlinify.lang.TypeNode.TypeKind.CLASS
-import io.t28.kotlinify.lang.TypeNode.TypeKind.ENUM
-import io.t28.kotlinify.lang.TypeNode.TypeKind.INTERFACE
+import io.t28.kotlinify.lang.TypeKind.CLASS
+import io.t28.kotlinify.lang.TypeKind.ENUM
+import io.t28.kotlinify.lang.TypeKind.INTERFACE
 import io.t28.kotlinify.parser.Parser
 import io.t28.kotlinify.util.getFilename
 import io.t28.kotlinify.util.removeFileExtension

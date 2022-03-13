@@ -16,12 +16,12 @@
 package io.t28.kotlinify.generator
 
 import com.google.common.truth.Truth.assertThat
-import io.t28.kotlinify.lang.AnnotationValue.Companion.annotation
-import io.t28.kotlinify.lang.IntegerValue
-import io.t28.kotlinify.lang.PropertyNode
-import io.t28.kotlinify.lang.StringValue
-import io.t28.kotlinify.lang.TypeNode
-import io.t28.kotlinify.lang.TypeNode.TypeKind.INTERFACE
+import io.t28.kotlinify.lang.impl.IntegerValue
+import io.t28.kotlinify.lang.impl.PropertyElementImpl
+import io.t28.kotlinify.lang.impl.StringValue
+import io.t28.kotlinify.lang.impl.TypeElementImpl
+import io.t28.kotlinify.lang.TypeKind.INTERFACE
+import io.t28.kotlinify.lang.annotation
 import kotlinx.serialization.Serializable
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -37,7 +37,7 @@ internal class InterfaceGeneratorTest {
     @Test
     fun `should generate an interface`() {
         // Arrange
-        val node = TypeNode(name = "InterfaceTest", kind = INTERFACE)
+        val node = TypeElementImpl(name = "InterfaceTest", kind = INTERFACE)
 
         // Act
         val actual = interfaceGenerator.generate(node)
@@ -53,17 +53,17 @@ internal class InterfaceGeneratorTest {
     @Test
     fun `should generate an interface with properties`() {
         // Arrange
-        val node = TypeNode(
+        val node = TypeElementImpl(
             name = "InterfaceTest",
             kind = INTERFACE,
             properties = listOf(
-                PropertyNode(
-                    value = StringValue(),
+                PropertyElementImpl(
+                    type = StringValue(),
                     name = "name",
                     originalName = "name"
                 ),
-                PropertyNode(
-                    value = IntegerValue(isNullable = true),
+                PropertyElementImpl(
+                    type = IntegerValue(isNullable = true),
                     name = "age",
                     originalName = "age"
                 )
@@ -88,17 +88,17 @@ internal class InterfaceGeneratorTest {
     @Test
     fun `should generate an interface with annotations and properties`() {
         // Arrange
-        val node = TypeNode(
+        val node = TypeElementImpl(
             name = "InterfaceTest",
             kind = INTERFACE,
             properties = listOf(
-                PropertyNode(
-                    value = StringValue(),
+                PropertyElementImpl(
+                    type = StringValue(),
                     name = "name",
                     originalName = "name"
                 ),
-                PropertyNode(
-                    value = IntegerValue(isNullable = true),
+                PropertyElementImpl(
+                    type = IntegerValue(isNullable = true),
                     name = "age",
                     originalName = "age"
                 )

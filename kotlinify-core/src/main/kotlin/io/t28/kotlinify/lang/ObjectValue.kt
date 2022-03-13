@@ -16,20 +16,11 @@
 package io.t28.kotlinify.lang
 
 /**
- * Represents an object value.
- *
- * @param reference The reference element of this value.
- * @param isNullable Whether this value is nullable.
+ * Represents an object value element.
  */
-class ObjectValue(
-    val reference: TypeNodeRef,
-    override val isNullable: Boolean = false
-) : ValueNode() {
-    override fun toString(): String = buildString {
-        append(ObjectValue::class.simpleName)
-        append("{")
-        append("reference=$reference,")
-        append("isNullable=$isNullable")
-        append("}")
-    }
+interface ObjectValue : ValueElement {
+    /**
+     * The definition of this object.
+     */
+    val definition: TypeElement
 }

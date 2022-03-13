@@ -13,37 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.t28.kotlinify.lang
+package io.t28.kotlinify.lang.impl
 
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
+import io.t28.kotlinify.lang.AnnotationValue
+import io.t28.kotlinify.lang.Element
+import io.t28.kotlinify.lang.PropertyElement
+import io.t28.kotlinify.lang.ValueElement
 import kotlinx.collections.immutable.toImmutableList
 
 /**
- * Represents a property node.
+ * Implementation of [PropertyElement].
  *
- * @param value The value of this property.
+ * @param type The type of this property.
  * @param name The name of this property.
  * @param originalName The original name of this property.
  * @param isMutable Whether the property is mutable.
  * @param annotations The annotated annotations fo this type.
  */
-class PropertyNode(
-    val value: ValueNode,
-    val name: String,
-    val originalName: String,
-    val isMutable: Boolean = false,
-    override val annotations: ImmutableList<AnnotationValue> = persistentListOf()
-) : AnnotatedNode() {
+internal class PropertyElementImpl(
+    override val type: ValueElement,
+    override val name: String,
+    override val originalName: String,
+    override val isMutable: Boolean = false,
+    override val annotations: List<AnnotationValue> = emptyList()
+) : PropertyElement {
     init {
-        require(name.isNotEmpty()) { "Name is empty string" }
         require(originalName.isNotEmpty()) { "Original name is empty string" }
+        require(name.isNotEmpty()) { "Name is empty string" }
     }
 
     override fun toString(): String = buildString {
-        append(PropertyNode::class.simpleName)
+        append(PropertyElementImpl::class.simpleName)
         append("{")
-        append("value=$value,")
+        append("type=$type,")
         append("name=$name,")
         append("originalName=$originalName,")
         append("isMutable=$isMutable,")
@@ -51,24 +53,16 @@ class PropertyNode(
         append("}")
     }
 
-    override fun children(): Collection<Node> {
-        return emptyList()
-    }
-
-    fun hasSameOriginalName(): Boolean {
-        return name == originalName
-    }
-
-    fun copy(
-        name: String = this.name,
-        value: ValueNode = this.value,
-        isMutable: Boolean = this.isMutable,
-        annotations: List<AnnotationValue> = this.annotations
-    ): PropertyNode {
-        return PropertyNode(
-            name = name,
+    override fun copy(
+        name: String,
+        type: ValueElement,
+        isMutable: Boolean,
+        annotations: List<AnnotationValue>
+    ): PropertyElement {
+        return PropertyElementImpl(
             originalName = this.originalName,
-            value = value,
+            name = name,
+            type = type,
             isMutable = isMutable,
             annotations = annotations.toImmutableList()
         )

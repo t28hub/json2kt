@@ -16,18 +16,20 @@
 package io.t28.kotlinify.parser
 
 import io.t28.kotlinify.lang.ArrayValue
-import io.t28.kotlinify.lang.BooleanValue
-import io.t28.kotlinify.lang.FloatValue
-import io.t28.kotlinify.lang.IntegerValue
-import io.t28.kotlinify.lang.NullValue
+import io.t28.kotlinify.lang.impl.BooleanValue
+import io.t28.kotlinify.lang.impl.FloatValue
+import io.t28.kotlinify.lang.impl.IntegerValue
+import io.t28.kotlinify.lang.impl.NullValue
 import io.t28.kotlinify.lang.ObjectValue
 import io.t28.kotlinify.lang.PrimitiveValue
-import io.t28.kotlinify.lang.PropertyNode
-import io.t28.kotlinify.lang.RootNode
-import io.t28.kotlinify.lang.StringValue
-import io.t28.kotlinify.lang.TypeNode
-import io.t28.kotlinify.lang.TypeNode.TypeKind.CLASS
-import io.t28.kotlinify.lang.ValueNode
+import io.t28.kotlinify.lang.impl.PropertyElementImpl
+import io.t28.kotlinify.lang.RootElement
+import io.t28.kotlinify.lang.impl.StringValue
+import io.t28.kotlinify.lang.impl.TypeElementImpl
+import io.t28.kotlinify.lang.TypeKind.CLASS
+import io.t28.kotlinify.lang.ValueElement
+import io.t28.kotlinify.lang.impl.ArrayValueImpl
+import io.t28.kotlinify.lang.impl.ObjectValueImpl
 import io.t28.kotlinify.parser.naming.NamingStrategy
 import io.t28.kotlinify.parser.naming.UniqueNamingStrategy
 import io.t28.kotlinify.util.firstOrElse
@@ -53,7 +55,7 @@ class JsonParser(
     private val typeNameStrategy: NamingStrategy,
     private val propertyNameStrategy: NamingStrategy
 ) : Parser<String> {
-    override fun parse(rootName: String, content: String): RootNode {
+    override fun parse(rootName: String, content: String): RootElement {
         val element = try {
             json.parseToJsonElement(content)
         } catch (e: SerializationException) {
@@ -72,15 +74,15 @@ class JsonParser(
         private val typeNameStrategy: NamingStrategy,
         private val propertyNameStrategy: NamingStrategy,
     ) : Parser<JsonElement> {
-        private lateinit var rootNode: RootNode
+        private lateinit var rootElement: RootElement
 
-        override fun parse(rootName: String, content: JsonElement): RootNode {
-            rootNode = RootNode()
+        override fun parse(rootName: String, content: JsonElement): RootElement {
+            rootElement = RootElement()
             parseAsValue(rootName, content)
-            return rootNode
+            return rootElement
         }
 
-        private fun parseAsValue(typeName: String, element: JsonElement): ValueNode {
+        private fun parseAsValue(typeName: String, element: JsonElement): ValueElement {
             return when (element) {
                 is JsonArray -> parseAsValue(typeName, element)
                 is JsonObject -> parseAsValue(typeName, element)
@@ -92,7 +94,7 @@ class JsonParser(
             val child = element.firstOrElse(JsonNull)
             val component = parseAsValue(childTypeName, child)
             val isNullable = element.isEmpty() or element.contains(JsonNull)
-            return ArrayValue(component, isNullable)
+            return ArrayValueImpl(component, isNullable)
         }
 
         private fun parseAsValue(typeName: String, element: JsonObject): ObjectValue {
@@ -100,18 +102,18 @@ class JsonParser(
             // Use reversed entries to generate classes order by defined by the JSON.
             val properties = element.entries.reversed().map { (key, child) ->
                 val childTypeName = typeNameStrategy.apply(key)
-                val propertyValue = parseAsValue(childTypeName, child)
+                val propertyType = parseAsValue(childTypeName, child)
                 val propertyName = propertyNamingStrategy.apply(key)
-                PropertyNode(value = propertyValue, name = propertyName, originalName = key)
+                PropertyElementImpl(type = propertyType, name = propertyName, originalName = key)
             }
 
-            val typeNode = TypeNode(
+            val typeElement = TypeElementImpl(
                 name = typeName,
                 kind = CLASS,
                 properties = properties.reversed().toImmutableList()
             )
-            val typeNodeRef = rootNode.add(typeNode)
-            return ObjectValue(reference = typeNodeRef)
+            val typeElementRef = rootElement.add(typeElement)
+            return ObjectValueImpl(reference = typeElementRef)
         }
 
         private fun parseAsValue(element: JsonPrimitive): PrimitiveValue {

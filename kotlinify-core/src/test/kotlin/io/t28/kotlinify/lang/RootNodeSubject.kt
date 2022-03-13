@@ -21,9 +21,9 @@ import com.google.common.truth.Subject
 import com.google.common.truth.Subject.Factory
 
 /**
- * [Subject] implementation for [RootNode].
+ * [Subject] implementation for [RootElement].
  */
-class RootNodeSubject(metadata: FailureMetadata, private val actual: RootNode) : Subject(metadata, actual) {
+class RootNodeSubject(metadata: FailureMetadata, private val actual: RootElement) : Subject(metadata, actual) {
     fun hasSize(expectedSize: Int) {
         return children().hasSize(expectedSize)
     }
@@ -39,7 +39,7 @@ class RootNodeSubject(metadata: FailureMetadata, private val actual: RootNode) :
     }
 
     companion object {
-        fun factory() = Factory<RootNodeSubject, RootNode> { metadata, actual ->
+        fun factory() = Factory<RootNodeSubject, RootElement> { metadata, actual ->
             RootNodeSubject(metadata, actual)
         }
     }

@@ -13,21 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.t28.kotlinify.interceptor
 
-import io.t28.kotlinify.lang.PropertyNode
-import io.t28.kotlinify.lang.TypeNode
+import io.t28.kotlinify.lang.PropertyElement
+import io.t28.kotlinify.lang.TypeElement
 import kotlinx.collections.immutable.toImmutableList
 
-typealias TypeInterceptor = Interceptor<TypeNode>
-typealias PropertyInterceptor = Interceptor<PropertyNode>
+typealias TypeInterceptor = Interceptor<TypeElement>
+typealias PropertyInterceptor = Interceptor<PropertyElement>
 
 class Execution(
     private val typeInterceptors: List<TypeInterceptor>,
     private val propertyInterceptors: List<PropertyInterceptor>
 ) {
-    fun execute(node: TypeNode): TypeNode {
+    fun execute(node: TypeElement): TypeElement {
         val proceeded = typeInterceptors.fold(node) { current, interceptor ->
             interceptor.intercept(current)
         }
@@ -37,7 +36,7 @@ class Execution(
         return proceeded.copy(properties = proceededProperties.toImmutableList())
     }
 
-    fun execute(property: PropertyNode): PropertyNode {
+    private fun execute(property: PropertyElement): PropertyElement {
         return propertyInterceptors.fold(property) { current, interceptor ->
             interceptor.intercept(current)
         }

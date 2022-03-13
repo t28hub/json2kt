@@ -15,17 +15,11 @@
  */
 package io.t28.kotlinify.lang
 
-import kotlin.reflect.KType
-import kotlin.reflect.full.createType
-
 /**
- * Represents a double value.
- *
- * @param isNullable Whether this element is nullable.
+ * The kind of a type.
  */
-data class DoubleValue(
-    override val isNullable: Boolean = false
-) : PrimitiveValue() {
-    override val type: KType
-        get() = Double::class.createType(nullable = isNullable)
+enum class TypeKind {
+    CLASS,
+    ENUM,
+    INTERFACE;
 }

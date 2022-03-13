@@ -20,13 +20,14 @@ import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
-import io.t28.kotlinify.lang.PropertyNode
-import io.t28.kotlinify.lang.TypeNode
+import io.t28.kotlinify.lang.PropertyElement
+import io.t28.kotlinify.lang.TypeElement
+import io.t28.kotlinify.lang.hasProperties
 
 internal class ClassGenerator(packageName: String) : TypeSpecGenerator(packageName) {
-    override fun generate(node: TypeNode): TypeSpec {
+    override fun generate(node: TypeElement): TypeSpec {
         return TypeSpec.classBuilder(node.name).apply {
-            if (node.hasChildren) {
+            if (node.hasProperties()) {
                 modifiers += KModifier.DATA
             }
 
@@ -34,7 +35,7 @@ internal class ClassGenerator(packageName: String) : TypeSpecGenerator(packageNa
                 annotation.asAnnotationSpec()
             }
 
-            propertySpecs += node.children().map { property ->
+            propertySpecs += node.properties.map { property ->
                 property.asPropertySpec()
             }
 
@@ -46,8 +47,8 @@ internal class ClassGenerator(packageName: String) : TypeSpecGenerator(packageNa
         }.build()
     }
 
-    private fun PropertyNode.asPropertySpec(): PropertySpec {
-        return PropertySpec.builder(name, value.asTypeName(packageName)).apply {
+    private fun PropertyElement.asPropertySpec(): PropertySpec {
+        return PropertySpec.builder(name, type.asTypeName(packageName)).apply {
             modifiers += KModifier.PUBLIC
             mutable(isMutable)
             initializer(name)

@@ -16,22 +16,19 @@
 package io.t28.kotlinify.interceptor.kotlinx
 
 import io.t28.kotlinify.assertThat
-import io.t28.kotlinify.lang.AnnotationValue.Companion.annotation
-import io.t28.kotlinify.lang.PropertyNode
-import io.t28.kotlinify.lang.StringValue
-import io.t28.kotlinify.lang.TypeNode
-import io.t28.kotlinify.lang.TypeNode.TypeKind.CLASS
+import io.t28.kotlinify.lang.annotation
+import io.t28.kotlinify.lang.impl.PropertyElementImpl
+import io.t28.kotlinify.lang.impl.StringValue
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.junit.jupiter.api.Test
 
 internal class SerialNameInterceptorTest {
     @Test
     fun `intercept should add @SerialName`() {
         // Arrange
-        val property = PropertyNode(
-            value = StringValue(),
+        val property = PropertyElementImpl(
+            type = StringValue(),
             name = "name",
             originalName = "_name"
         )
@@ -59,8 +56,8 @@ internal class SerialNameInterceptorTest {
     @Test
     fun `intercept should not add @SerialName when type has @SerialName`() {
         // Arrange
-        val property = PropertyNode(
-            value = StringValue(),
+        val property = PropertyElementImpl(
+            type = StringValue(),
             name = "name",
             originalName = "_name",
             annotations = persistentListOf(
@@ -82,8 +79,8 @@ internal class SerialNameInterceptorTest {
     @Test
     fun `intercept should not add @SerialName when 'name' == 'originalName'`() {
         // Arrange
-        val property = PropertyNode(
-            value = StringValue(),
+        val property = PropertyElementImpl(
+            type = StringValue(),
             name = "name",
             originalName = "name"
         )

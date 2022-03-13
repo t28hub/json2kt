@@ -23,8 +23,8 @@ import io.t28.kotlinify.interceptor.jackson.JsonIgnorePropertiesInterceptor
 import io.t28.kotlinify.interceptor.jackson.JsonPropertyInterceptor
 import io.t28.kotlinify.interceptor.kotlinx.SerialNameInterceptor
 import io.t28.kotlinify.interceptor.kotlinx.SerializableInterceptor
-import io.t28.kotlinify.lang.PropertyNode
-import io.t28.kotlinify.lang.TypeNode
+import io.t28.kotlinify.lang.PropertyElement
+import io.t28.kotlinify.lang.TypeElement
 import io.t28.kotlinify.util.getFilename
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -65,7 +65,7 @@ internal class KotlinifyTest {
         val actual = Kotlinify {
             indentSize = 2
             typeInterceptors += object : TypeInterceptor {
-                override fun intercept(node: TypeNode): TypeNode {
+                override fun intercept(node: TypeElement): TypeElement {
                     return node.copy(
                         name = "My${node.name}Json"
                     )
@@ -74,7 +74,7 @@ internal class KotlinifyTest {
             typeInterceptors += SerializableInterceptor
 
             propertyInterceptors += object : PropertyInterceptor {
-                override fun intercept(node: PropertyNode): PropertyNode {
+                override fun intercept(node: PropertyElement): PropertyElement {
                     return node.copy(
                         name = "m${node.name.replaceFirstChar(Char::uppercaseChar)}"
                     )

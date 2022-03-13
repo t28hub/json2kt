@@ -17,18 +17,19 @@ package io.t28.kotlinify.interceptor.moshi
 
 import com.squareup.moshi.Json
 import io.t28.kotlinify.interceptor.PropertyInterceptor
-import io.t28.kotlinify.lang.AnnotationValue.Companion.annotation
-import io.t28.kotlinify.lang.PropertyNode
+import io.t28.kotlinify.lang.PropertyElement
+import io.t28.kotlinify.lang.annotation
+import io.t28.kotlinify.lang.hasAnnotation
 import kotlinx.collections.immutable.toImmutableList
 
 object JsonInterceptor : PropertyInterceptor {
     @Suppress("DuplicatedCode")
-    override fun intercept(node: PropertyNode): PropertyNode {
+    override fun intercept(node: PropertyElement): PropertyElement {
         if (node.hasAnnotation<Json>()) {
             return node
         }
 
-        if (node.hasSameOriginalName()) {
+        if (node.name == node.originalName) {
             return node
         }
 

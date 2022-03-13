@@ -17,17 +17,18 @@ package io.t28.kotlinify.interceptor.fastjson
 
 import com.alibaba.fastjson.annotation.JSONField
 import io.t28.kotlinify.interceptor.PropertyInterceptor
-import io.t28.kotlinify.lang.AnnotationValue.Companion.annotation
-import io.t28.kotlinify.lang.PropertyNode
+import io.t28.kotlinify.lang.PropertyElement
+import io.t28.kotlinify.lang.annotation
+import io.t28.kotlinify.lang.hasAnnotation
 import kotlinx.collections.immutable.toImmutableList
 
 object JSONFieldInterceptor : PropertyInterceptor {
-    override fun intercept(node: PropertyNode): PropertyNode {
+    override fun intercept(node: PropertyElement): PropertyElement {
         if (node.hasAnnotation<JSONField>()) {
             return node
         }
 
-        if (node.hasSameOriginalName()) {
+        if (node.name == node.originalName) {
             return node
         }
 

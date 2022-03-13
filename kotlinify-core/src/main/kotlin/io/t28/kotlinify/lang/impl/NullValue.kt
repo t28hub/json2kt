@@ -13,16 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.t28.kotlinify.lang
+package io.t28.kotlinify.lang.impl
 
+import io.t28.kotlinify.lang.PrimitiveValue
 import kotlin.reflect.KType
+import kotlin.reflect.full.createType
 
 /**
- * Represents a primitive value element.
+ * Represents a null value element.
  */
-interface PrimitiveValue : ValueElement {
-    /**
-     * The type of this value.
-     */
-    val type: KType
+internal object NullValue : PrimitiveValue {
+    override val type: KType
+        get() = Any::class.createType(nullable = true)
+
+    override val isNullable: Boolean = true
 }

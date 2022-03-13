@@ -20,33 +20,34 @@ import io.t28.kotlinify.util.Ref.Companion.ref
 import io.t28.kotlinify.util.addFirst
 import kotlinx.collections.immutable.toImmutableList
 
-typealias TypeNodeRef = Ref<TypeNode>
+typealias TypeElementRef = Ref<TypeElement>
 
 /**
  * Represents a root node.
  *
  * @param references The references of children nodes.
  */
-class RootNode internal constructor(
-    private val references: MutableList<TypeNodeRef> = mutableListOf()
-) : Node {
+class RootElement internal constructor(
+    private val references: MutableList<TypeElementRef> = mutableListOf()
+) : Element {
     override fun toString() = buildString {
-        append(RootNode::class.simpleName)
+        append(RootElement::class.simpleName)
         append("{")
         append("${children()}")
         append("}")
     }
 
-    override fun children(): Collection<TypeNode> {
-        return references.map { nodeRef ->
-            nodeRef.get()
-        }.toImmutableList()
+    /**
+     * Returns children of children elements.
+     */
+    fun children(): List<TypeElement> {
+        return references.map(TypeElementRef::get).toImmutableList()
     }
 
     /**
-     * Returns references of children nodes.
+     * Returns references of children elements.
      */
-    fun references(): List<TypeNodeRef> {
+    fun references(): List<TypeElementRef> {
         return references.toImmutableList()
     }
 
@@ -56,7 +57,7 @@ class RootNode internal constructor(
      * @param node The node to be added.
      * @return The reference of added node.
      */
-    internal fun add(node: TypeNode): TypeNodeRef {
+    internal fun add(node: TypeElement): TypeElementRef {
         val nodeRef = node.ref()
         references.addFirst(nodeRef)
         return nodeRef

@@ -15,29 +15,12 @@
  */
 package io.t28.kotlinify.lang
 
-import io.t28.kotlinify.util.firstOrElse
-
 /**
- * Represents an array value.
- *
- * @param components The components of this value.
- * @param isNullable Whether this value is nullable.
+ * Represents an array value element.
  */
-data class ArrayValue(
-    private val components: List<ValueNode> = emptyList(),
-    override val isNullable: Boolean = false
-) : ValueNode() {
-    constructor(component: ValueNode, isNullable: Boolean = false) : this(listOf(component), isNullable)
-
-    override fun toString(): String = buildString {
-        append(ArrayValue::class.simpleName)
-        append("{")
-        append("values=$components,")
-        append("isNullable=$isNullable")
-        append("}")
-    }
-
-    fun componentType(): ValueNode {
-        return components.firstOrElse(NullValue)
-    }
+interface ArrayValue : ValueElement {
+    /**
+     * The component type of this array.
+     */
+    val componentType: ValueElement
 }

@@ -15,28 +15,19 @@
  */
 package io.t28.kotlinify.lang
 
-import kotlinx.collections.immutable.toImmutableList
 import kotlin.reflect.KClass
 
-class AnnotationValue private constructor(
-    internal val type: KClass<out Annotation>,
-    internal val members: List<String>
-) {
-    override fun toString() = buildString {
-        append(AnnotationValue::class.simpleName)
-        append("{")
-        append("type=${type.simpleName},")
-        append("members=$members")
-        append("}")
-    }
+/**
+ * Represents annotation value.
+ */
+interface AnnotationValue {
+    /**
+     * The type of [Annotation].
+     */
+    val type: KClass<out Annotation>
 
-    companion object {
-        inline fun <reified T : Annotation> annotation(vararg members: String): AnnotationValue {
-            return annotation(T::class, members.toList())
-        }
-
-        fun <T : Annotation> annotation(type: KClass<T>, members: List<String>): AnnotationValue {
-            return AnnotationValue(type = type, members = members.toImmutableList())
-        }
-    }
+    /**
+     * The members of [Annotation].
+     */
+    val members: List<String>
 }

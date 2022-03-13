@@ -15,17 +15,7 @@
  */
 package io.t28.kotlinify.lang
 
-import kotlin.reflect.KType
-import kotlin.reflect.full.createType
-
 /**
- * Represents a boolean value.
- *
- * @param isNullable Whether this element is nullable.
+ * Represents an element.
  */
-data class BooleanValue(
-    override val isNullable: Boolean = false
-) : PrimitiveValue() {
-    override val type: KType
-        get() = Boolean::class.createType(nullable = isNullable)
-}
+sealed interface Element

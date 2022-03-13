@@ -15,14 +15,12 @@
  */
 package io.t28.kotlinify.lang
 
-import kotlin.reflect.KType
-
 /**
- * Represents a primitive value element.
+ * Represents a value element.
  */
-interface PrimitiveValue : ValueElement {
+sealed interface ValueElement : Element {
     /**
-     * The type of this value.
+     * Whether this element is nullable.
      */
-    val type: KType
+    val isNullable: Boolean
 }

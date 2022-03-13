@@ -13,22 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.t28.kotlinify.lang
+package io.t28.kotlinify.lang.impl
+
+import io.t28.kotlinify.lang.PrimitiveValue
+import kotlin.reflect.KType
+import kotlin.reflect.full.createType
 
 /**
- * Represents a node.
+ * Represents a string value element.
+ *
+ * @param isNullable Whether this element is nullable.
  */
-sealed interface Node {
-    /**
-     * Whether this [Node] has children.
-     */
-    val hasChildren: Boolean
-        get() = children().isNotEmpty()
-
-    /**
-     * Return a collection of the children of this [Node].
-     *
-     * @return The collection of the children nodes.
-     */
-    fun children(): Collection<Node>
+internal class StringValue(
+    override val isNullable: Boolean = false
+) : PrimitiveValue {
+    override val type: KType
+        get() = String::class.createType(nullable = isNullable)
 }

@@ -16,19 +16,21 @@
 package io.t28.kotlinify.parser
 
 import io.t28.kotlinify.lang.ArrayValue
-import io.t28.kotlinify.lang.BooleanValue
-import io.t28.kotlinify.lang.DoubleValue
-import io.t28.kotlinify.lang.IntegerValue
-import io.t28.kotlinify.lang.NullValue
+import io.t28.kotlinify.lang.impl.BooleanValue
+import io.t28.kotlinify.lang.impl.DoubleValue
+import io.t28.kotlinify.lang.impl.IntegerValue
+import io.t28.kotlinify.lang.impl.NullValue
 import io.t28.kotlinify.lang.ObjectValue
 import io.t28.kotlinify.lang.PrimitiveValue
-import io.t28.kotlinify.lang.PropertyNode
-import io.t28.kotlinify.lang.RootNode
-import io.t28.kotlinify.lang.StringValue
-import io.t28.kotlinify.lang.TypeNode
-import io.t28.kotlinify.lang.TypeNode.TypeKind.CLASS
-import io.t28.kotlinify.lang.TypeNode.TypeKind.ENUM
-import io.t28.kotlinify.lang.ValueNode
+import io.t28.kotlinify.lang.impl.PropertyElementImpl
+import io.t28.kotlinify.lang.RootElement
+import io.t28.kotlinify.lang.impl.StringValue
+import io.t28.kotlinify.lang.impl.TypeElementImpl
+import io.t28.kotlinify.lang.TypeKind.CLASS
+import io.t28.kotlinify.lang.TypeKind.ENUM
+import io.t28.kotlinify.lang.ValueElement
+import io.t28.kotlinify.lang.impl.ArrayValueImpl
+import io.t28.kotlinify.lang.impl.ObjectValueImpl
 import io.t28.kotlinify.parser.jsonschema.ArrayDefinition
 import io.t28.kotlinify.parser.jsonschema.BooleanDefinition
 import io.t28.kotlinify.parser.jsonschema.DataType.ARRAY
@@ -50,14 +52,13 @@ import kotlinx.serialization.json.Json
 
 /**
  * [Parser] implementation for JSON Schema.
- *
  */
 class JsonSchemaParser(
     private val json: Json = Json { ignoreUnknownKeys = true },
     private val typeNameStrategy: NamingStrategy,
     private val propertyNameStrategy: NamingStrategy
 ) : Parser<String> {
-    override fun parse(rootName: String, content: String): RootNode {
+    override fun parse(rootName: String, content: String): RootElement {
         val document = try {
             json.decodeFromString<Document>(content)
         } catch (e: SerializationException) {
@@ -76,10 +77,10 @@ class JsonSchemaParser(
         private val typeNameStrategy: NamingStrategy,
         private val propertyNameStrategy: NamingStrategy,
     ) : Parser<Document> {
-        private lateinit var rootNode: RootNode
+        private lateinit var rootElement: RootElement
 
-        override fun parse(rootName: String, content: Document): RootNode {
-            rootNode = RootNode()
+        override fun parse(rootName: String, content: Document): RootElement {
+            rootElement = RootElement()
             when (content.type) {
                 ARRAY -> parse(rootName, content.asArray())
                 OBJECT -> parse(rootName, content.asObject())
@@ -87,10 +88,10 @@ class JsonSchemaParser(
                     // do nothing
                 }
             }
-            return rootNode
+            return rootElement
         }
 
-        private fun parse(typeName: String, definition: Definition): ValueNode {
+        private fun parse(typeName: String, definition: Definition): ValueElement {
             return when (definition) {
                 is ArrayDefinition -> parse(typeName, definition)
                 is EnumDefinition -> parse(typeName, definition)
@@ -105,17 +106,17 @@ class JsonSchemaParser(
             val firstItem: Definition = definition.firstOrElse(NullDefinition())
             val component = parse(typeName, firstItem)
             val isNullable = definition.isEmpty() or definition.containsNull()
-            return ArrayValue(component, isNullable)
+            return ArrayValueImpl(component, isNullable)
         }
 
         private fun parse(typeName: String, definition: EnumDefinition): ObjectValue {
-            val typeNode = TypeNode(
+            val typeElement = TypeElementImpl(
                 name = typeName,
                 kind = ENUM,
                 enumConstants = definition.values
             )
-            val typeNodeRef = rootNode.add(typeNode)
-            return ObjectValue(reference = typeNodeRef)
+            val typeElementRef = rootElement.add(typeElement)
+            return ObjectValueImpl(reference = typeElementRef)
         }
 
         private fun parse(typeName: String, definition: ObjectDefinition): ObjectValue {
@@ -123,17 +124,17 @@ class JsonSchemaParser(
             val properties = definition.properties.map { (name, property) ->
                 val childTypeName = typeNameStrategy.apply(name)
                 val propertyName = propertyNameStrategy.apply(name)
-                val propertyValue = parse(childTypeName, property)
-                PropertyNode(value = propertyValue, name = propertyName, originalName = name)
+                val propertyType = parse(childTypeName, property)
+                PropertyElementImpl(type = propertyType, name = propertyName, originalName = name)
             }
 
-            val typeNode = TypeNode(
+            val typeElement = TypeElementImpl(
                 name = typeName,
                 kind = CLASS,
                 properties = properties
             )
-            val typeNodeRef = rootNode.add(typeNode)
-            return ObjectValue(reference = typeNodeRef)
+            val typeElementRef = rootElement.add(typeElement)
+            return ObjectValueImpl(reference = typeElementRef)
         }
 
         private fun parse(definition: PrimitiveDefinition): PrimitiveValue {
