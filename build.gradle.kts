@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import groovy.lang.MissingPropertyException
+import info.solidsoft.gradle.pitest.PitestPluginExtension
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 import io.gitlab.arturbosch.detekt.report.ReportMergeTask
@@ -25,6 +26,7 @@ plugins {
     alias(deps.plugins.detekt)
     alias(deps.plugins.kotlin.jvm)
     alias(deps.plugins.kotlinx.kover)
+    alias(deps.plugins.pitest)
 }
 
 /**
@@ -39,6 +41,8 @@ fun properties(key: String): String {
     val property = project.findProperty(key)
     return property?.toString() ?: throw MissingPropertyException("Property '$key' does not exist")
 }
+
+apply(plugin = "info.solidsoft.pitest.aggregator")
 
 kover {
     isDisabled = false
@@ -57,6 +61,7 @@ allprojects {
 subprojects {
     apply(plugin = "org.jetbrains.kotlin.jvm")
     apply(plugin = "io.gitlab.arturbosch.detekt")
+    apply(plugin = "info.solidsoft.pitest")
 
     tasks {
         val javaVersion = properties("java.version")
@@ -108,6 +113,18 @@ subprojects {
         buildUponDefaultConfig = true
         config = files("$rootDir/config/detekt.yml")
         source = files("src/main/kotlin", "src/test/kotlin")
+    }
+
+    configure<PitestPluginExtension> {
+        testPlugin.set("junit5")
+        junit5PluginVersion.set("0.15")
+        mutators.set(setOf("DEFAULTS"))
+        targetClasses.set(setOf("io.t28.kotlinify.*"))
+        avoidCallsTo.set(setOf("kotlin.jvm.internal"))
+
+        outputFormats.set(setOf("HTML", "XML"))
+        timestampedReports.set(false)
+        exportLineCoverage.set(false)
     }
 }
 
