@@ -16,19 +16,9 @@
 package io.t28.kotlinify.parser.naming
 
 import com.google.common.truth.Truth.assertThat
-import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.api.extension.ExtensionContext
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.Arguments
-import org.junit.jupiter.params.provider.Arguments.arguments
-import org.junit.jupiter.params.provider.ArgumentsProvider
-import org.junit.jupiter.params.provider.ArgumentsSource
-import java.util.stream.Stream
 
 internal class UniqueNameStrategyTest {
     @Test
@@ -53,47 +43,33 @@ internal class UniqueNameStrategyTest {
         }
     }
 
-    @Nested
-    @TestInstance(PER_CLASS)
-    inner class ApplyTest {
-        private val namingStrategy = UniqueNameStrategy(
-            nameStrategy = JavaNameStrategy()
-        )
+    private val namingStrategy = UniqueNameStrategy(
+        nameStrategy = JavaNameStrategy()
+    )
 
-        @ParameterizedTest(name = "should transform \"{0}\" to \"{1}\"")
-        @ArgumentsSource(UniqueNameFixtures::class)
-        fun `should return an unique name`(name: String, expected: String) {
-            // Act
-            val actual = namingStrategy.apply(name)
+    @Test
+    fun `apply should return an unique name`() {
+        // Act
+        val userA = namingStrategy.apply("user")
+        val userB = namingStrategy.apply("user")
+        val userC = namingStrategy.apply("user")
 
-            // Assert
-            assertThat(actual).isEqualTo(expected)
-        }
-
-        @Test
-        fun `should throw Exception when number of retries exceeded maxRetries`() {
-            // Arrange
-            repeat(UniqueNameStrategy.DEFAULT_MAX_RETRIES) {
-                namingStrategy.apply("user_name")
-            }
-
-            // Assert
-            assertThrows<IllegalStateException> {
-                namingStrategy.apply("user_name")
-            }
-        }
+        // Assert
+        assertThat(userA).isEqualTo("user")
+        assertThat(userB).isEqualTo("user\$")
+        assertThat(userC).isEqualTo("user\$\$")
     }
 
-    companion object {
-        private class UniqueNameFixtures : ArgumentsProvider {
-            override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> {
-                return Stream.of(
-                    arguments("foo", "foo"),
-                    arguments("foo", "foo\$"),
-                    arguments("foo", "foo\$\$"),
-                    arguments("qux", "qux"),
-                )
-            }
+    @Test
+    fun `apply should throw Exception when number of retries exceeded maxRetries`() {
+        // Arrange
+        repeat(UniqueNameStrategy.DEFAULT_MAX_RETRIES) {
+            namingStrategy.apply("user")
+        }
+
+        // Assert
+        assertThrows<IllegalStateException> {
+            namingStrategy.apply("user")
         }
     }
 }
