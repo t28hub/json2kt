@@ -30,12 +30,12 @@ import org.junit.jupiter.params.provider.ArgumentsProvider
 import org.junit.jupiter.params.provider.ArgumentsSource
 import java.util.stream.Stream
 
-internal class UniqueNamingStrategyTest {
+internal class UniqueNameStrategyTest {
     @Test
     fun `should not throw Exception with maxRetries`() {
         assertDoesNotThrow {
-            UniqueNamingStrategy(
-                namingStrategy = JavaNamingStrategy(),
+            UniqueNameStrategy(
+                nameStrategy = JavaNameStrategy(),
                 maxRetries = 4,
                 reserved = setOf("as", "is", "in")
             )
@@ -45,8 +45,8 @@ internal class UniqueNamingStrategyTest {
     @Test
     fun `should throw Exception when maxRetries is 0`() {
         assertThrows<IllegalArgumentException> {
-            UniqueNamingStrategy(
-                namingStrategy = JavaNamingStrategy(),
+            UniqueNameStrategy(
+                nameStrategy = JavaNameStrategy(),
                 maxRetries = 0,
                 reserved = setOf("as", "is", "in")
             )
@@ -56,8 +56,8 @@ internal class UniqueNamingStrategyTest {
     @Nested
     @TestInstance(PER_CLASS)
     inner class ApplyTest {
-        private val namingStrategy = UniqueNamingStrategy(
-            namingStrategy = JavaNamingStrategy()
+        private val namingStrategy = UniqueNameStrategy(
+            nameStrategy = JavaNameStrategy()
         )
 
         @ParameterizedTest(name = "should transform \"{0}\" to \"{1}\"")
@@ -73,7 +73,7 @@ internal class UniqueNamingStrategyTest {
         @Test
         fun `should throw Exception when number of retries exceeded maxRetries`() {
             // Arrange
-            repeat(UniqueNamingStrategy.DEFAULT_MAX_RETRIES) {
+            repeat(UniqueNameStrategy.DEFAULT_MAX_RETRIES) {
                 namingStrategy.apply("user_name")
             }
 

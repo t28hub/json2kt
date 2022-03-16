@@ -16,7 +16,7 @@
 package io.t28.kotlinify.parser.naming
 
 import com.google.common.truth.Truth.assertThat
-import io.t28.kotlinify.parser.naming.JavaNamingStrategy.Companion.isJavaIdentifier
+import io.t28.kotlinify.parser.naming.JavaNameStrategy.Companion.isJavaIdentifier
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -31,12 +31,12 @@ import org.junit.jupiter.params.provider.ArgumentsProvider
 import org.junit.jupiter.params.provider.ArgumentsSource
 import java.util.stream.Stream
 
-internal class JavaNamingStrategyTest {
-    private lateinit var namingStrategy: JavaNamingStrategy
+internal class JavaNameStrategyTest {
+    private lateinit var namingStrategy: JavaNameStrategy
 
     @BeforeEach
     fun setUp() {
-        namingStrategy = JavaNamingStrategy()
+        namingStrategy = JavaNameStrategy()
     }
 
     @Test
@@ -44,7 +44,7 @@ internal class JavaNamingStrategyTest {
         // Act
         assertThrows<IllegalArgumentException> {
             // Act
-            JavaNamingStrategy('@')
+            JavaNameStrategy('@')
         }
     }
 
@@ -53,7 +53,7 @@ internal class JavaNamingStrategyTest {
         // Act
         assertThrows<IllegalArgumentException> {
             // Act
-            JavaNamingStrategy('@')
+            JavaNameStrategy('@')
         }
     }
 

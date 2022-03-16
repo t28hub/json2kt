@@ -19,7 +19,7 @@ package io.t28.kotlinify.parser.naming
 /**
  * Strategy for applying naming rules for type name and property name.
  */
-interface NamingStrategy {
+interface NameStrategy {
     /**
      * Apply naming rules.
      *

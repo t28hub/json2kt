@@ -20,7 +20,7 @@ package io.t28.kotlinify.parser.naming
  *
  * @param delimiter The delimiter for joining names.
  */
-open class JavaNamingStrategy(protected val delimiter: Char = NAME_DELIMITER) : NamingStrategy {
+open class JavaNameStrategy(protected val delimiter: Char = NAME_DELIMITER) : NameStrategy {
     init {
         require(delimiter.isJavaIdentifierStart()) {
             "Delimiter '$delimiter' is invalid Java identifier"
@@ -35,10 +35,6 @@ open class JavaNamingStrategy(protected val delimiter: Char = NAME_DELIMITER) : 
         const val INITIAL_INDEX = 0
 
         const val NAME_DELIMITER = '_'
-
-        private const val NO_INDEX = -1
-
-        private const val PACKAGE_SEPARATOR = '.'
 
         /**
          * Return whether the [CharSequence] is a valid Java identifier.
@@ -56,26 +52,6 @@ open class JavaNamingStrategy(protected val delimiter: Char = NAME_DELIMITER) : 
                     Character.isJavaIdentifierPart(char)
                 }
             }
-        }
-
-        /**
-         * Return whether the [CharSequence] is a valid qualified name.
-         */
-        fun CharSequence.isQualifiedName(): Boolean {
-            var startIndex = INITIAL_INDEX
-            while (startIndex < length) {
-                var nextIndex = indexOf(PACKAGE_SEPARATOR, startIndex)
-                if (nextIndex == NO_INDEX) {
-                    nextIndex = length
-                }
-
-                val part = substring(startIndex, nextIndex)
-                if (!part.isJavaIdentifier()) {
-                    return false
-                }
-                startIndex = nextIndex + 1
-            }
-            return true
         }
 
         /**

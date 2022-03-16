@@ -30,8 +30,8 @@ import io.t28.kotlinify.lang.TypeKind.CLASS
 import io.t28.kotlinify.lang.ValueElement
 import io.t28.kotlinify.lang.impl.ArrayValueImpl
 import io.t28.kotlinify.lang.impl.ObjectValueImpl
-import io.t28.kotlinify.parser.naming.NamingStrategy
-import io.t28.kotlinify.parser.naming.UniqueNamingStrategy
+import io.t28.kotlinify.parser.naming.NameStrategy
+import io.t28.kotlinify.parser.naming.UniqueNameStrategy
 import io.t28.kotlinify.util.firstOrElse
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.serialization.SerializationException
@@ -52,8 +52,8 @@ import kotlinx.serialization.json.intOrNull
  */
 class JsonParser(
     private val json: Json = Json,
-    private val typeNameStrategy: NamingStrategy,
-    private val propertyNameStrategy: NamingStrategy
+    private val typeNameStrategy: NameStrategy,
+    private val propertyNameStrategy: NameStrategy
 ) : Parser<String> {
     override fun parse(rootName: String, content: String): RootElement {
         val element = try {
@@ -63,7 +63,7 @@ class JsonParser(
         }
 
         val internalParser = InternalParser(
-            typeNameStrategy = UniqueNamingStrategy(typeNameStrategy),
+            typeNameStrategy = UniqueNameStrategy(typeNameStrategy),
             propertyNameStrategy = propertyNameStrategy
         )
         return internalParser.parse(rootName, element)
@@ -71,8 +71,8 @@ class JsonParser(
 
     // Define [InternalParser] to prevent pollution of [JsonParser]
     internal class InternalParser(
-        private val typeNameStrategy: NamingStrategy,
-        private val propertyNameStrategy: NamingStrategy,
+        private val typeNameStrategy: NameStrategy,
+        private val propertyNameStrategy: NameStrategy,
     ) : Parser<JsonElement> {
         private lateinit var rootElement: RootElement
 
@@ -98,7 +98,7 @@ class JsonParser(
         }
 
         private fun parseAsValue(typeName: String, element: JsonObject): ObjectValue {
-            val propertyNamingStrategy = UniqueNamingStrategy(this.propertyNameStrategy)
+            val propertyNamingStrategy = UniqueNameStrategy(this.propertyNameStrategy)
             // Use reversed entries to generate classes order by defined by the JSON.
             val properties = element.entries.reversed().map { (key, child) ->
                 val childTypeName = typeNameStrategy.apply(key)

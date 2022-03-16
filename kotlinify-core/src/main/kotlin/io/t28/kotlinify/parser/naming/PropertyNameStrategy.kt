@@ -15,12 +15,23 @@
  */
 package io.t28.kotlinify.parser.naming
 
-object TypeNamingStrategy : JavaNamingStrategy() {
+/**
+ * Strategy for applying property naming rules.
+ */
+object PropertyNameStrategy : JavaNameStrategy() {
     override fun apply(name: String): String {
-        val javaName = name.toJavaIdentifier()
+        val javaName = name.toJavaIdentifier(delimiter)
         val parts = javaName.split(delimiter).filter(String::isNotEmpty)
-        val typeName = parts.joinToString("", "", "") { part ->
-            part.replaceFirstChar(Char::uppercaseChar)
+        val typeName = parts.withIndex().joinToString(separator = "") { (index, name) ->
+            if (index == INITIAL_INDEX) {
+                name.replaceFirstChar(Char::lowercaseChar)
+            } else {
+                name.replaceFirstChar(Char::uppercaseChar)
+            }
+        }
+
+        if (typeName.isEmpty()) {
+            throw IllegalArgumentException("Name '$name' contains only invalid Java identifiers")
         }
 
         return if (typeName[0].isJavaIdentifierStart()) {

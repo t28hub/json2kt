@@ -15,20 +15,20 @@
  */
 package io.t28.kotlinify.parser.naming
 
-import io.t28.kotlinify.parser.naming.JavaNamingStrategy.Companion.isJavaIdentifier
+import io.t28.kotlinify.parser.naming.JavaNameStrategy.Companion.isJavaIdentifier
 
 /**
  * Naming strategy to generate an unique name.
  *
- * @param namingStrategy The [NamingStrategy] to be used inside this class.
+ * @param nameStrategy The [NameStrategy] to be used inside this class.
  * @param maxRetries The maximum number of retries.
  * @param reserved The reserved names.
  */
-internal class UniqueNamingStrategy internal constructor(
-    private val namingStrategy: NamingStrategy,
+internal class UniqueNameStrategy internal constructor(
+    private val nameStrategy: NameStrategy,
     private val maxRetries: Int = DEFAULT_MAX_RETRIES,
     reserved: Set<String> = emptySet()
-) : NamingStrategy {
+) : NameStrategy {
     /**
      * The set of names that have been already used.
      */
@@ -41,13 +41,13 @@ internal class UniqueNamingStrategy internal constructor(
 
     override fun apply(name: String): String {
         var originalName = name
-        var candidateName = namingStrategy.apply(name)
+        var candidateName = nameStrategy.apply(name)
         repeat(maxRetries) {
             if (candidateName.isJavaIdentifier() and allocated.add(candidateName)) {
                 return candidateName
             }
             originalName += ADDITIONAL_CHARACTER
-            candidateName = namingStrategy.apply(originalName)
+            candidateName = nameStrategy.apply(originalName)
         }
         throw IllegalStateException("Could not apply for '$name' due to exceeding max retries")
     }

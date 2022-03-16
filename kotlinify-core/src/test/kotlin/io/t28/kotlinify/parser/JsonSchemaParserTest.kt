@@ -21,8 +21,8 @@ import io.t28.kotlinify.lang.impl.BooleanValue
 import io.t28.kotlinify.lang.impl.DoubleValue
 import io.t28.kotlinify.lang.impl.IntegerValue
 import io.t28.kotlinify.lang.impl.StringValue
-import io.t28.kotlinify.parser.naming.PropertyNamingStrategy
-import io.t28.kotlinify.parser.naming.TypeNamingStrategy
+import io.t28.kotlinify.parser.naming.PropertyNameStrategy
+import io.t28.kotlinify.parser.naming.TypeNameStrategy
 import org.junit.jupiter.api.Test
 
 internal class JsonSchemaParserTest {
@@ -53,8 +53,8 @@ internal class JsonSchemaParserTest {
         """.trimIndent()
         // Act
         val parser = JsonSchemaParser(
-            typeNameStrategy = TypeNamingStrategy,
-            propertyNameStrategy = PropertyNamingStrategy
+            typeNameStrategy = TypeNameStrategy,
+            propertyNameStrategy = PropertyNameStrategy
         )
         val actual = parser.parse("Example", jsonSchema)
 
@@ -93,8 +93,8 @@ internal class JsonSchemaParserTest {
 
         // Act
         val parser = JsonSchemaParser(
-            typeNameStrategy = TypeNamingStrategy,
-            propertyNameStrategy = PropertyNamingStrategy
+            typeNameStrategy = TypeNameStrategy,
+            propertyNameStrategy = PropertyNameStrategy
         )
         val actual = parser.parse("Example", jsonSchema)
 
@@ -134,8 +134,8 @@ internal class JsonSchemaParserTest {
 
         // Act
         val parser = JsonSchemaParser(
-            typeNameStrategy = TypeNamingStrategy,
-            propertyNameStrategy = PropertyNamingStrategy
+            typeNameStrategy = TypeNameStrategy,
+            propertyNameStrategy = PropertyNameStrategy
         )
         val actual = parser.parse("Example", jsonSchema)
 
