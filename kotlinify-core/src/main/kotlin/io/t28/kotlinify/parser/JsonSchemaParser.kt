@@ -44,8 +44,8 @@ import io.t28.kotlinify.parser.jsonschema.NumberDefinition
 import io.t28.kotlinify.parser.jsonschema.ObjectDefinition
 import io.t28.kotlinify.parser.jsonschema.PrimitiveDefinition
 import io.t28.kotlinify.parser.jsonschema.StringDefinition
-import io.t28.kotlinify.parser.naming.NamingStrategy
-import io.t28.kotlinify.parser.naming.UniqueNamingStrategy
+import io.t28.kotlinify.parser.naming.NameStrategy
+import io.t28.kotlinify.parser.naming.UniqueNameStrategy
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -55,8 +55,8 @@ import kotlinx.serialization.json.Json
  */
 class JsonSchemaParser(
     private val json: Json = Json { ignoreUnknownKeys = true },
-    private val typeNameStrategy: NamingStrategy,
-    private val propertyNameStrategy: NamingStrategy
+    private val typeNameStrategy: NameStrategy,
+    private val propertyNameStrategy: NameStrategy
 ) : Parser<String> {
     override fun parse(rootName: String, content: String): RootElement {
         val document = try {
@@ -66,7 +66,7 @@ class JsonSchemaParser(
         }
 
         val internalParser = InternalParser(
-            typeNameStrategy = UniqueNamingStrategy(typeNameStrategy),
+            typeNameStrategy = UniqueNameStrategy(typeNameStrategy),
             propertyNameStrategy = propertyNameStrategy
         )
         return internalParser.parse(rootName, document)
@@ -74,8 +74,8 @@ class JsonSchemaParser(
 
     // Define [InternalParser] to prevent pollution of [JsonSchemaParser]
     internal class InternalParser(
-        private val typeNameStrategy: NamingStrategy,
-        private val propertyNameStrategy: NamingStrategy,
+        private val typeNameStrategy: NameStrategy,
+        private val propertyNameStrategy: NameStrategy,
     ) : Parser<Document> {
         private lateinit var rootElement: RootElement
 
@@ -120,7 +120,7 @@ class JsonSchemaParser(
         }
 
         private fun parse(typeName: String, definition: ObjectDefinition): ObjectValue {
-            val propertyNameStrategy = UniqueNamingStrategy(this.propertyNameStrategy)
+            val propertyNameStrategy = UniqueNameStrategy(this.propertyNameStrategy)
             val properties = definition.properties.map { (name, property) ->
                 val childTypeName = typeNameStrategy.apply(name)
                 val propertyName = propertyNameStrategy.apply(name)

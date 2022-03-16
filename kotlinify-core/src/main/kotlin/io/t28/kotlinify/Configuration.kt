@@ -17,9 +17,9 @@ package io.t28.kotlinify
 
 import io.t28.kotlinify.interceptor.PropertyInterceptor
 import io.t28.kotlinify.interceptor.TypeInterceptor
-import io.t28.kotlinify.parser.naming.NamingStrategy
-import io.t28.kotlinify.parser.naming.PropertyNamingStrategy
-import io.t28.kotlinify.parser.naming.TypeNamingStrategy
+import io.t28.kotlinify.parser.naming.NameStrategy
+import io.t28.kotlinify.parser.naming.PropertyNameStrategy
+import io.t28.kotlinify.parser.naming.TypeNameStrategy
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.serialization.json.Json
 
@@ -34,8 +34,8 @@ import kotlinx.serialization.json.Json
 class Configuration internal constructor(
     val json: Json,
     val indentSize: Int,
-    val typeNameStrategy: NamingStrategy,
-    val propertyNameStrategy: NamingStrategy,
+    val typeNameStrategy: NameStrategy,
+    val propertyNameStrategy: NameStrategy,
     val typeInterceptors: List<TypeInterceptor>,
     val propertyInterceptors: List<PropertyInterceptor>
 ) {
@@ -62,9 +62,9 @@ class Configuration internal constructor(
 
         var indentSize: Int = DEFAULT_INDENT_SIZE
 
-        var typeNameStrategy: NamingStrategy = TypeNamingStrategy
+        var typeNameStrategy: NameStrategy = TypeNameStrategy
 
-        var propertyNameStrategy: NamingStrategy = PropertyNamingStrategy
+        var propertyNameStrategy: NameStrategy = PropertyNameStrategy
 
         internal fun build(): Configuration {
             return Configuration(
