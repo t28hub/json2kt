@@ -59,6 +59,7 @@ jobs:
   mutation-test:
     needs: [ check ]
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
     timeout-minutes: 15
     steps:
       - name: 🚦Checkout repository
@@ -79,7 +80,6 @@ jobs:
   build-core:
     needs: [ check ]
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
     timeout-minutes: 10
     steps:
       - name: 🚦Checkout repository
