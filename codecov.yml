@@ -1,0 +1,6 @@
+codecov:
+  require_ci_to_pass: true
+
+ignore:
+  - "kotlinify-idea-plugin/src/main/kotlin/io/t28/kotlinify/idea/ui/*"
+

@@ -81,7 +81,6 @@ class NewKotlinFileDialog(
         setCancelButtonText(message("action.new.file.dialog.button.cancel"))
 
         init()
-        initValidation()
     }
 
     override fun createCenterPanel(): JComponent {
@@ -131,7 +130,7 @@ class NewKotlinFileDialog(
             columns(COLUMNS_SHORT)
             bindText(state::name)
 
-            validationOnInput(::validateClassName)
+            validationOnApply(::validateClassName)
 
             focused()
         }
@@ -165,7 +164,6 @@ class NewKotlinFileDialog(
             resizableColumn()
 
             validationOnApply(::validateInputText)
-            validationOnInput(::validateInputText)
 
             bind(
                 componentGet = { inputText },
