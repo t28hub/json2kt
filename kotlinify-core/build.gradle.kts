@@ -17,6 +17,7 @@ import kotlinx.kover.api.KoverTaskExtension
 
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
+    alias(deps.plugins.kotlin.jvm)
     alias(deps.plugins.kotlinx.serialization)
 }
 

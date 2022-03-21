@@ -13,13 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-rootProject.name = "kotlinify"
+package io.t28.kotlinify.idea
 
-include("kotlinify-core", "kotlinify-idea-plugin")
+import com.intellij.openapi.Disposable
+import com.intellij.openapi.components.Service
+import com.intellij.openapi.components.Service.Level
+import io.sentry.Sentry
 
-// https://docs.gradle.org/current/userguide/platforms.html
-enableFeaturePreview("VERSION_CATALOGS")
-dependencyResolutionManagement {
-    defaultLibrariesExtensionName.set("deps")
+@Service(Level.APP)
+class KotlinifyService : Disposable {
+    init {
+        Sentry.init { options ->
+            options.dsn = BuildConfig.SENTRY_DSN
+            options.environment = BuildConfig.SENTRY_ENVIRONMENT
+        }
+    }
+
+    override fun dispose() {
+        Sentry.close()
+    }
 }
-enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")

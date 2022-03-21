@@ -13,13 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-rootProject.name = "kotlinify"
 
-include("kotlinify-core", "kotlinify-idea-plugin")
+package io.t28.kotlinify.idea.util
 
-// https://docs.gradle.org/current/userguide/platforms.html
-enableFeaturePreview("VERSION_CATALOGS")
-dependencyResolutionManagement {
-    defaultLibrariesExtensionName.set("deps")
+class LoggerImpl internal constructor(private val logger: com.intellij.openapi.diagnostic.Logger) : Logger {
+    override fun e(message: String, vararg args: Any?) {
+        logger.error(message.format(args))
+    }
+
+    override fun w(message: String, vararg args: Any?) {
+        logger.warn(message.format(args))
+    }
+
+    override fun i(message: String, vararg args: Any?) {
+        logger.info(message.format(args))
+    }
+
+    override fun d(message: String, vararg args: Any?) {
+        logger.debug(message.format(args))
+    }
 }
-enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")

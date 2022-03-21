@@ -13,13 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-rootProject.name = "kotlinify"
+package io.t28.kotlinify
 
-include("kotlinify-core", "kotlinify-idea-plugin")
+/**
+ * Definitions of the plugin properties.
+ */
+interface PluginProperties {
+    /**
+     * The plugin name.
+     */
+    val name: String
 
-// https://docs.gradle.org/current/userguide/platforms.html
-enableFeaturePreview("VERSION_CATALOGS")
-dependencyResolutionManagement {
-    defaultLibrariesExtensionName.set("deps")
+    /**
+     * The plugin group.
+     */
+    val group: String
+
+    /**
+     * The plugin version.
+     */
+    val version: String
 }
-enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")

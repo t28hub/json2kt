@@ -13,13 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-rootProject.name = "kotlinify"
+package io.t28.kotlinify.impl
 
-include("kotlinify-core", "kotlinify-idea-plugin")
+import io.t28.kotlinify.JavaProperties
+import io.t28.kotlinify.getPropertyAsString
+import org.gradle.api.Project
 
-// https://docs.gradle.org/current/userguide/platforms.html
-enableFeaturePreview("VERSION_CATALOGS")
-dependencyResolutionManagement {
-    defaultLibrariesExtensionName.set("deps")
+/**
+ * Implementation of [JavaProperties]].
+ *
+ * @param project The current project.
+ */
+internal class JavaPropertiesImpl(private val project: Project) : JavaProperties {
+    override val version: String by lazy {
+        project.getPropertyAsString("java.version")
+    }
 }
-enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")

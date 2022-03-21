@@ -32,6 +32,11 @@
   <depends>org.jetbrains.kotlin</depends>
 
   <extensions defaultExtensionNs="com.intellij">
+    <applicationService serviceImplementation="io.t28.kotlinify.idea.KotlinifyService" />
+    <applicationService
+      serviceInterface="io.t28.kotlinify.idea.error.ErrorReporter"
+      serviceImplementation="io.t28.kotlinify.idea.error.SentryErrorReporter"/>
+
     <notificationGroup
       id="io.t28.kotlinify.idea"
       key="notification.group"
@@ -39,6 +44,8 @@
       displayType="BALLOON"
       toolWindowId="Project"
     />
+
+    <errorHandler implementation="io.t28.kotlinify.idea.KotlinifyErrorHandler" />
   </extensions>
 
   <actions>

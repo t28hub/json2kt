@@ -13,13 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-rootProject.name = "kotlinify"
+package io.t28.kotlinify
 
-include("kotlinify-core", "kotlinify-idea-plugin")
+import groovy.lang.MissingPropertyException
+import io.t28.kotlinify.impl.PropertiesImpl
+import org.gradle.api.Project
+import kotlin.jvm.Throws
 
-// https://docs.gradle.org/current/userguide/platforms.html
-enableFeaturePreview("VERSION_CATALOGS")
-dependencyResolutionManagement {
-    defaultLibrariesExtensionName.set("deps")
+/**
+ * Definitions of the project root properties.
+ */
+interface Properties {
+    /**
+     * The Java properties.
+     */
+    val java: JavaProperties
+
+    /**
+     * The plugin properties.
+     */
+    val plugin: PluginProperties
+
+    /**
+     * The Sentry properties.
+     */
+    val sentry: SentryProperties
 }
-enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
