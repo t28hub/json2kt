@@ -77,6 +77,7 @@ class NewKotlinFileAction : AnAction(KotlinIcons.FILE) {
             selected.add(createdFile)
             logger.warn("File '$fileName' is created")
         }
+        TODO()
     }
 
     override fun update(e: AnActionEvent) {

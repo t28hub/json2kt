@@ -13,13 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-rootProject.name = "kotlinify"
+package io.t28.kotlinify
 
-include("kotlinify-core", "kotlinify-idea-plugin")
+/**
+ * Definitions of the Sentry properties.
+ */
+interface SentryProperties {
+    /**
+     * The data source name.
+     *
+     * @link https://docs.sentry.io/product/sentry-basics/dsn-explainer/
+     */
+    val dsn: String
 
-// https://docs.gradle.org/current/userguide/platforms.html
-enableFeaturePreview("VERSION_CATALOGS")
-dependencyResolutionManagement {
-    defaultLibrariesExtensionName.set("deps")
+    /**
+     * The environment.
+     *
+     * @link https://docs.sentry.io/product/sentry-basics/environments/
+     */
+    val environment: String
 }
-enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")

@@ -13,13 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-rootProject.name = "kotlinify"
+package io.t28.kotlinify.impl
 
-include("kotlinify-core", "kotlinify-idea-plugin")
+import io.t28.kotlinify.SentryProperties
+import org.gradle.api.Project
 
-// https://docs.gradle.org/current/userguide/platforms.html
-enableFeaturePreview("VERSION_CATALOGS")
-dependencyResolutionManagement {
-    defaultLibrariesExtensionName.set("deps")
+/**
+ * Implementation of [SentryProperties].
+ *
+ * @param project The current project.
+ */
+internal class SentryPropertiesImpl(private val project: Project) : SentryProperties {
+    override val dsn: String by lazy {
+        "${System.getenv()["SENTRY_DNS"]}"
+    }
+
+    override val environment: String by lazy {
+        "${System.getenv()["SENTRY_ENVIRONMENT"]}"
+    }
 }
-enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")

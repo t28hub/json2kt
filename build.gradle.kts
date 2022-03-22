@@ -13,33 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import groovy.lang.MissingPropertyException
 import info.solidsoft.gradle.pitest.PitestPluginExtension
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 import io.gitlab.arturbosch.detekt.report.ReportMergeTask
-import kotlin.jvm.Throws
+import io.t28.kotlinify.properties
 import kotlinx.kover.api.CoverageEngine.INTELLIJ
 
-@Suppress("DSL_SCOPE_VIOLATION")
+@Suppress( "UnstableApiUsage", "DSL_SCOPE_VIOLATION")
 plugins {
     alias(deps.plugins.detekt)
     alias(deps.plugins.kotlin.jvm)
     alias(deps.plugins.kotlinx.kover)
     alias(deps.plugins.pitest)
-}
-
-/**
- * Retrieve a property by key as a String
- *
- * @param key Property key.
- * @return Property value as a String.
- * @throws MissingPropertyException Property key does not exist in properties.
- */
-@Throws(MissingPropertyException::class)
-fun properties(key: String): String {
-    val property = project.findProperty(key)
-    return property?.toString() ?: throw MissingPropertyException("Property '$key' does not exist")
 }
 
 apply(plugin = "info.solidsoft.pitest.aggregator")
@@ -50,8 +36,8 @@ kover {
 }
 
 allprojects {
-    group = properties("plugin.group")
-    version = properties("plugin.version")
+    group = properties().plugin.group
+    version = properties().plugin.version
 
     repositories {
         mavenCentral()
@@ -64,7 +50,7 @@ subprojects {
     apply(plugin = "info.solidsoft.pitest")
 
     tasks {
-        val javaVersion = properties("java.version")
+        val javaVersion = properties().java.version
         compileKotlin {
             sourceCompatibility = javaVersion
             targetCompatibility = javaVersion

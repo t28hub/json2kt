@@ -13,13 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-rootProject.name = "kotlinify"
+package io.t28.kotlinify.idea.util
 
-include("kotlinify-core", "kotlinify-idea-plugin")
+interface Logger {
+    /**
+     * Log an error message with optional format args.
+     *
+     * @param message The log message.
+     * @param args The format args.
+     */
+    fun e(message: String, vararg args: Any?)
 
-// https://docs.gradle.org/current/userguide/platforms.html
-enableFeaturePreview("VERSION_CATALOGS")
-dependencyResolutionManagement {
-    defaultLibrariesExtensionName.set("deps")
+    fun w(message: String, vararg args: Any?)
+
+    fun i(message: String, vararg args: Any?)
+
+    fun d(message: String, vararg args: Any?)
 }
-enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+

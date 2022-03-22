@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-rootProject.name = "kotlinify"
-
-include("kotlinify-core", "kotlinify-idea-plugin")
-
-// https://docs.gradle.org/current/userguide/platforms.html
-enableFeaturePreview("VERSION_CATALOGS")
-dependencyResolutionManagement {
-    defaultLibrariesExtensionName.set("deps")
+plugins {
+    `kotlin-dsl`
 }
-enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+}

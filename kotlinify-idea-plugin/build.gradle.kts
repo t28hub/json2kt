@@ -13,19 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import io.t28.kotlinify.properties
 import kotlinx.kover.api.KoverTaskExtension
 
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    alias(deps.plugins.intellij)
+    alias(deps.plugins.kotlin.jvm)
     alias(deps.plugins.kotlinx.serialization)
+    alias(deps.plugins.intellij)
+    alias(deps.plugins.buildconfig)
 }
 
 dependencies {
-    implementation(project(":kotlinify-core"))
+    implementation(projects.kotlinifyCore)
     implementation(deps.kotlin.stdlib)
     implementation(deps.kotlin.reflect)
     implementation(deps.kotlinx.serialization.json)
+    implementation(deps.sentry)
 
     testImplementation(deps.junit)
     testImplementation(deps.kotlin.test)
@@ -36,10 +40,21 @@ dependencies {
 intellij {
     pluginName.set("Kotlinify")
     version.set("2021.3.2")
+    type.set("IC")
     plugins.addAll(
         "com.intellij.java",
         "org.jetbrains.kotlin"
     )
+}
+
+buildConfig {
+    packageName("io.t28.kotlinify.idea")
+
+    buildConfigField(type = "String", name = "PLUGIN_NAME", value = "\"${project.name}\"")
+    buildConfigField(type = "String", name = "PLUGIN_VERSION", value = "\"${project.version}\"")
+    buildConfigField(type = "String", name = "SENTRY_DSN", value = "\"${project.properties().sentry.dsn}\"")
+    buildConfigField(type = "String", name = "SENTRY_ENVIRONMENT", value = "\"${project.properties().sentry.environment}\"")
+    buildConfigField(type = "Double", name = "SENTRY_SAMPLE_RATE", value = "1.0")
 }
 
 tasks {

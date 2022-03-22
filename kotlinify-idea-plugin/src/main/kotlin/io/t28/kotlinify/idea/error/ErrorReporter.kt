@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-rootProject.name = "kotlinify"
+package io.t28.kotlinify.idea.error
 
-include("kotlinify-core", "kotlinify-idea-plugin")
+import com.intellij.openapi.diagnostic.IdeaLoggingEvent
 
-// https://docs.gradle.org/current/userguide/platforms.html
-enableFeaturePreview("VERSION_CATALOGS")
-dependencyResolutionManagement {
-    defaultLibrariesExtensionName.set("deps")
+interface ErrorReporter {
+    fun error(error: Throwable, message: String? = null)
+
+    fun error(event: IdeaLoggingEvent)
 }
-enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
