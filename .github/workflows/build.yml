@@ -43,7 +43,7 @@ jobs:
         if: ${{ failure() }}
 
       - name: ☂Upload coverage reports
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
           directory: ./build/reports/kover
           files: kotlinify-core.xml,kotlinify-idea-plugin.xml
