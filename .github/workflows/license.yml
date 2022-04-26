@@ -17,12 +17,12 @@ jobs:
         uses: actions/checkout@v3
 
       - name: 🔍Run FOSSA lisence scan
-        uses: fossas/fossa-action@v1.1.0
+        uses: fossas/fossa-action@v1.3.1
         with:
           api-key: ${{ secrets.FOSSA_API_KEY }}
 
       - name: 🚨Run FOSSA test
-        uses: fossas/fossa-action@v1.1.0
+        uses: fossas/fossa-action@v1.3.1
         with:
           api-key: ${{ secrets.FOSSA_API_KEY }}
           run-tests: true
